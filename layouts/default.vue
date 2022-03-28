@@ -1,6 +1,7 @@
 <template>
   <v-app>
     <app-header />
+    <app-side-bar />
     <v-main>
       <v-container>
         <Nuxt />
@@ -11,11 +12,13 @@
 
 <script>
 import AppHeader from '@/components/AppHeader.vue'
+import AppSideBar from '@/components/AppSideBar.vue'
 export default {
   name: 'DefaultLayout',
-  components: { AppHeader },
+  components: { AppHeader, AppSideBar },
   // comments: {
-  //   AppHeader
+  //   AppHeader,
+  //   AppSideBar
   // },
   data() {
     return {}
