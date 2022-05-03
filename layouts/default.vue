@@ -1,27 +1,24 @@
 <template>
-  <v-app>
-    <app-header />
-    <app-side-bar />
-    <v-main>
-      <v-container>
-        <Nuxt />
-      </v-container>
-    </v-main>
-  </v-app>
+  <v-container class="main-container">
+    <Nuxt />
+  </v-container>
 </template>
 
 <script>
-import AppHeader from '@/components/AppHeader.vue'
-import AppSideBar from '@/components/AppSideBar.vue'
 export default {
   name: 'DefaultLayout',
-  components: { AppHeader, AppSideBar },
-  // comments: {
-  //   AppHeader,
-  //   AppSideBar
-  // },
   data() {
     return {}
   },
 }
 </script>
+
+<style scoped>
+.main-container {
+  /* background-image: linear-gradient(to bottom right, #0156d2, #d20156); */
+  background-color: #f8f8ff;
+  max-width: 100%;
+  max-height: 100%;
+  margin: auto;
+}
+</style>
