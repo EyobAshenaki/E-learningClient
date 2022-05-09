@@ -107,7 +107,7 @@
         <v-col cols="12" class="solid">
           <v-card class="half-fullheight pt-0" elevation="0">
             <v-card-title primary-title class="justify-center pb-0">
-              Quiz
+              Quizzes
             </v-card-title>
             <v-list>
               <template v-for="(n, idx) in 4">
@@ -166,13 +166,13 @@ export default {
 </script>
 
 <style scoped>
-.dashed {
-  /* border: dashed black 1px; */
+/* .dashed {
+  border: dashed black 1px;
 }
 
 .solid {
-  /* border: solid black 1px; */
-}
+  border: solid black 1px;
+} */
 
 .half-fullheight {
   position: relative;

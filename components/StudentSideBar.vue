@@ -1,18 +1,22 @@
 <template>
   <v-navigation-drawer
     v-model="drawer"
-    :mini-variant.sync="mini"
+    :mini-variant="true"
     mini-variant-width="100"
     clipped
     app
     permanent
   >
-    <v-list>
-      <v-list-item v-for="item in items" :key="item.title" link>
-        <v-list-item-icon>
-          <v-btn depressed>
-            <v-icon medium>{{ item.icon }}</v-icon>
-          </v-btn>
+    <v-list class="pa-0">
+      <v-list-item
+        v-for="item in items"
+        :key="item.title"
+        link
+        class="px-0"
+        @click="goToRoute(item.title)"
+      >
+        <v-list-item-icon class="py-2">
+          <v-icon size="30">{{ item.icon }}</v-icon>
         </v-list-item-icon>
 
         <v-list-item-content>
@@ -39,7 +43,16 @@ export default {
     }
   },
   watch: {},
-  methods: {},
+  methods: {
+    goToRoute(name) {
+      if (name === 'Dashboard') {
+        console.log(this.$router)
+        this.$router.push('dashboardPage')
+      } else if (name === 'My Courses') {
+        this.$router.push('coursesPage')
+      }
+    },
+  },
 }
 </script>
 
