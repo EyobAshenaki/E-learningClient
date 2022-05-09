@@ -1,6 +1,10 @@
 <template>
   <div>
-    <h1>Landing Page</h1>
+    <v-row justify="center" align="center"> </v-row>
+    <!-- <CourseWhatYoullLearn />
+  <CourseCourseContent />
+  <CourseRequirements /> -->
+    <AdminClassesClasses />
   </div>
 </template>
 <script>
