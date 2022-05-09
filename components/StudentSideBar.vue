@@ -15,13 +15,18 @@
         class="px-0"
         @click="goToRoute(item.title)"
       >
-        <v-list-item-icon class="py-2">
-          <v-icon size="30">{{ item.icon }}</v-icon>
-        </v-list-item-icon>
+        <v-tooltip top>
+          <template #activator="{ on, attrs }">
+            <v-list-item-icon class="py-2" v-bind="attrs" v-on="on">
+              <v-icon size="30">{{ item.icon }}</v-icon>
+            </v-list-item-icon>
+          </template>
+          <span>{{ item.title }}</span>
+        </v-tooltip>
 
-        <v-list-item-content>
+        <!-- <v-list-item-content>
           <v-list-item-title>{{ item.title }}</v-list-item-title>
-        </v-list-item-content>
+        </v-list-item-content> -->
       </v-list-item>
     </v-list>
   </v-navigation-drawer>
