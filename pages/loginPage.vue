@@ -1,50 +1,11 @@
 <template>
   <v-row class="login-container">
     <v-col cols="12" sm="5" lg="4" class="section-form">
-      <h1 class="form-title">Sign in</h1>
-      <v-form ref="form" v-model="valid" lazy-validation>
-        <v-text-field
-          v-model="email"
-          class="form-textfield"
-          lable="Email"
-          type="email"
-          required
-          solo
-          :rules="emailRules"
-        >
-          <template #prepend-inner>
-            <v-icon class="form-textfield-icon"> mdi-email-outline </v-icon>
-            <v-divider vertical class="form-textfield-divider"></v-divider>
-          </template>
-        </v-text-field>
-        <v-text-field
-          v-model="password"
-          class="form-textfield"
-          lable="Password"
-          required
-          solo
-          :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-          :type="showPassword ? 'text' : 'password'"
-          :rules="passwordRules"
-          :counter="8"
-          @click:append="showPassword = !showPassword"
-        >
-          <template #prepend-inner>
-            <v-icon class="form-textfield-icon"> mdi-lock-outline </v-icon>
-            <v-divider vertical class="form-textfield-divider"></v-divider>
-          </template>
-        </v-text-field>
-        <v-btn
-          large
-          rounded
-          color="#D27D01"
-          class="form-button"
-          @click="submit"
-        >
-          login
-        </v-btn>
-        <a class="form-link" href="#">Forgot your password?</a>
-      </v-form>
+      <login-form ref="login_form" @success="onLoginSucess($event)" />
+      <v-btn large rounded color="#D27D01" class="form-button" @click="login">
+        Login
+      </v-btn>
+      <a class="form-link" href="#">Forgot your password?</a>
     </v-col>
     <v-col cols="12" sm="7" class="section-svg">
       <img class="svg" src="../assets/img/example-25.svg" alt="" />
@@ -53,39 +14,14 @@
 </template>
 
 <script>
-
 export default {
-  data: () => ({
-    valid: true,
-    password: '',
-    showPassword: false,
-    passwordRules: [
-      (v) => !!v || 'Password is required',
-      (v) => (v && v.length >= 8) || 'Name must be greater than 8 characters',
-    ],
-    email: '',
-    emailRules: [
-      (v) => !!v || 'E-mail is required',
-      (v) =>
-        /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/.test(
-          v
-        ) || 'E-mail must be valid',
-    ],
-  }),
-
   methods: {
-    submit() {
-      if (this.$refs.form.validate()) {
-        // Native form submission is not yet supported
-        this.$axios.post('/api/auth/signin', {
-          email: this.email,
-          password: this.password
-        })
-      }
+    login() {
+      this.$refs.login_form.submit();
     },
-    clear() {
-      this.$refs.form.reset()
-    },
+    onLoginSucess(data) {
+      console.log(data)
+    } 
   },
 }
 </script>
