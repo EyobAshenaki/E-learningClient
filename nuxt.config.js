@@ -1,6 +1,6 @@
 import colors from 'vuetify/es5/util/colors'
 
-export default {
+export default function () {return{
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
     titleTemplate: '%s - E-learningPlatform',
@@ -39,13 +39,16 @@ export default {
   // Modules: https://go.nuxtjs.dev/config-modules
   modules: [
     // https://go.nuxtjs.dev/axios
-    '@nuxtjs/axios',
+    '@nuxtjs/axios'
   ],
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
-  axios: {
-    // Workaround to avoid enforcing hard-coded localhost:3000: https://github.com/nuxt-community/axios-module/issues/308
-    baseURL: '/',
+ axios: {
+    proxy: true // Can be also an object with default options
+  },
+
+  proxy: {
+    '/api': { target: process.env.BASE_URL, pathRewrite: {'^/api/': '/'} }
   },
 
   // Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify
@@ -79,4 +82,5 @@ export default {
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {},
+}
 }

@@ -53,7 +53,6 @@
 </template>
 
 <script>
-import axios from 'axios'
 
 export default {
   data: () => ({
@@ -78,7 +77,7 @@ export default {
     submit() {
       if (this.$refs.form.validate()) {
         // Native form submission is not yet supported
-        axios.post('/api/submit', {
+        this.$axios.post('/api/auth/signin', {
           name: this.name,
           email: this.email,
         })
