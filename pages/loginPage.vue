@@ -96,10 +96,10 @@ export default {
 } */
 
 .login-container {
-  /* margin: auto; */
   box-sizing: border-box;
+  margin-left: 20em;
   padding: 0;
-  height: 65%;
+  height: 100vh;
   align-self: center;
 }
 
