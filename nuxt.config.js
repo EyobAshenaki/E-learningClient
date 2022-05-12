@@ -49,7 +49,8 @@ export default function () {
     },
 
     proxy: {
-      '/api': { target: process.env.BASE_URL, pathRewrite: { '^/api/': '/' } },
+      '/api': { target: process.env.BASE_URL, changeOrigin:true, pathRewrite: { '^/api/': '/' } },
+      '/graphql': {target: process.env.BASE_URL, changeOrigin:false },
     },
 
     // Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify
