@@ -378,65 +378,65 @@
 </template>
 
 <script>
-export default {
-  layout: 'courseManager',
+  export default {
+    layout: 'courseManager',
 
-  data() {
-    return {
-      user: null,
-      courses: [],
-      teachers: [],
-      departments: [],
-      newCourse: {
-        code: '',
-        name: '',
-        description: '',
-        overview: '',
-        creditHour: '',
-        department: '',
-      },
-      defaultCourse: {
-        code: '',
-        name: '',
-        description: '',
-        overview: '',
-        creditHour: '',
-        department: '',
-      },
-      createCourseDialog: false,
-      courseDialogDelete: false,
-      tooltipValue: '',
-      showTooltip: false,
-      tooltipPositionX: null,
-      tooltipPositionY: null,
-      unassignedTeachers: [],
-      teacherTypes: [],
-      selectedTeacher: '',
-      selectedTeacherType: '',
-      selectedCourseId: null,
-      assignTeacherDialog: false,
-    }
-  },
-
-  computed: {
-    tooltipText() {
-      if (this.tooltipValue === 'assign') return 'Assign Teacher'
-      else if (this.tooltipValue === 'edit') return 'Edit Course'
-      else if (this.tooltipValue === 'delete') return 'Delete Course'
-      else return null
+    data() {
+      return {
+        user: null,
+        courses: [],
+        teachers: [],
+        departments: [],
+        newCourse: {
+          code: '',
+          name: '',
+          description: '',
+          overview: '',
+          creditHour: '',
+          department: '',
+        },
+        defaultCourse: {
+          code: '',
+          name: '',
+          description: '',
+          overview: '',
+          creditHour: '',
+          department: '',
+        },
+        createCourseDialog: false,
+        courseDialogDelete: false,
+        tooltipValue: '',
+        showTooltip: false,
+        tooltipPositionX: null,
+        tooltipPositionY: null,
+        unassignedTeachers: [],
+        teacherTypes: [],
+        selectedTeacher: '',
+        selectedTeacherType: '',
+        selectedCourseId: null,
+        assignTeacherDialog: false,
+      }
     },
-  },
 
-  created() {
-    this.initializeUser()
-    this.initializeCourses()
-    this.initializeTeachers()
-    this.initializeDepartments()
-  },
+    computed: {
+      tooltipText() {
+        if (this.tooltipValue === 'assign') return 'Assign Teacher'
+        else if (this.tooltipValue === 'edit') return 'Edit Course'
+        else if (this.tooltipValue === 'delete') return 'Delete Course'
+        else return null
+      },
+    },
 
-  methods: {
-    async initializeUser() {
-      const query = `query user ($id: ID!) {
+    created() {
+      this.initializeUser()
+      this.initializeCourses()
+      this.initializeTeachers()
+      this.initializeDepartments()
+    },
+
+    methods: {
+      async initializeUser() {
+        const query = `query user ($id: ID!) {
                       user (id: $id) {
                         id
                         firstName
@@ -445,20 +445,20 @@ export default {
                       }
                     }`
 
-      const variables = {
-        id: this.$nuxt.context.params.id,
-      }
+        const variables = {
+          id: this.$nuxt.context.params.id,
+        }
 
-      const userResponse = await this.$axios.post('/graphql', {
-        query,
-        variables,
-      })
+        const userResponse = await this.$axios.post('/graphql', {
+          query,
+          variables,
+        })
 
-      this.user = userResponse.data.data.user
-    },
+        this.user = userResponse.data.data.user
+      },
 
-    async initializeCourses() {
-      const query = `query courses {
+      async initializeCourses() {
+        const query = `query courses {
                       courses {
                         id
                         name
@@ -474,43 +474,43 @@ export default {
                       }
                     }`
 
-      const response = await this.$axios.post('/graphql', {
-        query,
-      })
+        const response = await this.$axios.post('/graphql', {
+          query,
+        })
 
-      this.courses = [...response.data.data.courses]
-    },
+        this.courses = [...response.data.data.courses]
+      },
 
-    async initializeTeachers() {
-      this.teachers = JSON.parse(JSON.stringify(await this.getTeachers()))
-    },
+      async initializeTeachers() {
+        this.teachers = JSON.parse(JSON.stringify(await this.getTeachers()))
+      },
 
-    async getTeachers() {
-      const roles = ['Teacher', 'Course Owner', 'Course Teacher']
-      const teachers = []
+      async getTeachers() {
+        const roles = ['Teacher', 'Course Owner', 'Course Teacher']
+        const teachers = []
 
-      for (const role of roles) {
-        const users = await this.getUsersWithRole(role)
+        for (const role of roles) {
+          const users = await this.getUsersWithRole(role)
 
-        if (users === null) break
+          if (users === null) break
 
-        let duplicateFlag = false
-        for (const user of users) {
-          for (const teacher of teachers) {
-            if (user.id === teacher.id) {
-              duplicateFlag = true
-              break
+          let duplicateFlag = false
+          for (const user of users) {
+            for (const teacher of teachers) {
+              if (user.id === teacher.id) {
+                duplicateFlag = true
+                break
+              }
             }
+            if (!duplicateFlag) teachers.push(user)
           }
-          if (!duplicateFlag) teachers.push(user)
         }
-      }
 
-      return teachers
-    },
+        return teachers
+      },
 
-    async getUsersWithRole(role) {
-      const query = `query users($filter: UserFilter) {
+      async getUsersWithRole(role) {
+        const query = `query users($filter: UserFilter) {
                       users(filter: $filter) {
                         id
                         firstName
@@ -528,147 +528,147 @@ export default {
                       }
                     }`
 
-      const variables = {
-        filter: {
-          roleName: this.getRoleName(role),
-        },
-      }
+        const variables = {
+          filter: {
+            roleName: this.getRoleName(role),
+          },
+        }
 
-      const userResponse = await this.$axios.post('/graphql', {
-        query,
-        variables,
-      })
+        const userResponse = await this.$axios.post('/graphql', {
+          query,
+          variables,
+        })
 
-      return userResponse.data.data.users
-    },
+        return userResponse.data.data.users
+      },
 
-    async initializeDepartments() {
-      const query = `query departments {
+      async initializeDepartments() {
+        const query = `query departments {
                       departments {
                         id
                         name
                       }
                     }`
 
-      const departmentsResponse = await this.$axios.post('/graphql', {
-        query,
-      })
+        const departmentsResponse = await this.$axios.post('/graphql', {
+          query,
+        })
 
-      this.departments = departmentsResponse.data.data.departments
-    },
+        this.departments = departmentsResponse.data.data.departments
+      },
 
-    getRoleName(role) {
-      const tempRole = role.split(' ')
-      return tempRole.length > 1
-        ? `${tempRole[0].toUpperCase()}_${tempRole[1].toUpperCase()}`
-        : `${tempRole[0].toUpperCase()}`
-    },
+      getRoleName(role) {
+        const tempRole = role.split(' ')
+        return tempRole.length > 1
+          ? `${tempRole[0].toUpperCase()}_${tempRole[1].toUpperCase()}`
+          : `${tempRole[0].toUpperCase()}`
+      },
 
-    goToTeachersPage() {
-      this.$router.push({
-        name: 'courseManager-id-teachers',
-      })
-    },
+      goToTeachersPage() {
+        this.$router.push({
+          name: 'courseManager-id-teachers',
+        })
+      },
 
-    // Tooltip functions
+      // Tooltip functions
 
-    assignEnter(event) {
-      this.tooltipPositionX = event.clientX
-      this.tooltipPositionY = event.clientY - 20
-      this.tooltipValue = 'assign'
-      this.showTooltip = true
-    },
-    editEnter(event) {
-      this.tooltipPositionX = event.clientX
-      this.tooltipPositionY = event.clientY - 20
-      this.tooltipValue = 'edit'
-      this.showTooltip = true
-    },
-    deleteEnter(event) {
-      this.tooltipPositionX = event.clientX
-      this.tooltipPositionY = event.clientY - 20
-      this.tooltipValue = 'delete'
-      this.showTooltip = true
-    },
+      assignEnter(event) {
+        this.tooltipPositionX = event.clientX
+        this.tooltipPositionY = event.clientY - 20
+        this.tooltipValue = 'assign'
+        this.showTooltip = true
+      },
+      editEnter(event) {
+        this.tooltipPositionX = event.clientX
+        this.tooltipPositionY = event.clientY - 20
+        this.tooltipValue = 'edit'
+        this.showTooltip = true
+      },
+      deleteEnter(event) {
+        this.tooltipPositionX = event.clientX
+        this.tooltipPositionY = event.clientY - 20
+        this.tooltipValue = 'delete'
+        this.showTooltip = true
+      },
 
-    leaveBtn() {
-      this.showTooltip = false
-    },
+      leaveBtn() {
+        this.showTooltip = false
+      },
 
-    // Course CRUD functions
+      // Course CRUD functions
 
-    createCourse() {
-      this.createCourseDialog = true
-    },
+      createCourse() {
+        this.createCourseDialog = true
+      },
 
-    async assignCourseTeacher(courseId) {
-      this.assignTeacherDialog = true
+      async assignCourseTeacher(courseId) {
+        this.assignTeacherDialog = true
 
-      this.teacherTypes = ['Course Owner', 'Course Teacher']
-      this.selectedCourseId = courseId
+        this.teacherTypes = ['Course Owner', 'Course Teacher']
+        this.selectedCourseId = courseId
 
-      this.unassignedTeachers = await this.getTeachers()
-      this.unassignedTeachers = this.unassignedTeachers.map(
-        (unassignedTeacher) => {
-          return {
-            unassignedTeacherFullName: `${unassignedTeacher.firstName} ${unassignedTeacher.middleName} ${unassignedTeacher.lastName}`,
-            unassignedTeacher,
+        this.unassignedTeachers = await this.getTeachers()
+        this.unassignedTeachers = this.unassignedTeachers.map(
+          (unassignedTeacher) => {
+            return {
+              unassignedTeacherFullName: `${unassignedTeacher.firstName} ${unassignedTeacher.middleName} ${unassignedTeacher.lastName}`,
+              unassignedTeacher,
+            }
           }
-        }
-      )
-    },
+        )
+      },
 
-    goToCourseEdit(courseId) {
-      this.$router.push({
-        name: 'courseManager-id-courseEdit-courseId',
-        params: { courseId, userId: this.$nuxt.context.params.id },
-      })
-    },
+      goToCourseEdit(courseId) {
+        this.$router.push({
+          name: 'courseManager-id-courseEdit-courseId',
+          params: { courseId, userId: this.$nuxt.context.params.id },
+        })
+      },
 
-    deleteCourse(course) {
-      this.newCourse = Object.assign({}, course)
-      this.courseDialogDelete = true
-    },
+      deleteCourse(course) {
+        this.newCourse = Object.assign({}, course)
+        this.courseDialogDelete = true
+      },
 
-    async deleteCourseConfirm() {
-      const query = `mutation removeCourse($id: ID!) {
+      async deleteCourseConfirm() {
+        const query = `mutation removeCourse($id: ID!) {
                       removeCourse(id: $id)
                     }`
-      const variables = {
-        id: this.newCourse.id,
-      }
+        const variables = {
+          id: this.newCourse.id,
+        }
 
-      const removeCourseResponse = await this.$axios.post('/graphql', {
-        query,
-        variables,
-      })
+        const removeCourseResponse = await this.$axios.post('/graphql', {
+          query,
+          variables,
+        })
 
-      const isCourseRemoved = removeCourseResponse.data.data.removeCourse
+        const isCourseRemoved = removeCourseResponse.data.data.removeCourse
 
-      this.deleteCourseClose(isCourseRemoved)
-    },
+        this.deleteCourseClose(isCourseRemoved)
+      },
 
-    deleteCourseClose(isCourseRemoved) {
-      this.courseDialogDelete = false
-      this.$nextTick(() => {
-        this.newCourse = Object.assign({}, this.defaultCourse)
-        if (isCourseRemoved) this.initializeCourses()
-      })
-    },
+      deleteCourseClose(isCourseRemoved) {
+        this.courseDialogDelete = false
+        this.$nextTick(() => {
+          this.newCourse = Object.assign({}, this.defaultCourse)
+          if (isCourseRemoved) this.initializeCourses()
+        })
+      },
 
-    saveCourseClose() {
-      this.createCourseDialog = false
-      this.$nextTick(() => {
-        this.newCourse = Object.assign({}, this.defaultCourse)
-      })
-    },
+      saveCourseClose() {
+        this.createCourseDialog = false
+        this.$nextTick(() => {
+          this.newCourse = Object.assign({}, this.defaultCourse)
+        })
+      },
 
-    assignCourseTeacherClose() {
-      this.assignTeacherDialog = false
-    },
+      assignCourseTeacherClose() {
+        this.assignTeacherDialog = false
+      },
 
-    async saveCourse() {
-      const query = `mutation createCourse(
+      async saveCourse() {
+        const query = `mutation createCourse(
                       $code: String!
                       $name: String!
                       $description: String!
@@ -690,46 +690,46 @@ export default {
                       }
                     }`
 
-      const variables = {
-        code: this.newCourse.code,
-        name: this.newCourse.name,
-        description: this.newCourse.description,
-        overview: this.newCourse.overview,
-        creditHour: parseInt(this.newCourse.creditHour),
-        departmentId: this.newCourse.department.id,
-      }
+        const variables = {
+          code: this.newCourse.code,
+          name: this.newCourse.name,
+          description: this.newCourse.description,
+          overview: this.newCourse.overview,
+          creditHour: parseInt(this.newCourse.creditHour),
+          departmentId: this.newCourse.department.id,
+        }
 
-      await this.$axios.post('/graphql', {
-        query,
-        variables,
-      })
+        await this.$axios.post('/graphql', {
+          query,
+          variables,
+        })
 
-      this.$nextTick(() => {
-        this.initializeCourses()
-      })
+        this.$nextTick(() => {
+          this.initializeCourses()
+        })
 
-      this.saveCourseClose()
-    },
+        this.saveCourseClose()
+      },
 
-    async assignCourseTeacherConfirm() {
-      const query = `mutation assignUserToCourse ($courseId: ID! $userId: ID!) {
+      async assignCourseTeacherConfirm() {
+        const query = `mutation assignUserToCourse ($courseId: ID! $userId: ID!) {
                         assignUserToCourse (courseId: $courseId userId: $userId)
                       }`
-      const variables = {
-        userId: this.selectedTeacher.id,
-        courseId: this.selectedCourseId,
-      }
+        const variables = {
+          userId: this.selectedTeacher.id,
+          courseId: this.selectedCourseId,
+        }
 
-      const assignUserResponse = await this.$axios.post('/graphql', {
-        query,
-        variables,
-      })
+        const assignUserResponse = await this.$axios.post('/graphql', {
+          query,
+          variables,
+        })
 
-      const assignedRole = this.getRoleName(this.selectedTeacherType)
+        const assignedRole = this.getRoleName(this.selectedTeacherType)
 
-      if (assignUserResponse.data.data.assignUserToCourse === true) {
-        // Change role to selectedTeacherType using Update user
-        const changeUserRoleQuery = `mutation updateUser ($id: ID! $roleName: RoleName) {
+        if (assignUserResponse.data.data.assignUserToCourse === true) {
+          // Change role to selectedTeacherType using Update user
+          const changeUserRoleQuery = `mutation updateUser ($id: ID! $roleName: RoleName) {
                                       updateUser (updateUserInput: {id: $id roleName: $roleName}) {
                                         id
                                         roles {
@@ -738,21 +738,21 @@ export default {
                                         }
                                       }
                                     }`
-        const changeUserRoleVariables = {
-          id: this.selectedTeacher.id,
-          roleName: assignedRole,
+          const changeUserRoleVariables = {
+            id: this.selectedTeacher.id,
+            roleName: assignedRole,
+          }
+
+          await this.$axios.post('/graphql', {
+            query: changeUserRoleQuery,
+            variables: changeUserRoleVariables,
+          })
         }
 
-        await this.$axios.post('/graphql', {
-          query: changeUserRoleQuery,
-          variables: changeUserRoleVariables,
-        })
-      }
-
-      this.initializeCourses()
-      this.initializeTeachers()
-      this.assignCourseTeacherClose()
+        this.initializeCourses()
+        this.initializeTeachers()
+        this.assignCourseTeacherClose()
+      },
     },
-  },
-}
+  }
 </script>

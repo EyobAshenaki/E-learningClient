@@ -1,3 +1,3 @@
 <template>
-  <v-row> course owner page </v-row>
+  <div>Course Owner page</div>
 </template>

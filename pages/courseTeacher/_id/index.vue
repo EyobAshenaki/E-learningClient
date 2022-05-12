@@ -1,3 +1,3 @@
 <template>
-  <v-row> course teacher page </v-row>
+  <div>Course Teacher page</div>
 </template>

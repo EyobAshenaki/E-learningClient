@@ -286,38 +286,38 @@
 </template>
 
 <script>
-export default {
-  layout: 'departmentAdmin',
+  export default {
+    layout: 'departmentAdmin',
 
-  data() {
-    return {
-      updateDom: false,
-      user: null,
-      department: null,
-      classesByYear: null,
-      totalStudents: null,
-      classes: [],
-      unassignedCourses: [],
-      assignedCourses: [],
-    }
-  },
+    data() {
+      return {
+        updateDom: false,
+        user: null,
+        department: null,
+        classesByYear: null,
+        totalStudents: null,
+        classes: [],
+        unassignedCourses: [],
+        assignedCourses: [],
+      }
+    },
 
-  async created() {
-    await this.initializeUser()
-    await this.initializeDepartment()
-  },
-
-  async beforeUpdate() {
-    if (this.updateDom) {
+    async created() {
+      await this.initializeUser()
       await this.initializeDepartment()
-      this.classesByYear = this.organizeClassesByYear(this.department.classes)
-      this.updateDom = false
-    }
-  },
+    },
 
-  methods: {
-    async initializeUser() {
-      const query = `query user ($id: ID!) {
+    async beforeUpdate() {
+      if (this.updateDom) {
+        await this.initializeDepartment()
+        this.classesByYear = this.organizeClassesByYear(this.department.classes)
+        this.updateDom = false
+      }
+    },
+
+    methods: {
+      async initializeUser() {
+        const query = `query user ($id: ID!) {
                       user (id: $id) {
                         id
                         firstName
@@ -329,20 +329,20 @@ export default {
                       }
                     }`
 
-      const variables = {
-        id: this.$nuxt.context.params.id,
-      }
+        const variables = {
+          id: this.$nuxt.context.params.id,
+        }
 
-      const userResponse = await this.$axios.post('/graphql', {
-        query,
-        variables,
-      })
-      this.user = userResponse.data.data.user
-    },
+        const userResponse = await this.$axios.post('/graphql', {
+          query,
+          variables,
+        })
+        this.user = userResponse.data.data.user
+      },
 
-    async initializeDepartment() {
-      this.updateDom = true
-      const query = `query department($id: ID!) {
+      async initializeDepartment() {
+        this.updateDom = true
+        const query = `query department($id: ID!) {
                       department(id: $id) {
                         name
                         ownedCourses {
@@ -368,90 +368,90 @@ export default {
                       }
                     }`
 
-      const variables = {
-        id: this.user.department.id,
-      }
-
-      const departmentResponse = await this.$axios.post('/graphql', {
-        query,
-        variables,
-      })
-
-      this.department = departmentResponse.data.data.department
-    },
-
-    organizeClassesByYear(classes) {
-      const classesByYear = classes.reduce((acc, cur) => {
-        if (!acc[cur.year]) acc[cur.year] = []
-
-        acc[cur.year].push(cur)
-
-        return acc
-      }, {})
-
-      for (const classes in classesByYear) {
-        for (const clss of classesByYear[classes]) {
-          if (!this.totalStudents) this.totalStudents = {}
-
-          if (!this.totalStudents[classes]) this.totalStudents[classes] = 0
-
-          this.totalStudents[classes] += clss.students.length
+        const variables = {
+          id: this.user.department.id,
         }
-      }
 
-      return classesByYear
-    },
+        const departmentResponse = await this.$axios.post('/graphql', {
+          query,
+          variables,
+        })
 
-    organizeClassCourses(year) {
-      this.unassignedCourses = []
-      this.assignedCourses = []
+        this.department = departmentResponse.data.data.department
+      },
 
-      for (const section of year) {
-        for (const attendingCourse of section.attendingCourses) {
+      organizeClassesByYear(classes) {
+        const classesByYear = classes.reduce((acc, cur) => {
+          if (!acc[cur.year]) acc[cur.year] = []
+
+          acc[cur.year].push(cur)
+
+          return acc
+        }, {})
+
+        for (const classes in classesByYear) {
+          for (const clss of classesByYear[classes]) {
+            if (!this.totalStudents) this.totalStudents = {}
+
+            if (!this.totalStudents[classes]) this.totalStudents[classes] = 0
+
+            this.totalStudents[classes] += clss.students.length
+          }
+        }
+
+        return classesByYear
+      },
+
+      organizeClassCourses(year) {
+        this.unassignedCourses = []
+        this.assignedCourses = []
+
+        for (const section of year) {
+          for (const attendingCourse of section.attendingCourses) {
+            let existsFlag = false
+            for (const course of this.assignedCourses) {
+              if (course.id === attendingCourse.id) {
+                existsFlag = true
+                break
+              }
+            }
+            if (!existsFlag) this.assignedCourses.push(attendingCourse)
+          }
+        }
+
+        for (const course of this.department.ownedCourses) {
           let existsFlag = false
-          for (const course of this.assignedCourses) {
-            if (course.id === attendingCourse.id) {
+          for (const assignedCourse of this.assignedCourses) {
+            if (assignedCourse.id === course.id) {
               existsFlag = true
               break
             }
           }
-          if (!existsFlag) this.assignedCourses.push(attendingCourse)
+          if (!existsFlag) this.unassignedCourses.push(course)
         }
-      }
+      },
 
-      for (const course of this.department.ownedCourses) {
-        let existsFlag = false
-        for (const assignedCourse of this.assignedCourses) {
-          if (assignedCourse.id === course.id) {
-            existsFlag = true
-            break
-          }
-        }
-        if (!existsFlag) this.unassignedCourses.push(course)
-      }
-    },
+      getPostfix(idx) {
+        if (idx === '1') return 'st'
+        else if (idx === '2') return 'nd'
+        else if (idx === '3') return 'rd'
+        else return 'th'
+      },
 
-    getPostfix(idx) {
-      if (idx === '1') return 'st'
-      else if (idx === '2') return 'nd'
-      else if (idx === '3') return 'rd'
-      else return 'th'
-    },
+      getTotalStudents(year) {
+        return this.totalStudents[year]
+      },
 
-    getTotalStudents(year) {
-      return this.totalStudents[year]
-    },
+      goToCoursesPage() {
+        console.log('Classes Page')
+      },
 
-    goToCoursesPage() {
-      console.log('Classes Page')
+      goToSectionPage(sectionId) {
+        this.$router.push({
+          name: 'departmentAdministrator-id-section-sectionId',
+          params: { id: this.$nuxt.context.params.id, sectionId },
+        })
+      },
     },
-
-    goToSectionPage(sectionId) {
-      this.$router.push({
-        name: 'departmentAdministrator-id-section-sectionId',
-        params: { id: this.$nuxt.context.params.id, sectionId },
-      })
-    },
-  },
-}
+  }
 </script>
