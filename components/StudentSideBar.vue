@@ -13,7 +13,7 @@
         :key="item.title"
         link
         class="px-0"
-        @click="goToRoute(item.title)"
+        @click="changePage(item.title)"
       >
         <v-tooltip top>
           <template #activator="{ on, attrs }">
@@ -49,12 +49,17 @@ export default {
   },
   watch: {},
   methods: {
-    goToRoute(name) {
+    changePage(name) {
       if (name === 'Dashboard') {
-        console.log(this.$router)
-        this.$router.push('dashboardPage')
+        this.$router.push({ name: 'student-id', params: { id: 1 } })
       } else if (name === 'My Courses') {
-        this.$router.push('coursesPage')
+        this.$router.push({ name: 'student-id-courses', params: { id: 1 } })
+      } else if (name === 'Assignments') {
+        this.$router.push({ name: 'student-id-assignments', params: { id: 1 } })
+      } else if (name === 'Quizzes') {
+        this.$router.push({ name: 'student-id-quizzes', params: { id: 1 } })
+      } else if (name === 'Calendar') {
+        this.$router.push({ name: 'student-id-calendar', params: { id: 1 } })
       }
     },
   },
