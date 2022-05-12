@@ -17,11 +17,14 @@
 export default {
   methods: {
     login() {
-      this.$refs.login_form.submit();
+      this.$refs.login_form.submit()
     },
-    onLoginSucess(data) {
-      console.log(data)
-    } 
+    onLoginSucess({ data }) {
+      const roles = data.roles.map((role) => role.toLowerCase())
+      const id = data.id
+
+      this.$router.push({ path: `${roles[0]}/${id}` })
+    },
   },
 }
 </script>
@@ -52,7 +55,7 @@ export default {
 }
 
 .section-form {
-  /* background-color: #fff; */
+  /* background-color: #000; */
   display: flex;
   flex-direction: column;
   justify-content: center;

@@ -59,14 +59,20 @@ export default {
     }
   },
   methods: {
-    async submit() {
+    submit() {
       if (this.$refs.form.validate()) {
         // Native form submission is not yet supported
-        const {data} = await this.$axios.post('/api/auth/signin', {
-          email: this.email,
-          password: this.password,
-        })
-        this.$emit('success', data)
+        this.$axios
+          .post('/api/auth/signin', {
+            email: this.email,
+            password: this.password,
+          })
+          .then((result) => {
+            this.$emit('success', result)
+          })
+          .catch((err) => {
+            console.log(err)
+          })
       }
     },
     clear() {
