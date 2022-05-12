@@ -78,8 +78,8 @@ export default {
       if (this.$refs.form.validate()) {
         // Native form submission is not yet supported
         this.$axios.post('/api/auth/signin', {
-          name: this.name,
           email: this.email,
+          password: this.password
         })
       }
     },
