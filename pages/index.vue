@@ -5,6 +5,7 @@
   <CourseCourseContent />
   <CourseRequirements /> -->
   <AdminClassesClasses />
+  <TrialTrialTrial />
   </div>
 </template>
 
