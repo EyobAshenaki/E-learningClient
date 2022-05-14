@@ -4,7 +4,8 @@
     <!-- <CourseWhatYoullLearn />
   <CourseCourseContent />
   <CourseRequirements /> -->
-    <AdminClassesClasses />
+  <AdminClassesClasses />
+  <TrialTrialTrial />
   </div>
 </template>
 <script>

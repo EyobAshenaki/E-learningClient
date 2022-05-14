@@ -4,16 +4,16 @@
   <v-data-table
     dense
     :headers="headers"
-    :items="classes"
+    :items="students"
     :search="search"
-    sort-by="className"
+    sort-by="studentId"
     class="elevation-1 mt-5"
   >
     <template v-slot:top>
       <v-toolbar
         flat
       >
-        <v-toolbar-title>All Classes</v-toolbar-title>
+        <v-toolbar-title>Students</v-toolbar-title>
         <v-divider
           class="mx-4"
           inset
@@ -41,7 +41,7 @@
               v-bind="attrs"
               v-on="on"
             >
-              Add New Class
+              Add New Student
             </v-btn>
           </template>
           <v-card>
@@ -69,8 +69,8 @@
                     md="4"
                   >
                     <v-text-field
-                      v-model="editedItem.className"
-                      label="Class Name"
+                      v-model="editedItem.studentId"
+                      label="Student ID"
                       type="text"
                     ></v-text-field>
                   </v-col>
@@ -80,8 +80,41 @@
                     md="4"
                   >
                     <v-text-field
-                      v-model="editedItem.year"
-                      label="Year"
+                      v-model="editedItem.fullName"
+                      label="Full Name"
+                      type="text"
+                    ></v-text-field>
+                  </v-col>
+                  <v-col
+                    cols="12"
+                    sm="6"
+                    md="4"
+                  >
+                    <v-text-field
+                      v-model="editedItem.email"
+                      label="E-mail"
+                      type="email"
+                    ></v-text-field>
+                  </v-col>
+                  <v-col
+                    cols="12"
+                    sm="6"
+                    md="4"
+                  >
+                    <v-text-field
+                      v-model="editedItem.department"
+                      label="Department"
+                      type="text"
+                    ></v-text-field>
+                  </v-col>
+                  <v-col
+                    cols="12"
+                    sm="6"
+                    md="4"
+                  >
+                    <v-text-field
+                      v-model="editedItem.batch"
+                      label="Batch"
                       type="number"
                     ></v-text-field>
                   </v-col>
@@ -91,19 +124,9 @@
                     md="4"
                   >
                     <v-text-field
-                      v-model="editedItem.room"
-                      label="Room"
+                      v-model="editedItem.class"
+                      label="Class"
                       type="text"
-                    ></v-text-field>
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    sm="6"
-                    md="4"
-                  >
-                    <v-text-field
-                      v-model="editedItem.protein"
-                      label="Protein (g)"
                     ></v-text-field>
                   </v-col>
                 </v-row>
@@ -156,12 +179,6 @@
       >
         mdi-delete
       </v-icon>
-      <!-- <v-icon
-        small
-        @click="deleteItem(item)"
-      >
-        mdi-account-group
-      </v-icon> -->
     </template>
     <template v-slot:no-data>
       <v-btn
@@ -176,10 +193,10 @@
 </template>
 
 <script>
+
   export default {
     data: () => ({
         search: '',
-        studentToggle: false,
       dialog: false,
       dialogDelete: false,
       headers: [
@@ -189,27 +206,33 @@
           sortable: false,
           value: 'id',
         },
-        { text: 'Class Name', value: 'className' },
-        { text: 'Year', value: 'year' },
-        { text: 'Room', value: 'room' },
-        { text: 'Protein (g)', value: 'protein' },
+        { text: 'Student ID', value: 'studentId' },
+        { text: 'Full Name', value: 'fullName' },
+        { text: 'E-mail', value: 'email' },
+        { text: 'Department', value: 'department' },
+        { text: 'Batch', value: 'batch' },
+        { text: 'Class', value: 'class' },
         { text: 'Actions', value: 'actions', sortable: false },
       ],
-      classes: [],
+      students: [],
       editedIndex: -1,
       editedItem: {
         id: 0,
-        className: '',
-        year: 0,
-        room: '',
-        protein: 0,
+        studentId: '',
+        fullName: '',
+        email: '',
+        department: '',
+        batch: 0,
+        class: '',
       },
       defaultItem: {
         id: 0,
-        className: '',
-        year: 0,
-        room: '',
-        protein: 0,
+        studentId: '',
+        fullName: '',
+        email: '',
+        department: '',
+        batch: 0,
+        class: '',
       },
     }),
 
@@ -234,60 +257,69 @@
 
     methods: {
       initialize () {
-        this.classes = [
+        this.students = [
           {
             id: 1,
-            className: 'A',
-            year: 5,
-            room: '24',
-            protein: 4.0,
+            studentId: 'ETS0000/11',
+            fullName: 'John Doe Smith',
+            email: 'johndoe@gmail.com',
+            department: 'Software Engineering',
+            batch: 3,
+            class: "A",
           },
           {
             id: 2,
-            className: 'B',
-            year: 4,
-            room: 37,
-            protein: 4.3,
+            studentId: 'ETS0000/11',
+            fullName: 'John Doe Smith',
+            email: 'johndoe@gmail.com',
+            department: 'Software Engineering',
+            batch: 3,
+            class: "A",
           },
           {
             id: 3,
-            className: 'C',
-            year: 1,
-            room: '23',
-            protein: 6.0,
+            studentId: 'ETS0000/11',
+            fullName: 'John Doe Smith',
+            email: 'johndoe@gmail.com',
+            department: 'Software Engineering',
+            batch: 3,
+            class: "A",
           },
           {
             id: 4,
-            className: 'D',
-            year: 3,
-            room: '67',
-            protein: 4.3,
+            studentId: 'ETS0000/11',
+            fullName: 'John Doe Smith',
+            email: 'johndoe@gmail.com',
+            department: 'Software Engineering',
+            batch: 3,
+            class: "A",
           },
           {
             id: 5,
-            className: 'E',
-            year: 2,
-            room: '49',
-            protein: 3.9,
+            studentId: 'ETS0000/11',
+            fullName: 'John Doe Smith',
+            email: 'johndoe@gmail.com',
+            department: 'Software Engineering',
+            batch: 3,
+            class: "A",
           },
         ]
       },
 
       editItem (item) {
-        this.editedIndex = this.classes.indexOf(item)
+        this.editedIndex = this.students.indexOf(item)
         this.editedItem = Object.assign({}, item)
         this.dialog = true
       },
 
       deleteItem (item) {
-
-        this.editedIndex = this.classes.indexOf(item)
+        this.editedIndex = this.students.indexOf(item)
         this.editedItem = Object.assign({}, item)
         this.dialogDelete = true
       },
 
       deleteItemConfirm () {
-        this.classes.splice(this.editedIndex, 1)
+        this.students.splice(this.editedIndex, 1)
         this.closeDelete()
       },
 
@@ -309,9 +341,9 @@
 
       save () {
         if (this.editedIndex > -1) {
-          Object.assign(this.classes[this.editedIndex], this.editedItem)
+          Object.assign(this.students[this.editedIndex], this.editedItem)
         } else {
-          this.classes.push(this.editedItem)
+          this.students.push(this.editedItem)
         }
         this.close()
       },
