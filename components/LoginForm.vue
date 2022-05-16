@@ -62,17 +62,26 @@ export default {
     submit() {
       if (this.$refs.form.validate()) {
         // Native form submission is not yet supported
-        this.$axios
-          .post('/api/auth/signin', {
+        try {
+          const { data } = await this.$axios.post('/api/auth/signin', {
             email: this.email,
             password: this.password,
           })
-          .then((result) => {
-            this.$emit('success', result)
-          })
-          .catch((err) => {
-            console.log(err)
-          })
+          this.$emit('success', data)
+        } catch (error) {
+          let emittableError
+          if (error.isAxiosError) {
+            const errorResp = error.response.data
+            if (typeof errorResp === 'string') {
+              emittableError = { message: errorResp }
+            } else {
+              emittableError = errorResp
+            }
+          } else {
+            emittableError = error
+          }
+          this.$emit('error', { statusCode: 500, ...emittableError })
+        }
       }
     },
     clear() {

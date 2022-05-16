@@ -1,7 +1,11 @@
 <template>
   <v-row class="login-container">
     <v-col cols="12" sm="5" lg="4" class="section-form">
-      <login-form ref="login_form" @success="onLoginSucess($event)" />
+      <login-form
+        ref="login_form"
+        @success="onLoginSucess($event)"
+        @error="onLoginError($event)"
+      />
       <v-btn large rounded color="#D27D01" class="form-button" @click="login">
         Login
       </v-btn>
@@ -24,6 +28,9 @@ export default {
       const id = data.id
 
       this.$router.push({ path: `${roles[0]}/${id}`, params: { id } })
+    },
+    onLoginError(error) {
+      console.log(error)
     },
   },
 }
