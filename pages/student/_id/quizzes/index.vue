@@ -56,7 +56,10 @@ export default {
 
   methods: {
     gotoQuizPage() {
-      this.$router.push({ name: 'student-id-quizPage', params: { id: 1 } })
+      this.$router.push({
+        name: 'student-id-quizzes-quizPage',
+        params: { id: 1 },
+      })
     },
   },
 }
