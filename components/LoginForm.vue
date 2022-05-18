@@ -1,6 +1,5 @@
 <template>
   <div>
-    <h1 class="form-title">Sign in</h1>
     <v-form ref="form" v-model="valid" lazy-validation>
       <v-text-field
         v-model="email"
@@ -59,7 +58,7 @@ export default {
     }
   },
   methods: {
-    submit() {
+    async submit() {
       if (this.$refs.form.validate()) {
         // Native form submission is not yet supported
         try {
@@ -90,3 +89,21 @@ export default {
   },
 }
 </script>
+
+<style scoped>
+.form-textfield {
+  width: 90%;
+  margin: 0 auto;
+  margin-bottom: 0.7em;
+}
+
+.form-textfield-icon {
+  padding: 0 0.35em;
+}
+
+.form-textfield-divider {
+  background-color: gray;
+  margin: 0.1em 0;
+  margin-right: 1em;
+}
+</style>

@@ -1,29 +1,39 @@
 <template>
-  <v-container>
-    <v-row justify="center" align="center">
-      <v-col cols="4" class="mx-auto">
-        <v-card max-width="500">
-          <v-card-title
-            >Authorize Telegram Bot (<code>@e-learning-bot</code>)</v-card-title
-          >
-          <v-card-subtitle
-            >Welcome <span>{{ name }}</span
-            >. Please login to authorize our telegram bot.
-          </v-card-subtitle>
-          <v-card-text>
-            <LoginForm ref="loginForm" @success="onAuthSuccess($event)" />
-          </v-card-text>
-          <v-card-actions>
-            <v-btn :loading="loading" :disabled="loading" @click="login"> Authorize </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-col>
-    </v-row>
+  <v-container class="telegram-auth-container">
+    <v-card width="500" height="380" class="form-container">
+      <v-card-title class="form-title">Welcome {{ name }}</v-card-title>
+      <v-card-subtitle class="form-subtitle">
+        Please login to authorize our telegram bot.
+      </v-card-subtitle>
+      <v-card-title v-if="hasError" class="form-error-message">{{
+        errorMsg
+      }}</v-card-title>
+      <v-card-text class="form-fields-container">
+        <LoginForm
+          ref="loginForm"
+          @success="onAuthSuccess($event)"
+          @error="onAuthError($event)"
+        />
+      </v-card-text>
+      <v-card-actions class="form-button-container">
+        <v-btn
+          large
+          rounded
+          color="#D27D01"
+          :loading="loading"
+          :disabled="loading"
+          class="form-button"
+          @click="login"
+        >
+          Continue
+        </v-btn>
+      </v-card-actions>
+    </v-card>
   </v-container>
 </template>
 
 <script>
-import {GraphqlError} from  '../utils/errors'
+import { GraphqlError } from '../utils/errors'
 export default {
   middleware({ query, error }) {
     const { chatId, userId, name } = query
@@ -36,12 +46,14 @@ export default {
     return {
       name,
       userId,
-      chatId
+      chatId,
     }
   },
   data() {
     return {
       loading: false,
+      hasError: false,
+      errorMsg: null,
     }
   },
   methods: {
@@ -64,10 +76,10 @@ export default {
       const variables = {
         chatId: this.chatId,
         telegramId: this.userId,
-        userId: user.id
+        userId: user.id,
       }
       try {
-        const {data} = await this.$axios.post('/graphql/', {
+        const { data } = await this.$axios.post('/graphql/', {
           query,
           variables,
         })
@@ -79,11 +91,84 @@ export default {
         if (error.isAxiosError) {
           console.error(error.response.data)
         }
-        console.error(error)
-      }finally {
-        this.loading = false;
+        // console.error(error.errors[0].message)
+
+        this.hasError = true
+        this.errorMsg = error.errors[0].message
+        setTimeout(() => {
+          this.hasError = false
+          this.errorMsg = null
+        }, 4000)
+      } finally {
+        this.loading = false
       }
+    },
+
+    onAuthError(error) {
+      this.loading = false
+
+      this.errorMsg = error.message
+      this.hasError = true
+      setTimeout(() => {
+        this.hasError = false
+        this.errorMsg = null
+      }, 4000)
     },
   },
 }
 </script>
+
+<style scoped>
+.telegram-auth-container {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.form-container {
+  background-color: #f8f8ff;
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  box-shadow: none !important;
+}
+
+.form-title {
+  margin-bottom: 0.3em;
+  font-weight: 800;
+  font-size: 2em;
+  align-self: center;
+}
+
+.form-subtitle {
+  margin-bottom: 0.6em;
+  font-size: 1em;
+  align-self: center;
+}
+
+.form-error-message {
+  padding: 0;
+  padding-bottom: 0.5em;
+  font-weight: normal;
+  font-size: 1em;
+  color: red;
+  align-self: center;
+}
+
+.form-fields-container {
+  padding: 0 2.5em;
+}
+
+.form-button-container {
+  padding-top: 0;
+}
+
+.form-button {
+  margin: 0.5em auto;
+  width: 60%;
+  font-size: 1.2em;
+  font-weight: 800;
+  text-align: center;
+}
+</style>

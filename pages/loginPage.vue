@@ -1,6 +1,7 @@
 <template>
   <v-row class="login-container">
     <v-col cols="12" sm="5" lg="4" class="section-form">
+      <h1 class="form-title">Sign in</h1>
       <login-form
         ref="login_form"
         @success="onLoginSucess($event)"
@@ -80,23 +81,7 @@ export default {
   text-align: left;
   width: 90%;
   margin: 0 auto;
-  margin-bottom: 0.3em;
-}
-
-.form-textfield {
-  width: 90%;
-  margin: 0 auto;
-  margin-top: 1em;
-}
-
-.form-textfield-icon {
-  padding: 0 0.35em;
-}
-
-.form-textfield-divider {
-  background-color: gray;
-  margin: 0.1em 0;
-  margin-right: 1em;
+  margin-bottom: 0.5em;
 }
 
 .form-link {
