@@ -86,10 +86,12 @@ export default {
         if (data.errors !== undefined) {
           throw new GraphqlError(data.errors)
         }
-        window.location.href = `https://t.me/nestJsTelegrambot?start`
+        window.location.href = `https://t.me/nestJsTelegrambot`
       } catch (error) {
         if (error.isAxiosError) {
           console.error(error.response.data)
+        } else {
+          console.error(error)
         }
         // console.error(error.errors[0].message)
 
