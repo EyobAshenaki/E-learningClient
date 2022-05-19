@@ -4,7 +4,7 @@
       :headers="headers"
       :items="classes"
       :search="search"
-      sort-by="className"
+      sort-by="id"
       class="mt-5"
       style="height: 75vh"
     >
@@ -44,8 +44,8 @@
                     </v-col>
                     <v-col cols="12" sm="6" md="4">
                       <v-text-field
-                        v-model="editedItem.className"
-                        label="Class Name"
+                        v-model="editedItem.section"
+                        label="Section"
                         type="text"
                       ></v-text-field>
                     </v-col>
@@ -58,8 +58,8 @@
                     </v-col>
                     <v-col cols="12" sm="6" md="4">
                       <v-text-field
-                        v-model="editedItem.room"
-                        label="Room"
+                        v-model="editedItem.department"
+                        label="Department"
                         type="text"
                       ></v-text-field>
                     </v-col>
@@ -135,9 +135,9 @@ export default {
         sortable: false,
         value: 'id',
       },
-      { text: 'Class Name', value: 'className' },
+      { text: 'Section', value: 'section' },
       { text: 'Year', value: 'year' },
-      { text: 'Room', value: 'room' },
+      { text: 'Department', value: 'department' },
       // // { text: 'Protein (g)', value: 'protein' },
       { text: 'Actions', value: 'actions', sortable: false },
     ],
@@ -145,16 +145,16 @@ export default {
     editedIndex: -1,
     editedItem: {
       id: 0,
-      className: '',
+      section: '',
       year: 0,
-      room: '',
+      department: '',
       // protein: 0,
     },
     defaultItem: {
       id: 0,
-      className: '',
+      section: '',
       year: 0,
-      room: '',
+      department: '',
       // protein: 0,
     },
   }),
@@ -185,37 +185,37 @@ export default {
       this.classes = [
         {
           id: 1,
-          className: 'A',
+          section: 'A',
           year: 5,
-          room: '24',
+          department: '24',
           // protein: 4.0,
         },
         {
           id: 2,
-          className: 'B',
+          section: 'B',
           year: 4,
-          room: 37,
+          department: 37,
           // protein: 4.3,
         },
         {
           id: 3,
-          className: 'C',
+          section: 'C',
           year: 1,
-          room: '23',
+          department: '23',
           // protein: 6.0,
         },
         {
           id: 4,
-          className: 'D',
+          section: 'D',
           year: 3,
-          room: '67',
+          department: '67',
           // protein: 4.3,
         },
         {
           id: 5,
-          className: 'E',
+          section: 'E',
           year: 2,
-          room: '49',
+          department: '49',
           // protein: 3.9,
         },
       ]
