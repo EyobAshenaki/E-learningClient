@@ -4,14 +4,15 @@
   <!-- <CourseWhatYoullLearn />
   <CourseCourseContent />
   <CourseRequirements /> -->
-  <AdminClassesClasses />
-  <AdminAllAccounts />
+  <!-- <AdminClassesClasses />
+  <AdminAllAccounts /> -->
+  <AdminAdminsAdmins />
   </div>
 </template>
 
 <script>
 export default {
   layout: 'administrator',
-  name: 'IndexPage',
+  name: 'AdminsIndexPage',
 }
 </script>

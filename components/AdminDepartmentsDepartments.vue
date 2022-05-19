@@ -2,7 +2,7 @@
   <div>
     <v-data-table
       :headers="headers"
-      :items="courseManagers"
+      :items="departments"
       :search="search"
       sort-by="id"
       class="mt-5"
@@ -10,9 +10,8 @@
     >
       <template v-slot:top>
         <v-toolbar flat>
-          <!-- <v-toolbar-title>Course Managers</v-toolbar-title>
+          <!-- <v-toolbar-title>Departments</v-toolbar-title>
           <v-divider class="mx-4" inset vertical></v-divider> -->
-
           <v-text-field
             v-model="search"
             append-icon="mdi-magnify"
@@ -25,7 +24,7 @@
           <v-dialog v-model="dialog" max-width="500px">
             <template v-slot:activator="{ on, attrs }">
               <v-btn color="primary" dark class="mb-2" v-bind="attrs" v-on="on">
-                Add New Course Manager
+                Add New Department
               </v-btn>
             </template>
             <v-card>
@@ -36,13 +35,13 @@
               <v-card-text>
                 <v-container>
                   <v-row>
-                    <v-col cols="12" sm="6" md="4">
+                    <!-- <v-col cols="12" sm="6" md="4">
                       <v-text-field
                         v-model="editedItem.id"
                         label="ID"
                         type="number"
                       ></v-text-field>
-                    </v-col>
+                    </v-col> -->
                     <!-- <v-col
                     cols="12"
                     sm="6"
@@ -56,29 +55,25 @@
                   </v-col> -->
                     <v-col cols="12" sm="6" md="4">
                       <v-text-field
-                        v-model="editedItem.fullName"
-                        label="Full Name"
+                        v-model="editedItem.name"
+                        label="Department Name"
                         type="text"
                       ></v-text-field>
                     </v-col>
                     <v-col cols="12" sm="6" md="4">
                       <v-text-field
-                        v-model="editedItem.email"
-                        label="E-mail"
-                        type="email"
+                        v-model="editedItem.depAdmin"
+                        label="Department Administrator"
+                        type="text"
                       ></v-text-field>
                     </v-col>
-                    <!-- <v-col
-                    cols="12"
-                    sm="6"
-                    md="4"
-                  >
-                    <v-text-field
-                      v-model="editedItem.department"
-                      label="Department"
-                      type="text"
-                    ></v-text-field>
-                  </v-col> -->
+                    <v-col cols="12" sm="6" md="4">
+                      <v-text-field
+                        v-model="editedItem.numOfStudents"
+                        label="Number of Students"
+                        type="number"
+                      ></v-text-field>
+                    </v-col>
                     <!-- <v-col
                     cols="12"
                     sm="6"
@@ -158,30 +153,30 @@ export default {
         value: 'id',
       },
       // { text: 'Student ID', value: 'studentId' },
-      { text: 'Full Name', value: 'fullName' },
-      { text: 'E-mail', value: 'email' },
-      // { text: 'Department', value: 'department' },
+      { text: 'Department Name', value: 'name', sortable: false },
+      { text: 'Department Administrator', value: 'depAdmin', sortable: false },
+      { text: 'Number of Students', value: 'numOfStudents', sortable: false },
       // { text: 'Role', value: 'role' },
       // { text: 'Courses', value: 'courses' },
       { text: 'Actions', value: 'actions', sortable: false },
     ],
-    courseManagers: [],
+    departments: [],
     editedIndex: -1,
     editedItem: {
-      id: 0,
+      dbId: null,
       // studentId: '',
-      fullName: '',
-      email: '',
-      // department: '',
+      name: '',
+      depAdmin: '',
+      numOfStudents: '',
       // role: '',
       // courses: '',
     },
     defaultItem: {
-      id: 0,
+      dbId: null,
       // studentId: '',
-      fullName: '',
-      email: '',
-      // department: '',
+      name: '',
+      depAdmin: '',
+      numOfStudents: '',
       // role: '',
       // courses: '',
     },
@@ -207,70 +202,107 @@ export default {
   },
 
   methods: {
-    initialize() {
-      this.courseManagers = [
-        {
-          id: 1,
-          // studentId: 'ETS0000/11',
-          fullName: 'John Doe Smith',
-          email: 'johndoe@gmail.com',
-          // department: 'Software Engineering',
-          // role: 'Course Owner',
-          // courses: "A",
-        },
-        {
-          id: 2,
-          // studentId: 'ETS0000/11',
-          fullName: 'John Doe Smith',
-          email: 'johndoe@gmail.com',
-          department: 'Software Engineering',
-          role: 'Course Owner',
-          courses: 'A',
-        },
-        {
-          id: 3,
-          // studentId: 'ETS0000/11',
-          fullName: 'John Doe Smith',
-          email: 'johndoe@gmail.com',
-          // department: 'Software Engineering',
-          // role: 'Course Owner',
-          // courses: "A",
-        },
-        {
-          id: 4,
-          // studentId: 'ETS0000/11',
-          fullName: 'John Doe Smith',
-          email: 'johndoe@gmail.com',
-          // department: 'Software Engineering',
-          // role: 'Course Owner',
-          // courses: "A",
-        },
-        {
-          id: 5,
-          // studentId: 'ETS0000/11',
-          fullName: 'John Doe Smith',
-          email: 'johndoe@gmail.com',
-          // department: 'Software Engineering',
-          // role: 'Course Owner',
-          // courses: "A",
-        },
-      ]
+    async initialize() {
+      const query = `query deps {
+                        departments {
+                          dbId: id
+                          name
+                        }
+                      }`
+      const depResponse = await this.$axios.post(
+        'http://localhost:4000/graphql',
+        { query }
+      )
+      if (depResponse.data.errors?.length) {
+        console.log(depResponse.data.errors[0].message)
+        throw new Error(depResponse.data.errors[0].message)
+      }
+      this.departments = depResponse.data.data.departments
+      // this.departments = [
+      //   {
+      //     // id: 1,
+      //     // studentId: 'ETS0000/11',
+      //     name: 'Software Engineering',
+      //     depAdmin: 'John Doe Smith',
+      //     numOfStudents: 200,
+      //     // role: 'Course Owner',
+      //     // courses: "A",
+      //   },
+      //   {
+      //     // id: 2,
+      //     // studentId: 'ETS0000/11',
+      //     name: 'Software Engineering',
+      //     depAdmin: 'John Doe Smith',
+      //     numOfStudents: 200,
+      //     //   role: 'Course Owner',
+      //     //   courses: 'A',
+      //   },
+      //   {
+      //     // id: 3,
+      //     // studentId: 'ETS0000/11',
+      //     name: 'Software Engineering',
+      //     depAdmin: 'John Doe Smith',
+      //     numOfStudents: 200,
+      //     // role: 'Course Owner',
+      //     // courses: "A",
+      //   },
+      //   {
+      //     // id: 4,
+      //     // studentId: 'ETS0000/11',
+      //     name: 'Software Engineering',
+      //     depAdmin: 'John Doe Smith',
+      //     numOfStudents: 200,
+      //     // role: 'Course Owner',
+      //     // courses: "A",
+      //   },
+      //   {
+      //     // id: 5,
+      //     // studentId: 'ETS0000/11',
+      //     name: 'Software Engineering',
+      //     depAdmin: 'John Doe Smith',
+      //     numOfStudents: 200,
+      //     // role: 'Course Owner',
+      //     // courses: "A",
+      //   },
+      // ]
+
+      this.departments = this.departments.map((dep, idx) => {
+        return {
+          ...dep,
+          id: idx + 1,
+        }
+      })
     },
 
     editItem(item) {
-      this.editedIndex = this.courseManagers.indexOf(item)
+      this.editedIndex = this.departments.indexOf(item)
       this.editedItem = Object.assign({}, item)
       this.dialog = true
     },
 
     deleteItem(item) {
-      this.editedIndex = this.courseManagers.indexOf(item)
+      this.editedIndex = this.departments.indexOf(item)
       this.editedItem = Object.assign({}, item)
       this.dialogDelete = true
     },
 
-    deleteItemConfirm() {
-      this.courseManagers.splice(this.editedIndex, 1)
+    async deleteItemConfirm() {
+      const query = `mutation dd($id: ID!) {
+                        removeDepartment(id: $id) {
+                          dbId: id
+                          name
+                        }
+                      }`
+      const variables = { id: this.editedItem.dbId }
+      const deletedDepartment = await this.$axios.post(
+        'http://localhost:4000/graphql',
+        { query, variables }
+      )
+      if (deletedDepartment.data.errors?.length) {
+        console.log(deletedDepartment.data.errors[0].message)
+        throw new Error(deletedDepartment.data.errors[0].message)
+      }
+      this.departments.splice(this.editedIndex, 1)
       this.closeDelete()
     },
 
@@ -290,11 +322,45 @@ export default {
       })
     },
 
-    save() {
+    async save() {
       if (this.editedIndex > -1) {
-        Object.assign(this.courseManagers[this.editedIndex], this.editedItem)
+        console.log(this.editedItem)
+        const query = `mutation ud($id: ID!  $name: String!) {
+                          updateDepartment(id: $id name: $name) {
+                            dbId: id
+                            name
+                          }
+                        }`
+        const variables = {
+          name: this.editedItem.name,
+          id: this.editedItem.dbId,
+        }
+        const editedDepartment = await this.$axios.post(
+          'http://localhost:4000/graphql',
+          { query, variables }
+        )
+        if (editedDepartment.data.errors?.length) {
+          console.log(editedDepartment.data.errors[0].message)
+          throw new Error(editedDepartment.data.errors[0].message)
+        }
+        Object.assign(this.departments[this.editedIndex], this.editedItem)
       } else {
-        this.courseManagers.push(this.editedItem)
+        const query = `mutation CreateDepartment($name: String!){
+                          createDepartment(name: $name){
+                            dbId: id
+                            name
+                          }
+                        }`
+        const variables = { name: this.editedItem.name }
+        const newDepartment = await this.$axios.post(
+          'http://localhost:4000/graphql',
+          { query, variables }
+        )
+        if (newDepartment.data.errors?.length) {
+          console.log(newDepartment.data.errors[0].message)
+          throw new Error(newDepartment.data.errors[0].message)
+        }
+        this.departments.push(this.editedItem)
       }
       this.close()
     },
