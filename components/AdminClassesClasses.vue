@@ -110,7 +110,7 @@
         <v-icon small class="mr-2" @click="deleteItem(item)">
           mdi-delete
         </v-icon>
-        <NuxtLink to="/administrator/_id/student">
+        <NuxtLink to="/administrator/_id/department">
           <v-icon small> mdi-account-group </v-icon>
         </NuxtLink>
       </template>
