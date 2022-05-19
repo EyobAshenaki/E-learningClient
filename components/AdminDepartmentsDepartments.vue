@@ -67,13 +67,13 @@
                         type="text"
                       ></v-text-field>
                     </v-col>
-                    <v-col cols="12" sm="6" md="4">
+                    <!-- <v-col cols="12" sm="6" md="4">
                       <v-text-field
                         v-model="editedItem.numOfStudents"
                         label="Number of Students"
                         type="number"
                       ></v-text-field>
-                    </v-col>
+                    </v-col> -->
                     <!-- <v-col
                     cols="12"
                     sm="6"
@@ -155,7 +155,7 @@ export default {
       // { text: 'Student ID', value: 'studentId' },
       { text: 'Department Name', value: 'name', sortable: false },
       { text: 'Department Administrator', value: 'depAdmin', sortable: false },
-      { text: 'Number of Students', value: 'numOfStudents', sortable: false },
+      // { text: 'Number of Students', value: 'numOfStudents', sortable: false },
       // { text: 'Role', value: 'role' },
       // { text: 'Courses', value: 'courses' },
       { text: 'Actions', value: 'actions', sortable: false },
@@ -167,7 +167,7 @@ export default {
       // studentId: '',
       name: '',
       depAdmin: '',
-      numOfStudents: '',
+      // numOfStudents: '',
       // role: '',
       // courses: '',
     },
@@ -176,7 +176,7 @@ export default {
       // studentId: '',
       name: '',
       depAdmin: '',
-      numOfStudents: '',
+      // numOfStudents: '',
       // role: '',
       // courses: '',
     },
@@ -324,7 +324,6 @@ export default {
 
     async save() {
       if (this.editedIndex > -1) {
-        console.log(this.editedItem)
         const query = `mutation ud($id: ID!  $name: String!) {
                           updateDepartment(id: $id name: $name) {
                             dbId: id
