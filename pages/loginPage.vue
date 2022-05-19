@@ -23,7 +23,7 @@ export default {
       const roles = data.roles.map((role) => role.toLowerCase())
       const id = data.id
 
-      this.$router.push({ path: `${roles[0]}/${id}` })
+      this.$router.push({ path: `${roles[0]}/${id}`, params: { id } })
     },
   },
 }
