@@ -4,12 +4,13 @@
     <!-- <CourseWhatYoullLearn />
   <CourseCourseContent />
   <CourseRequirements /> -->
-  <AdminClassesClasses />
-  <TrialTrialTrial />
+    <AdminClassesClasses />
+    <AdminAllAccounts />
   </div>
 </template>
 <script>
   export default {
-    layout: 'guest',
+    name: 'IndexPage',
+    layout: 'administrator',
   }
 </script>

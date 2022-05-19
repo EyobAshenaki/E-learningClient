@@ -2,15 +2,20 @@
   <div>
     <v-data-table
       :headers="headers"
-      :items="classes"
+      :items="accounts"
       :search="search"
-      sort-by="className"
+      sort-by="institutionId"
       class="mt-5"
       style="height: 75vh"
     >
+      <template v-slot:[`item.roles`]="{ item }">
+        <v-chip dark class="mr-1" v-for="(role, id) in item.roles" :key="id">
+          {{ role }}
+        </v-chip>
+      </template>
       <template v-slot:top>
         <v-toolbar flat>
-          <!-- <v-toolbar-title>All Classes</v-toolbar-title>
+          <!-- <v-toolbar-title>All Users</v-toolbar-title>
           <v-divider class="mx-4" inset vertical></v-divider> -->
           <v-text-field
             v-model="search"
@@ -24,9 +29,10 @@
           <v-dialog v-model="dialog" max-width="500px">
             <template v-slot:activator="{ on, attrs }">
               <v-btn color="primary" dark class="mb-2" v-bind="attrs" v-on="on">
-                Add New Class
+                Add New User Account
               </v-btn>
             </template>
+
             <v-card>
               <v-card-title>
                 <span class="text-h5">{{ formTitle }}</span>
@@ -44,23 +50,23 @@
                     </v-col>
                     <v-col cols="12" sm="6" md="4">
                       <v-text-field
-                        v-model="editedItem.className"
-                        label="Class Name"
+                        v-model="editedItem.institutionId"
+                        label="Student ID"
                         type="text"
                       ></v-text-field>
                     </v-col>
                     <v-col cols="12" sm="6" md="4">
                       <v-text-field
-                        v-model="editedItem.year"
-                        label="Year"
-                        type="number"
+                        v-model="editedItem.fullName"
+                        label="Full Name"
+                        type="text"
                       ></v-text-field>
                     </v-col>
                     <v-col cols="12" sm="6" md="4">
                       <v-text-field
-                        v-model="editedItem.room"
-                        label="Room"
-                        type="text"
+                        v-model="editedItem.email"
+                        label="E-mail"
+                        type="email"
                       ></v-text-field>
                     </v-col>
                     <!-- <v-col
@@ -69,10 +75,31 @@
                     md="4"
                   >
                     <v-text-field
-                       v-model="editedItem.protein" -->
-                    <!-- label="Protein (g)"
-                    </v-text-field>
+                      v-model="editedItem.department"
+                      label="Department"
+                      type="text"
+                    ></v-text-field>
                   </v-col> -->
+                    <!-- <v-col
+                    cols="12"
+                    sm="6"
+                    md="4"
+                  >
+                    <v-text-field
+                      v-model="editedItem.batch"
+                      label="Batch"
+                      type="number"
+                    ></v-text-field>
+                  </v-col> -->
+                    <v-col cols="12" sm="6" md="4">
+                      <v-select
+                        v-model="editedItem.roles"
+                        :items="roles"
+                        label="Roles"
+                        multiple
+                        chips
+                      ></v-select>
+                    </v-col>
                   </v-row>
                 </v-container>
               </v-card-text>
@@ -107,12 +134,7 @@
       </template>
       <template v-slot:[`item.actions`]="{ item }">
         <v-icon small class="mr-2" @click="editItem(item)"> mdi-pencil </v-icon>
-        <v-icon small class="mr-2" @click="deleteItem(item)">
-          mdi-delete
-        </v-icon>
-        <NuxtLink to="/administrator/_id/student">
-          <v-icon small> mdi-account-group </v-icon>
-        </NuxtLink>
+        <v-icon small @click="deleteItem(item)"> mdi-delete </v-icon>
       </template>
       <template v-slot:no-data>
         <v-btn color="primary" @click="initialize"> Reset </v-btn>
@@ -122,9 +144,9 @@
 </template>
 
 <script>
-// import { mapState, mapActions } from 'vuex'
 export default {
   data: () => ({
+    roles: ['Student', 'Teacher', 'Admin', 'Dep Admin', 'Course Manager'],
     search: '',
     dialog: false,
     dialogDelete: false,
@@ -135,32 +157,37 @@ export default {
         sortable: false,
         value: 'id',
       },
-      { text: 'Class Name', value: 'className' },
-      { text: 'Year', value: 'year' },
-      { text: 'Room', value: 'room' },
-      // // { text: 'Protein (g)', value: 'protein' },
+      { text: 'Institutional ID', value: 'institutionId' },
+      { text: 'Full Name', value: 'fullName' },
+      { text: 'E-mail', value: 'email' },
+      // { text: 'Department', value: 'department' },
+      // { text: 'Batch', value: 'batch' },
+      { text: 'Roles', value: 'roles' },
       { text: 'Actions', value: 'actions', sortable: false },
     ],
-    classes: [],
+    accounts: [],
     editedIndex: -1,
     editedItem: {
       id: 0,
-      className: '',
-      year: 0,
-      room: '',
-      // protein: 0,
+      institutionId: '',
+      fullName: '',
+      email: '',
+      // department: '',
+      // batch: 0,
+      roles: [],
     },
     defaultItem: {
       id: 0,
-      className: '',
-      year: 0,
-      room: '',
-      // protein: 0,
+      institutionId: '',
+      fullName: '',
+      email: '',
+      // department: '',
+      // batch: 0,
+      roles: [],
     },
   }),
 
   computed: {
-    // ...mapState(['studentToggle']),
     formTitle() {
       return this.editedIndex === -1 ? 'New Item' : 'Edit Item'
     },
@@ -180,61 +207,70 @@ export default {
   },
 
   methods: {
-    // ...mapActions(['viewStudents']),
     initialize() {
-      this.classes = [
+      this.accounts = [
         {
           id: 1,
-          className: 'A',
-          year: 5,
-          room: '24',
-          // protein: 4.0,
+          institutionId: 'ETS0000/11',
+          fullName: 'John Doe Smith',
+          email: 'johndoe@gmail.com',
+          // department: 'Software Engineering',
+          // batch: 3,
+          roles: ['Student'],
         },
         {
           id: 2,
-          className: 'B',
-          year: 4,
-          room: 37,
-          // protein: 4.3,
+          institutionId: 'ETS0000/11',
+          fullName: 'John Doe Smith',
+          email: 'johndoe@gmail.com',
+          // department: 'Software Engineering',
+          // batch: 3,
+          roles: ['Student', 'Teacher'],
         },
         {
           id: 3,
-          className: 'C',
-          year: 1,
-          room: '23',
-          // protein: 6.0,
+          institutionId: 'ETS0000/11',
+          fullName: 'John Doe Smith',
+          email: 'johndoe@gmail.com',
+          // department: 'Software Engineering',
+          // batch: 3,
+          roles: ['Admin'],
         },
         {
           id: 4,
-          className: 'D',
-          year: 3,
-          room: '67',
-          // protein: 4.3,
+          institutionId: 'ETS0000/11',
+          fullName: 'John Doe Smith',
+          email: 'johndoe@gmail.com',
+          // department: 'Software Engineering',
+          // batch: 3,
+          roles: ['Dep Admin'],
         },
         {
           id: 5,
-          className: 'E',
-          year: 2,
-          room: '49',
-          // protein: 3.9,
+          institutionId: 'ETS0000/11',
+          fullName: 'John Doe Smith',
+          email: 'johndoe@gmail.com',
+          // department: 'Software Engineering',
+          // batch: 3,
+          roles: ['Course Manager', 'Dep Admin'],
         },
       ]
     },
 
     editItem(item) {
-      this.editedIndex = this.classes.indexOf(item)
+      this.editedIndex = this.accounts.indexOf(item)
       this.editedItem = Object.assign({}, item)
       this.dialog = true
     },
 
     deleteItem(item) {
-      this.editedIndex = this.classes.indexOf(item)
+      this.editedIndex = this.accounts.indexOf(item)
       this.editedItem = Object.assign({}, item)
       this.dialogDelete = true
     },
 
     deleteItemConfirm() {
-      this.classes.splice(this.editedIndex, 1)
+      this.accounts.splice(this.editedIndex, 1)
       this.closeDelete()
     },
 
@@ -256,9 +292,9 @@ export default {
 
     save() {
       if (this.editedIndex > -1) {
-        Object.assign(this.classes[this.editedIndex], this.editedItem)
+        Object.assign(this.accounts[this.editedIndex], this.editedItem)
       } else {
-        this.classes.push(this.editedItem)
+        this.accounts.push(this.editedItem)
       }
       this.close()
     },

@@ -1,8 +1,31 @@
 <template>
-  <v-row> Admin page </v-row>
+  <v-row justify="center" align="center">
+    <v-col cols="11" class="mt-10">
+      <div class="blue--text">
+        <v-breadcrumbs :items="items"></v-breadcrumbs>
+      </div>
+      <AdminDashboardCards />
+      <AdminDashTableTabs />
+      <!-- <AdminStudentsStudents v-if="studentToggle" /> -->
+    </v-col>
+  </v-row>
 </template>
+
 <script>
+  // import { mapState, mapActions } from 'vuex'
   export default {
-    layout: 'admin',
+    name: 'AdminIndexPage',
+    layout: 'administrator',
+    data: () => ({
+      items: [
+        {
+          text: 'Dashboard',
+        },
+      ],
+    }),
+    // computed: mapState(['studentToggle']),
+    // methods: {
+    //   ...mapActions(['viewStudents']),
+    // },
   }
 </script>

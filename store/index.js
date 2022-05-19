@@ -1,14 +1,21 @@
-export const actions = {
-  async nuxtServerInit({ dispatch, getters }, { req, $axios }) {
-    if (
-      !getters['auth/isLoggedIn'] &&
-      req.headers.cookie?.includes('sessionId')
-    ) {
-      const user = await $axios.get('/api/auth/me').then((resp) => resp.data)
-      dispatch('auth/login', {
-        ...user,
-        roles: user.roles.map((role) => role.name),
-      })
-    }
-  },
-}
+// export const state = () => ({
+//     studentToggle: false,
+// })
+
+// export const getters = {
+
+// }
+
+// export const actions = {
+//     viewStudents({commit}) {
+//         const studentToggle = !this.state.studentToggle;
+//         commit("viewStudents", studentToggle);
+//         return studentToggle;
+//       },
+// }
+
+// export const mutations = {
+//     viewStudents(state, studentToggle) {
+//         state.studentToggle = studentToggle;
+//     }
+// }
