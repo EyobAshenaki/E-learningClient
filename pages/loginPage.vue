@@ -24,7 +24,7 @@ export default {
     login() {
       this.$refs.login_form.submit()
     },
-    onLoginSucess({ data }) {
+    onLoginSucess(data) {
       const roles = data.roles.map((role) => role.toLowerCase())
       const id = data.id
 
