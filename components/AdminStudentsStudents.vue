@@ -51,8 +51,22 @@
                     </v-col>
                     <v-col cols="12" sm="6" md="4">
                       <v-text-field
-                        v-model="editedItem.fullName"
-                        label="Full Name"
+                        v-model="editedItem.firstName"
+                        label="Fisrt Name"
+                        type="text"
+                      ></v-text-field>
+                    </v-col>
+                    <v-col cols="12" sm="6" md="4">
+                      <v-text-field
+                        v-model="editedItem.middleName"
+                        label="Middle Name"
+                        type="text"
+                      ></v-text-field>
+                    </v-col>
+                    <v-col cols="12" sm="6" md="4">
+                      <v-text-field
+                        v-model="editedItem.lastName"
+                        label="Last Name"
                         type="text"
                       ></v-text-field>
                     </v-col>
@@ -70,13 +84,13 @@
                         type="text"
                       ></v-text-field>
                     </v-col>
-                    <v-col cols="12" sm="6" md="4">
+                    <!-- <v-col cols="12" sm="6" md="4">
                       <v-text-field
                         v-model="editedItem.batch"
                         label="Batch"
                         type="number"
                       ></v-text-field>
-                    </v-col>
+                    </v-col> -->
                     <v-col cols="12" sm="6" md="4">
                       <v-text-field
                         v-model="editedItem.class"
@@ -141,10 +155,12 @@ export default {
         value: 'id',
       },
       { text: 'Student ID', value: 'studentId' },
-      { text: 'Full Name', value: 'fullName' },
+      { text: 'First Name', value: 'firstName' },
+      { text: 'Middle Name', value: 'middleName' },
+      { text: 'Last Name', value: 'lastName' },
       { text: 'E-mail', value: 'email' },
       { text: 'Department', value: 'department' },
-      { text: 'Batch', value: 'batch' },
+      // { text: 'Batch', value: 'batch' },
       { text: 'Class', value: 'class' },
       { text: 'Actions', value: 'actions', sortable: false },
     ],
@@ -153,19 +169,23 @@ export default {
     editedItem: {
       id: 0,
       studentId: '',
-      fullName: '',
+      firstName: '',
+      middleName: '',
+      lastName: '',
       email: '',
       department: '',
-      batch: 0,
+      // batch: 0,
       class: '',
     },
     defaultItem: {
       id: 0,
       studentId: '',
-      fullName: '',
+      firstName: '',
+      middleName: '',
+      lastName: '',
       email: '',
       department: '',
-      batch: 0,
+      // batch: 0,
       class: '',
     },
   }),
@@ -195,46 +215,56 @@ export default {
         {
           id: 1,
           studentId: 'ETS0000/11',
-          fullName: 'John Doe Smith',
+          firstName: 'John',
+          middleName: 'Doe',
+          lastName: 'Smith',
           email: 'johndoe@gmail.com',
           department: 'Software Engineering',
-          batch: 3,
+          // batch: 3,
           class: 'A',
         },
         {
           id: 2,
           studentId: 'ETS0000/11',
-          fullName: 'John Doe Smith',
+          firstName: 'John',
+          middleName: 'Doe',
+          lastName: 'Smith',
           email: 'johndoe@gmail.com',
           department: 'Software Engineering',
-          batch: 3,
+          // batch: 3,
           class: 'A',
         },
         {
           id: 3,
           studentId: 'ETS0000/11',
-          fullName: 'John Doe Smith',
+          firstName: 'John',
+          middleName: 'Doe',
+          lastName: 'Smith',
           email: 'johndoe@gmail.com',
           department: 'Software Engineering',
-          batch: 3,
+          // batch: 3,
           class: 'A',
         },
         {
           id: 4,
           studentId: 'ETS0000/11',
-          fullName: 'John Doe Smith',
+          firstName: 'John',
+          middleName: 'Doe',
+          lastName: 'Smith',
           email: 'johndoe@gmail.com',
           department: 'Software Engineering',
-          batch: 3,
+          // batch: 3,
           class: 'A',
         },
         {
           id: 5,
           studentId: 'ETS0000/11',
-          fullName: 'John Doe Smith',
+          firstName: 'John',
+          middleName: 'Doe',
+          lastName: 'Smith',
           email: 'johndoe@gmail.com',
           department: 'Software Engineering',
-          batch: 3,
+          // batch: 3,
           class: 'A',
         },
       ]
