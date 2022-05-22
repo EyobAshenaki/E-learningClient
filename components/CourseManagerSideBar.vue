@@ -39,7 +39,7 @@ export default {
       drawer: true,
       items: [
         { title: 'Dashboard', icon: 'mdi-view-dashboard' },
-        { title: 'My Courses', icon: 'mdi-bookshelf' },
+        { title: 'Teachers', icon: 'mdi-account-group' },
       ],
       mini: true,
     }
@@ -49,9 +49,9 @@ export default {
     changePage(name) {
       if (name === 'Dashboard') {
         this.$router.push({ name: 'courseManager-id', params: { id: 1 } })
-      } else if (name === 'My Courses') {
+      } else if (name === 'Teachers') {
         this.$router.push({
-          name: 'courseManager-id-courses',
+          name: 'courseManager-id-teachers',
           params: { id: 1 },
         })
       }
@@ -59,5 +59,3 @@ export default {
   },
 }
 </script>
-
-<style lang="scss" scoped></style>
