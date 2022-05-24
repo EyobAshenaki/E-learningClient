@@ -47,7 +47,7 @@
                 >
                 <v-spacer></v-spacer>
                 <v-col cols="4" class="d-flex justify-end">
-                  <v-btn text color="orange darken-4" @click="createCourse">
+                  <v-btn outlined color="orange darken-4" @click="createCourse">
                     <v-icon>mdi-plus</v-icon>
                     Create Course
                   </v-btn>
@@ -291,7 +291,7 @@
             </v-col>
           </v-row>
         </v-col>
-        <v-col v-for="n in 10" :key="n" cols="12" class="py-1">
+        <v-col v-for="n in 4" :key="n" cols="12" class="py-1">
           <v-card outlined class="py-3">
             <v-row>
               <v-col cols="4" class="pr-0 d-flex justify-end">
@@ -321,90 +321,19 @@ export default {
         {
           id: 1,
           code: 'sweg4052',
-          name: 'Course-1',
+          name: 'Requirement and Design',
           description:
             'lorem this itjdnf dfnadkj fakdjfakdfkjadbsf kajdsfbakj fbkajbsf',
           overview:
             'dfhuf aiuf aif iuafb aifaif afafn ajdfuia faf aif aidfbaf ajdbfiabf',
           creditHour: '4',
           chapters: [
-            { id: 1 },
-            { id: 2 },
-            { id: 3 },
-            { id: 4 },
-            { id: 5 },
-            { id: 6 },
-          ],
-        },
-        {
-          id: 2,
-          code: 'sweg4053',
-          name: 'Course-2',
-          description:
-            'lorem this itjdnf dfnadkj fakdjfakdfkjadbsf kajdsfbakj fbkajbsf',
-          overview:
-            'dfhuf aiuf aif iuafb aifaif afafn ajdfuia faf aif aidfbaf ajdbfiabf',
-          creditHour: '3',
-          chapters: [
-            { id: 1 },
-            { id: 2 },
-            { id: 3 },
-            { id: 4 },
-            { id: 5 },
-            { id: 6 },
-            { id: 7 },
-            { id: 8 },
-          ],
-        },
-        {
-          id: 3,
-          code: 'sweg4054',
-          name: 'Course-3',
-          description:
-            'lorem this itjdnf dfnadkj fakdjfakdfkjadbsf kajdsfbakj fbkajbsf',
-          overview:
-            'dfhuf aiuf aif iuafb aifaif afafn ajdfuia faf aif aidfbaf ajdbfiabf',
-          creditHour: '1',
-          chapters: [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 }],
-        },
-        {
-          id: 4,
-          code: 'sweg4055',
-          name: 'Course-4',
-          description:
-            'lorem this itjdnf dfnadkj fakdjfakdfkjadbsf kajdsfbakj fbkajbsf',
-          overview:
-            'dfhuf aiuf aif iuafb aifaif afafn ajdfuia faf aif aidfbaf ajdbfiabf',
-          creditHour: '2',
-          chapters: [
-            { id: 1 },
-            { id: 2 },
-            { id: 3 },
-            { id: 4 },
-            { id: 5 },
-            { id: 6 },
-            { id: 7 },
-          ],
-        },
-        {
-          id: 5,
-          code: 'sweg4056',
-          name: 'Course-5',
-          description:
-            'lorem this itjdnf dfnadkj fakdjfakdfkjadbsf kajdsfbakj fbkajbsf',
-          overview:
-            'dfhuf aiuf aif iuafb aifaif afafn ajdfuia faf aif aidfbaf ajdbfiabf',
-          creditHour: '3',
-          chapters: [
-            { id: 1 },
-            { id: 2 },
-            { id: 3 },
-            { id: 4 },
-            { id: 5 },
-            { id: 6 },
-            { id: 7 },
-            { id: 8 },
-            { id: 9 },
+            { id: 1, title: 'Introduction', sequenceNumber: 1 },
+            { id: 2, title: 'Requirement Elicitaion', sequenceNumber: 2 },
+            { id: 3, title: 'Design and Architecture', sequenceNumber: 3 },
+            { id: 4, title: 'Testing', sequenceNumber: 4 },
+            { id: 5, title: 'Assurance', sequenceNumber: 5 },
+            { id: 6, title: 'Security', sequenceNumber: 6 },
           ],
         },
       ],
@@ -492,6 +421,10 @@ export default {
     },
 
     goToCourseDetail(course) {
+      this.$router.push({
+        name: 'courseManager-id-courseEdit-courseId',
+        params: { courseId: course },
+      })
       console.log('Go to ', course)
     },
 

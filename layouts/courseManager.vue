@@ -2,7 +2,7 @@
   <v-app>
     <app-header />
     <course-manager-side-bar />
-    <v-main>
+    <v-main class="grey lighten-4">
       <v-container>
         <Nuxt />
       </v-container>
