@@ -57,11 +57,14 @@
                       ></v-text-field>
                     </v-col>
                     <v-col cols="12" sm="6" md="4">
-                      <v-text-field
+                      <v-select
                         v-model="editedItem.department"
+                        :items="departments"
+                        item-text="name"
                         label="Department"
-                        type="text"
-                      ></v-text-field>
+                        chips
+                        return-object
+                      ></v-select>
                     </v-col>
                     <!-- <v-col
                     cols="12"
@@ -86,7 +89,7 @@
               </v-card-actions>
             </v-card>
           </v-dialog>
-          <v-dialog v-model="dialogDelete" max-width="500px">
+          <v-dialog v-model="dialogDelete" v-if="studentNone" max-width="500px">
             <v-card>
               <v-card-title class="text-h5"
                 >Are you sure you want to delete this item?</v-card-title
@@ -103,15 +106,70 @@
               </v-card-actions>
             </v-card>
           </v-dialog>
+          <v-dialog v-model="dialogDelete" v-else max-width="500px">
+            <v-card>
+              <v-card-title class="text-h5"
+                >This class has enrolled students. Are you sure you still want
+                to delete this item?</v-card-title
+              >
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="blue darken-1" text @click="closeDelete"
+                  >Cancel</v-btn
+                >
+                <v-btn color="blue darken-1" text @click="deleteItemConfirm"
+                  >OK</v-btn
+                >
+                <v-spacer></v-spacer>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
         </v-toolbar>
       </template>
+      <template v-slot:[`item.department`]="{ item }">
+        {{ item.department.name }}
+      </template>
       <template v-slot:[`item.actions`]="{ item }">
-        <v-icon small class="mr-2" @click="editItem(item)"> mdi-pencil </v-icon>
-        <v-icon small class="mr-2" @click="deleteItem(item)">
-          mdi-delete
-        </v-icon>
-        <NuxtLink to="/administrator/_id/department">
-          <v-icon small> mdi-account-group </v-icon>
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-icon
+              v-bind="attrs"
+              v-on="on"
+              class="mr-2"
+              size="23"
+              @click="editItem(item)"
+            >
+              mdi-pencil
+            </v-icon>
+          </template>
+          <span>Edit</span>
+        </v-tooltip>
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-icon
+              v-bind="attrs"
+              v-on="on"
+              class="mr-2"
+              size="23"
+              @click="deleteItem(item)"
+            >
+              mdi-delete
+            </v-icon>
+          </template>
+          <span>Delete</span>
+        </v-tooltip>
+        <NuxtLink
+          to="/administrator/_id/department"
+          class="text-decoration-none"
+        >
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on, attrs }">
+              <v-icon v-bind="attrs" v-on="on" size="23">
+                mdi-account-group
+              </v-icon>
+            </template>
+            <span>Students</span>
+          </v-tooltip>
         </NuxtLink>
       </template>
       <template v-slot:no-data>
@@ -128,6 +186,7 @@ export default {
     search: '',
     dialog: false,
     dialogDelete: false,
+    studentNone: true,
     headers: [
       {
         text: 'ID',
@@ -138,9 +197,9 @@ export default {
       { text: 'Section', value: 'section', sortable: false },
       { text: 'Year', value: 'year', sortable: false },
       { text: 'Department', value: 'department', sortable: false },
-      // // { text: 'Protein (g)', value: 'protein' },
       { text: 'Actions', value: 'actions', sortable: false },
     ],
+    departments: [],
     classes: [],
     editedIndex: -1,
     editedItem: {
@@ -201,43 +260,27 @@ export default {
         throw new Error(studClassResponse.data.errors[0].message)
       }
       this.classes = studClassResponse.data.data.studentClasses
-      // this.classes = [
-      //   {
-      //     id: 1,
-      //     section: 'A',
-      //     year: 5,
-      //     department: '24',
-      //     // protein: 4.0,
-      //   },
-      //   {
-      //     id: 2,
-      //     section: 'B',
-      //     year: 4,
-      //     department: 37,
-      //     // protein: 4.3,
-      //   },
-      //   {
-      //     id: 3,
-      //     section: 'C',
-      //     year: 1,
-      //     department: '23',
-      //     // protein: 6.0,
-      //   },
-      //   {
-      //     id: 4,
-      //     section: 'D',
-      //     year: 3,
-      //     department: '67',
-      //     // protein: 4.3,
-      //   },
-      //   {
-      //     id: 5,
-      //     section: 'E',
-      //     year: 2,
-      //     department: '49',
-      //     // protein: 3.9,
-      //   },
-      // ]
+
+      const queryDep = `query dep {
+                          departments {
+                            id
+                            name
+                          }
+                        }`
+      const depsResponse = await this.$axios.post(
+        'http://localhost:4000/graphql',
+        { query: queryDep }
+      )
+      if (depsResponse.data.errors?.length) {
+        console.log(depsResponse.data.errors[0].message)
+        throw new Error(depsResponse.data.errors[0].message)
+      }
+
+      // this.roles = depsResponse.data.data.roles.map((role) =>
+      //   this.getRoleName(role)
+      // )
+      this.departments = [...depsResponse.data.data.departments]
+
       this.classes = this.classes.map((clas, idx) => {
         return {
           ...clas,
@@ -258,7 +301,19 @@ export default {
       this.dialogDelete = true
     },
 
-    deleteItemConfirm() {
+    async deleteItemConfirm() {
+      const query = `mutation removeclass($id: ID!, $removeStudents: Boolean) {
+                        deleteStudentClass(id: $id, removeStudents: $removeStudents)
+                      }`
+      const variables = { id: this.editedItem.dbId, removeStudents: true }
+      const deletedClass = await this.$axios.post(
+        'http://localhost:4000/graphql',
+        { query, variables }
+      )
+      if (deletedClass.data.errors?.length) {
+        console.log(deletedClass.data.errors[0].message)
+        throw new Error(deletedClass.data.errors[0].message)
+      }
       this.classes.splice(this.editedIndex, 1)
       this.closeDelete()
     },
@@ -294,6 +349,7 @@ export default {
           id: this.editedItem.dbId,
           year: this.editedItem.year,
           section: this.editedItem.section,
+          // department: this.editedItem.department,
         }
         const editedClass = await this.$axios.post(
           'http://localhost:4000/graphql',
@@ -305,18 +361,23 @@ export default {
         }
         Object.assign(this.classes[this.editedIndex], this.editedItem)
       } else {
-        const query = `mutation cc($year: String!, $section: String!) {
+        console.log(this.editedItem.department)
+        const query = `mutation cc($year: String!, $section: String!, $departmentId: ID!) {
                           createStudentClass(
-                            createStudentClassInput: { year: $year, section: $section }
+                            createStudentClassInput: { year: $year, section: $section, departmentId: $departmentId}
                           ) {
                             dbId: id
                             year
                             section
+                            department {
+                              name
+                            }
                           }
                         }`
         const variables = {
           year: this.editedItem.year,
           section: this.editedItem.section,
+          departmentId: this.editedItem.department.id,
         }
         const newClass = await this.$axios.post(
           'http://localhost:4000/graphql',
@@ -326,7 +387,7 @@ export default {
           console.log(newClass.data.errors[0].message)
           throw new Error(newClass.data.errors[0].message)
         }
-        this.classes.push(this.editedItem)
+        this.initialize()
       }
       this.close()
     },
