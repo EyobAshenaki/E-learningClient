@@ -53,19 +53,24 @@
                       type="text"
                     ></v-text-field>
                   </v-col> -->
-                    <v-col cols="12" sm="6" md="4">
+                    <v-col cols="12" sm="5">
                       <v-text-field
                         v-model="editedItem.name"
                         label="Department Name"
                         type="text"
                       ></v-text-field>
                     </v-col>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-text-field
-                        v-model="editedItem.depAdmin"
+                    <v-col cols="12" sm="7">
+                      <v-select
+                        v-model="editedItem.departmentAdministrator"
+                        :items="unassignedDepAdmins"
+                        item-text="departmentAdminName"
+                        item-value="unassignedDepAdmin"
+                        :menu-props="{ bottom: true, offsetY: true }"
+                        class="ma-0 pt-1"
                         label="Department Administrator"
-                        type="text"
-                      ></v-text-field>
+                        chips
+                      ></v-select>
                     </v-col>
                     <!-- <v-col cols="12" sm="6" md="4">
                       <v-text-field
@@ -128,6 +133,11 @@
           </v-dialog>
         </v-toolbar>
       </template>
+      <template v-slot:[`item.departmentAdministrator`]="{ item }">
+        {{
+          `${item.departmentAdministrator.firstName} ${item.departmentAdministrator.middleName} ${item.departmentAdministrator.lastName}`
+        }}
+      </template>
       <template v-slot:[`item.actions`]="{ item }">
         <v-icon small class="mr-2" @click="editItem(item)"> mdi-pencil </v-icon>
         <v-icon small @click="deleteItem(item)"> mdi-delete </v-icon>
@@ -154,19 +164,24 @@ export default {
       },
       // { text: 'Student ID', value: 'studentId' },
       { text: 'Department Name', value: 'name', sortable: false },
-      { text: 'Department Administrator', value: 'depAdmin', sortable: false },
+      {
+        text: 'Department Administrator',
+        value: 'departmentAdministrator',
+        sortable: false,
+      },
       // { text: 'Number of Students', value: 'numOfStudents', sortable: false },
       // { text: 'Role', value: 'role' },
       // { text: 'Courses', value: 'courses' },
       { text: 'Actions', value: 'actions', sortable: false },
     ],
+    unassignedDepAdmins: [],
     departments: [],
     editedIndex: -1,
     editedItem: {
       dbId: null,
       // studentId: '',
       name: '',
-      depAdmin: '',
+      departmentAdministrator: [],
       // numOfStudents: '',
       // role: '',
       // courses: '',
@@ -175,11 +190,12 @@ export default {
       dbId: null,
       // studentId: '',
       name: '',
-      depAdmin: '',
+      departmentAdministrator: [],
       // numOfStudents: '',
       // role: '',
       // courses: '',
     },
+    currentDepAdminId: null,
   }),
 
   computed: {
@@ -207,6 +223,12 @@ export default {
                         departments {
                           dbId: id
                           name
+                          departmentAdministrator {
+                            id
+                            firstName
+                            middleName
+                            lastName
+                          }
                         }
                       }`
       const depResponse = await this.$axios.post(
@@ -218,53 +240,40 @@ export default {
         throw new Error(depResponse.data.errors[0].message)
       }
       this.departments = depResponse.data.data.departments
-      // this.departments = [
-      //   {
-      //     // id: 1,
-      //     // studentId: 'ETS0000/11',
-      //     name: 'Software Engineering',
-      //     depAdmin: 'John Doe Smith',
-      //     numOfStudents: 200,
-      //     // role: 'Course Owner',
-      //     // courses: "A",
-      //   },
-      //   {
-      //     // id: 2,
-      //     // studentId: 'ETS0000/11',
-      //     name: 'Software Engineering',
-      //     depAdmin: 'John Doe Smith',
-      //     numOfStudents: 200,
-      //     //   role: 'Course Owner',
-      //     //   courses: 'A',
-      //   },
-      //   {
-      //     // id: 3,
-      //     // studentId: 'ETS0000/11',
-      //     name: 'Software Engineering',
-      //     depAdmin: 'John Doe Smith',
-      //     numOfStudents: 200,
-      //     // role: 'Course Owner',
-      //     // courses: "A",
-      //   },
-      //   {
-      //     // id: 4,
-      //     // studentId: 'ETS0000/11',
-      //     name: 'Software Engineering',
-      //     depAdmin: 'John Doe Smith',
-      //     numOfStudents: 200,
-      //     // role: 'Course Owner',
-      //     // courses: "A",
-      //   },
-      //   {
-      //     // id: 5,
-      //     // studentId: 'ETS0000/11',
-      //     name: 'Software Engineering',
-      //     depAdmin: 'John Doe Smith',
-      //     numOfStudents: 200,
-      //     // role: 'Course Owner',
-      //     // courses: "A",
-      //   },
-      // ]
+
+      const queryUnass = `query getdepadmins{
+                              getAllNewDepartmentAdministrators{
+                                id
+                                firstName
+                                middleName
+                                lastName
+                              }
+                            }`
+      const unassResponse = await this.$axios.post(
+        'http://localhost:4000/graphql',
+        { query: queryUnass }
+      )
+      if (unassResponse.data.errors?.length) {
+        console.log(unassResponse.data.errors[0].message)
+        throw new Error(unassResponse.data.errors[0].message)
+      }
+
+      // this.roles = unassResponse.data.data.roles.map((role) =>
+      //   this.getRoleName(role)
+      // )
+      this.unassignedDepAdmins = [
+        ...unassResponse.data.data.getAllNewDepartmentAdministrators,
+      ]
+
+      this.unassignedDepAdmins = this.unassignedDepAdmins.map(
+        (unAssDepAdmin) => {
+          const depAdminName = `${unAssDepAdmin.firstName} ${unAssDepAdmin.middleName} ${unAssDepAdmin.lastName}`
+          return {
+            departmentAdminName: depAdminName,
+            unassignedDepAdmin: unAssDepAdmin,
+          }
+        }
+      )
 
       this.departments = this.departments.map((dep, idx) => {
         return {
@@ -277,6 +286,7 @@ export default {
     editItem(item) {
       this.editedIndex = this.departments.indexOf(item)
       this.editedItem = Object.assign({}, item)
+      this.currentDepAdminId = this.editedItem.departmentAdministrator.id
       this.dialog = true
     },
 
@@ -288,10 +298,7 @@ export default {
 
     async deleteItemConfirm() {
       const query = `mutation dd($id: ID!) {
-                        removeDepartment(id: $id) {
-                          dbId: id
-                          name
-                        }
+                        removeDepartment(id: $id) 
                       }`
       const variables = { id: this.editedItem.dbId }
       const deletedDepartment = await this.$axios.post(
@@ -302,7 +309,8 @@ export default {
         console.log(deletedDepartment.data.errors[0].message)
         throw new Error(deletedDepartment.data.errors[0].message)
       }
-      this.departments.splice(this.editedIndex, 1)
+
+      this.initialize()
       this.closeDelete()
     },
 
@@ -324,7 +332,23 @@ export default {
 
     async save() {
       if (this.editedIndex > -1) {
-        const query = `mutation ud($id: ID!  $name: String!) {
+        const queryDismiss = `mutation dismissdepadmin ($departmentId: ID!, $userId: ID!){
+                                dismissDepartmentAdministrator(departmentId: $departmentId, userId: $userId)
+                              }`
+        const variablesDismiss = {
+          departmentId: this.editedItem.dbId,
+          userId: this.currentDepAdminId,
+        }
+        const dismissedAdmin = await this.$axios.post(
+          'http://localhost:4000/graphql',
+          { query: queryDismiss, variables: variablesDismiss }
+        )
+        if (dismissedAdmin.data.errors?.length) {
+          console.log(dismissedAdmin.data.errors[0].message)
+          throw new Error(dismissedAdmin.data.errors[0].message)
+        }
+
+        const query = `mutation ud($id: ID!  $name: String) {
                           updateDepartment(id: $id name: $name) {
                             dbId: id
                             name
@@ -334,15 +358,33 @@ export default {
           name: this.editedItem.name,
           id: this.editedItem.dbId,
         }
-        const editedDepartment = await this.$axios.post(
+        const editedDepartmentResponse = await this.$axios.post(
           'http://localhost:4000/graphql',
           { query, variables }
         )
-        if (editedDepartment.data.errors?.length) {
-          console.log(editedDepartment.data.errors[0].message)
-          throw new Error(editedDepartment.data.errors[0].message)
+        if (editedDepartmentResponse.data.errors?.length) {
+          console.log(editedDepartmentResponse.data.errors[0].message)
+          throw new Error(editedDepartmentResponse.data.errors[0].message)
         }
-        Object.assign(this.departments[this.editedIndex], this.editedItem)
+
+        const editedDepartment =
+          editedDepartmentResponse.data.data.updateDepartment
+
+        const queryAssign = `mutation appointDep($departmentId: ID!, $userId: ID!) {
+                                appointDepartmentAdministrator(departmentId: $departmentId, userId: $userId)
+                              }`
+        const variablesAssign = {
+          departmentId: editedDepartment.dbId,
+          userId: this.editedItem.departmentAdministrator.id,
+        }
+        const assignedAdmin = await this.$axios.post(
+          'http://localhost:4000/graphql',
+          { query: queryAssign, variables: variablesAssign }
+        )
+        if (assignedAdmin.data.errors?.length) {
+          console.log(assignedAdmin.data.errors[0].message)
+          throw new Error(assignedAdmin.data.errors[0].message)
+        }
       } else {
         const query = `mutation CreateDepartment($name: String!){
                           createDepartment(name: $name){
@@ -351,16 +393,35 @@ export default {
                           }
                         }`
         const variables = { name: this.editedItem.name }
-        const newDepartment = await this.$axios.post(
+        const newDepartmentResponse = await this.$axios.post(
           'http://localhost:4000/graphql',
           { query, variables }
         )
-        if (newDepartment.data.errors?.length) {
-          console.log(newDepartment.data.errors[0].message)
-          throw new Error(newDepartment.data.errors[0].message)
+        if (newDepartmentResponse.data.errors?.length) {
+          console.log(newDepartmentResponse.data.errors[0].message)
+          throw new Error(newDepartmentResponse.data.errors[0].message)
         }
-        this.departments.push(this.editedItem)
+
+        const newDepartment = newDepartmentResponse.data.data.createDepartment
+
+        const queryAssign = `mutation appointDep($departmentId: ID!, $userId: ID!) {
+                                appointDepartmentAdministrator(departmentId: $departmentId, userId: $userId)
+                              }`
+        const variablesAssign = {
+          departmentId: newDepartment.dbId,
+          userId: this.editedItem.departmentAdministrator.id,
+        }
+        const assignedAdmin = await this.$axios.post(
+          'http://localhost:4000/graphql',
+          { query: queryAssign, variables: variablesAssign }
+        )
+        if (assignedAdmin.data.errors?.length) {
+          console.log(assignedAdmin.data.errors[0].message)
+          throw new Error(assignedAdmin.data.errors[0].message)
+        }
       }
+
+      this.initialize()
       this.close()
     },
   },
