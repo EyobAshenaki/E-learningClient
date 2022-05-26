@@ -77,13 +77,13 @@
                         type="email"
                       ></v-text-field>
                     </v-col>
-                    <v-col cols="12" sm="6" md="4">
+                    <!-- <v-col cols="12" sm="6" md="4">
                       <v-text-field
-                        v-model="editedItem.department"
+                         v-model="editedItem.department"
                         label="Department"
                         type="text"
                       ></v-text-field>
-                    </v-col>
+                    </v-col> -->
                     <!-- <v-col cols="12" sm="6" md="4">
                       <v-text-field
                         v-model="editedItem.batch"
@@ -91,13 +91,13 @@
                         type="number"
                       ></v-text-field>
                     </v-col> -->
-                    <v-col cols="12" sm="6" md="4">
+                    <!-- <v-col cols="12" sm="6" md="4">
                       <v-text-field
                         v-model="editedItem.class"
                         label="Class"
                         type="text"
                       ></v-text-field>
-                    </v-col>
+                    </v-col> -->
                   </v-row>
                 </v-container>
               </v-card-text>
@@ -159,34 +159,34 @@ export default {
       { text: 'Middle Name', value: 'middleName' },
       { text: 'Last Name', value: 'lastName' },
       { text: 'E-mail', value: 'email' },
-      { text: 'Department', value: 'department' },
+      // { text: 'Department', value: 'department' },
       // { text: 'Batch', value: 'batch' },
-      { text: 'Class', value: 'class' },
+      // { text: 'Class', value: 'class' },
       { text: 'Actions', value: 'actions', sortable: false },
     ],
     students: [],
     editedIndex: -1,
     editedItem: {
-      id: 0,
-      studentId: '',
-      firstName: '',
-      middleName: '',
-      lastName: '',
-      email: '',
-      department: '',
+      dbId: null,
+      studentId: null,
+      firstName: null,
+      middleName: null,
+      lastName: null,
+      email: null,
+      // department: null,
       // batch: 0,
-      class: '',
+      // class: null,
     },
     defaultItem: {
-      id: 0,
-      studentId: '',
-      firstName: '',
-      middleName: '',
-      lastName: '',
-      email: '',
-      department: '',
+      dbId: 0,
+      studentId: null,
+      firstName: null,
+      middleName: null,
+      lastName: null,
+      email: null,
+      // department: null,
       // batch: 0,
-      class: '',
+      // class: null,
     },
   }),
 
@@ -210,64 +210,35 @@ export default {
   },
 
   methods: {
-    initialize() {
-      this.students = [
-        {
-          id: 1,
-          studentId: 'ETS0000/11',
-          firstName: 'John',
-          middleName: 'Doe',
-          lastName: 'Smith',
-          email: 'johndoe@gmail.com',
-          department: 'Software Engineering',
-          // batch: 3,
-          class: 'A',
-        },
-        {
-          id: 2,
-          studentId: 'ETS0000/11',
-          firstName: 'John',
-          middleName: 'Doe',
-          lastName: 'Smith',
-          email: 'johndoe@gmail.com',
-          department: 'Software Engineering',
-          // batch: 3,
-          class: 'A',
-        },
-        {
-          id: 3,
-          studentId: 'ETS0000/11',
-          firstName: 'John',
-          middleName: 'Doe',
-          lastName: 'Smith',
-          email: 'johndoe@gmail.com',
-          department: 'Software Engineering',
-          // batch: 3,
-          class: 'A',
-        },
-        {
-          id: 4,
-          studentId: 'ETS0000/11',
-          firstName: 'John',
-          middleName: 'Doe',
-          lastName: 'Smith',
-          email: 'johndoe@gmail.com',
-          department: 'Software Engineering',
-          // batch: 3,
-          class: 'A',
-        },
-        {
-          id: 5,
-          studentId: 'ETS0000/11',
-          firstName: 'John',
-          middleName: 'Doe',
-          lastName: 'Smith',
-          email: 'johndoe@gmail.com',
-          department: 'Software Engineering',
-          // batch: 3,
-          class: 'A',
-        },
-      ]
+    async initialize() {
+      const query = `query studentclass($id: ID!) {
+                        studentClass(id: $id) {
+                          students{
+                            dbId: id
+                            firstName
+                            middleName
+                            lastName
+                            email
+                          }
+                        }
+                      }`
+      // const variables = {id: }
+      const studClassResponse = await this.$axios.post(
+        'http://localhost:4000/graphql',
+        { query }
+      )
+      if (studClassResponse.data.errors?.length) {
+        console.log(studClassResponse.data.errors[0].message)
+        throw new Error(studClassResponse.data.errors[0].message)
+      }
+      this.students = studClassResponse.data.data.studentClass.students
+
+      this.students = this.students.map((clas, idx) => {
+        return {
+          ...clas,
+          id: idx + 1,
+        }
+      })
     },
 
     editItem(item) {

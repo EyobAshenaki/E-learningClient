@@ -158,19 +158,20 @@
           </template>
           <span>Delete</span>
         </v-tooltip>
-        <NuxtLink
-          to="/administrator/_id/department"
-          class="text-decoration-none"
-        >
-          <v-tooltip bottom>
-            <template v-slot:activator="{ on, attrs }">
-              <v-icon v-bind="attrs" v-on="on" size="23">
-                mdi-account-group
-              </v-icon>
-            </template>
-            <span>Students</span>
-          </v-tooltip>
-        </NuxtLink>
+
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-icon
+              v-bind="attrs"
+              v-on="on"
+              size="23"
+              @click="toDetailsPage(item)"
+            >
+              mdi-account-group
+            </v-icon>
+          </template>
+          <span>Students</span>
+        </v-tooltip>
       </template>
       <template v-slot:no-data>
         <v-btn color="primary" @click="initialize"> Reset </v-btn>
@@ -240,6 +241,12 @@ export default {
 
   methods: {
     // ...mapActions(['viewStudents']),
+    toDetailsPage(classItem) {
+      this.$router.push({
+        path: '/administrator/_id/class',
+        params: { classId: classItem.dbId },
+      })
+    },
     async initialize() {
       const query = `query class {
                         studentClasses {

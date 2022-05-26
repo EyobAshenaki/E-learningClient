@@ -1,11 +1,11 @@
 <template>
   <div>
-  <v-row justify="center" align="center"> </v-row>
-  <!-- <CourseWhatYoullLearn />
+    <v-row justify="center" align="center"> </v-row>
+    <!-- <CourseWhatYoullLearn />
   <CourseCourseContent />
   <CourseRequirements /> -->
-  <AdminClassesClasses />
-  <AdminAllAccounts />
+    <TrialComponent />
+    <!-- <AdminAllAccounts /> -->
   </div>
 </template>
 
