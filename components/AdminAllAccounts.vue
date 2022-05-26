@@ -8,15 +8,13 @@
       class="mt-5"
       style="height: 75vh"
     >
-      <template v-slot:[`item.roles`]="{ item }">
-        <v-chip dark class="mr-1" v-for="(role, id) in item.roles" :key="id">
+      <template #[`item.roles`]="{ item }">
+        <v-chip v-for="(role, id) in item.roles" :key="id" dark class="mr-1">
           {{ role.name }}
         </v-chip>
       </template>
-      <template v-slot:top>
+      <template #top>
         <v-toolbar flat>
-          <!-- <v-toolbar-title>All Users</v-toolbar-title>
-          <v-divider class="mx-4" inset vertical></v-divider> -->
           <v-text-field
             v-model="search"
             append-icon="mdi-magnify"
@@ -26,183 +24,16 @@
             class="mr-4"
           ></v-text-field>
           <v-spacer></v-spacer>
-          <!-- edit password dialog -->
-          <v-dialog v-model="dialogPassword" max-width="500px">
-            <v-card>
-              <v-card-text>
-                <v-container>
-                  <v-row>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-text-field
-                        v-model="editedItem.password"
-                        label="Password"
-                        type="text"
-                      ></v-text-field>
-                    </v-col>
-                  </v-row>
-                </v-container>
-              </v-card-text>
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn color="blue darken-1" text @click="closePassword">
-                  Cancel
-                </v-btn>
-                <v-btn color="blue darken-1" text @click="savePassword">
-                  Save
-                </v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
-
-          <v-dialog v-model="dialog" max-width="500px">
-            <template v-slot:activator="{ on, attrs }">
-              <v-btn color="primary" dark class="mb-2" v-bind="attrs" v-on="on">
-                Add New User Account
-              </v-btn>
-            </template>
-
-            <v-card>
-              <v-card-title>
-                <span class="text-h5">{{ formTitle }}</span>
-              </v-card-title>
-
-              <v-card-text>
-                <v-container>
-                  <v-row>
-                    <!-- <v-col cols="12" sm="6" md="4">
-                      <v-text-field
-                        v-model="editedItem.id"
-                        label="ID"
-                        type="number"
-                      ></v-text-field>
-                    </v-col> -->
-                    <!-- <v-col cols="12" sm="6" md="4">
-                      <v-text-field
-                        v-model="editedItem.institutionId"
-                        label="Student ID"
-                        type="text"
-                      ></v-text-field>
-                    </v-col> -->
-                    <v-col cols="12" sm="6" md="4">
-                      <v-text-field
-                        v-model="editedItem.firstName"
-                        label="First Name"
-                        type="text"
-                      ></v-text-field>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-text-field
-                        v-model="editedItem.middleName"
-                        label="Middle Name"
-                        type="text"
-                      ></v-text-field>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-text-field
-                        v-model="editedItem.lastName"
-                        label="Last Name"
-                        type="text"
-                      ></v-text-field>
-                    </v-col>
-                    <v-col cols="12" sm="6" md="4">
-                      <v-text-field
-                        v-model="editedItem.email"
-                        label="E-mail"
-                        type="email"
-                      ></v-text-field>
-                    </v-col>
-                    <v-col v-if="editedIndex <= -1" cols="12" sm="6" md="4">
-                      <v-text-field
-                        v-model="editedItem.password"
-                        label="Password"
-                        type="password"
-                      ></v-text-field>
-                    </v-col>
-                    <v-col v-if="editedIndex > -1" cols="12" sm="6" md="4">
-                      <v-switch
-                        v-model="roleSwitch"
-                        inset
-                        :label="`Role: ${getRoleSwitchLabel(roleSwitch)}`"
-                      ></v-switch>
-                    </v-col>
-                    <!-- <v-col
-                    cols="12"
-                    sm="6"
-                    md="4"
-                  >
-                    <v-text-field
-                      v-model="editedItem.batch"
-                      label="Batch"
-                      type="number"
-                    ></v-text-field>
-                  </v-col> -->
-                    <v-col v-if="roleSwitch" cols="12" sm="6" md="4">
-                      <v-select
-                        v-model="editedItem.roles"
-                        :items="unassignedRoles"
-                        label="Add Role"
-                        chips
-                      ></v-select>
-                    </v-col>
-                    <v-col v-else cols="12" sm="6" md="4">
-                      <v-select
-                        v-model="editedItem.roles"
-                        :items="assignedRoles"
-                        label="Remove Role"
-                        chips
-                      ></v-select>
-                    </v-col>
-                  </v-row>
-                </v-container>
-              </v-card-text>
-
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn color="blue darken-1" text @click="close">
-                  Cancel
-                </v-btn>
-                <v-btn color="blue darken-1" text @click="save"> Save </v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
-          <v-dialog v-model="dialogDelete" max-width="500px">
-            <v-card>
-              <v-card-title class="text-h5"
-                >Are you sure you want to delete this item?</v-card-title
-              >
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn color="blue darken-1" text @click="closeDelete"
-                  >Cancel</v-btn
-                >
-                <v-btn color="blue darken-1" text @click="deleteItemConfirm"
-                  >OK</v-btn
-                >
-                <v-spacer></v-spacer>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
+          <add-account-dialog />
         </v-toolbar>
       </template>
-      <template v-slot:[`item.actions`]="{ item }">
+
+      <!-- eslint-disable-next-line -->
+      <template #item.actions="{ item }">
         <edit-account-dialog :account="item" />
         <delete-account-dialog :account="item" />
-        <v-tooltip bottom>
-          <template v-slot:activator="{ on, attrs }">
-            <v-icon
-              v-bind="attrs"
-              v-on="on"
-              small
-              @click="changePassword(item)"
-            >
-              mdi-lock-reset
-            </v-icon>
-          </template>
-          <span>Change Password</span>
-        </v-tooltip>
       </template>
-
-      <template v-slot:no-data>
+      <template #no-data>
         <v-btn color="primary" @click="initialize"> Reset </v-btn>
       </template>
     </v-data-table>
@@ -210,7 +41,11 @@
 </template>
 
 <script>
+import AddAccountDialog from './AddAccountDialog.vue'
+import DeleteAccountDialog from './DeleteAccountDialog.vue'
+import EditAccountDialog from './EditAccountDialog.vue'
 export default {
+  components: { AddAccountDialog, EditAccountDialog, DeleteAccountDialog },
   props: {
     users: {
       type: Array,
@@ -244,49 +79,8 @@ export default {
         { text: 'Roles', value: 'roles' },
         { text: 'Actions', value: 'actions', sortable: false },
       ],
-      editPasswordIndex: -1,
-      editedIndex: -1,
-      editedItem: {
-        dbId: null,
-        // institutionId: '',
-        firstName: '',
-        middleName: '',
-        lastName: '',
-        email: '',
-        password: '',
-        // batch: 0,
-        roles: [],
-      },
-      defaultItem: {
-        dbId: null,
-        // institutionId: '',
-        firstName: '',
-        middleName: '',
-        lastName: '',
-        email: '',
-        password: '',
-        // batch: 0,
-        roles: [],
-      },
       parsedUsers: this.users,
     }
-  },
-  computed: {
-    formTitle() {
-      return this.editedIndex === -1 ? 'New Item' : 'Edit Item'
-    },
-  },
-
-  watch: {
-    dialog(val) {
-      val || this.close()
-    },
-    dialogDelete(val) {
-      val || this.closeDelete()
-    },
-    dialogPassword(val) {
-      val || this.closePassword()
-    },
   },
 
   created() {
@@ -348,26 +142,6 @@ export default {
       this.editedItem = Object.assign({}, item)
       this.dialogPassword = true
     },
-
-    editItem(item) {
-      this.editedIndex = this.parsedUsers.indexOf(item)
-      Object.assign(this.editedItem, item)
-      const itemRoleNames = item.roles.map((role) => role.name)
-      this.unassignedRoles = this.roles.filter((role) => {
-        return !itemRoleNames.includes(role)
-      })
-      this.assignedRoles = this.roles.filter((role) => {
-        return itemRoleNames.includes(role)
-      })
-      this.dialog = true
-    },
-
-    deleteItem(item) {
-      this.editedIndex = this.parsedUsers.indexOf(item)
-      this.editedItem = Object.assign({}, item)
-      this.dialogDelete = true
-    },
-
     async deleteItemConfirm() {
       const query = `mutation deleteUser($id: ID!) {
                         removeUser(id: $id) {
@@ -387,29 +161,6 @@ export default {
       this.closeDelete()
     },
 
-    closePassword() {
-      this.dialogPassword = false
-      this.$nextTick(() => {
-        this.editedItem = Object.assign({}, this.defaultItem)
-        this.editPasswordIndex = -1
-      })
-    },
-
-    close() {
-      this.dialog = false
-      // this.$nextTick(() => {
-      this.editedItem = Object.assign({}, this.defaultItem)
-      this.editedIndex = -1
-      // })
-    },
-
-    closeDelete() {
-      this.dialogDelete = false
-      this.$nextTick(() => {
-        this.editedItem = Object.assign({}, this.defaultItem)
-        this.editedIndex = -1
-      })
-    },
     // fix password pls
 
     async savePassword() {
