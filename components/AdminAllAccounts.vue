@@ -2,9 +2,9 @@
   <div>
     <v-data-table
       :headers="headers"
-      :items="users"
+      :items="parsedUsers"
       :search="search"
-      sort-by="firstName"
+      sort-by="id"
       class="mt-5"
       style="height: 75vh"
     >
@@ -26,6 +26,34 @@
             class="mr-4"
           ></v-text-field>
           <v-spacer></v-spacer>
+          <!-- edit password dialog -->
+          <v-dialog v-model="dialogPassword" max-width="500px">
+            <v-card>
+              <v-card-text>
+                <v-container>
+                  <v-row>
+                    <v-col cols="12" sm="6" md="4">
+                      <v-text-field
+                        v-model="editedItem.password"
+                        label="Password"
+                        type="text"
+                      ></v-text-field>
+                    </v-col>
+                  </v-row>
+                </v-container>
+              </v-card-text>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="blue darken-1" text @click="closePassword">
+                  Cancel
+                </v-btn>
+                <v-btn color="blue darken-1" text @click="savePassword">
+                  Save
+                </v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+
           <v-dialog v-model="dialog" max-width="500px">
             <template v-slot:activator="{ on, attrs }">
               <v-btn color="primary" dark class="mb-2" v-bind="attrs" v-on="on">
@@ -112,7 +140,7 @@
                       <v-select
                         v-model="editedItem.roles"
                         :items="unassignedRoles"
-                        label="Roles"
+                        label="Add Role"
                         chips
                       ></v-select>
                     </v-col>
@@ -120,7 +148,7 @@
                       <v-select
                         v-model="editedItem.roles"
                         :items="assignedRoles"
-                        label="Roles"
+                        label="Remove Role"
                         chips
                       ></v-select>
                     </v-col>
@@ -157,38 +185,17 @@
         </v-toolbar>
       </template>
       <template v-slot:[`item.actions`]="{ item }">
+        <edit-account-dialog :account="item" />
+        <delete-account-dialog :account="item" />
         <v-tooltip bottom>
           <template v-slot:activator="{ on, attrs }">
             <v-icon
               v-bind="attrs"
               v-on="on"
               small
-              class="mr-2"
-              @click="editItem(item)"
+              @click="changePassword(item)"
             >
-              mdi-pencil
-            </v-icon>
-          </template>
-          <span>Edit</span>
-        </v-tooltip>
-        <v-tooltip bottom>
-          <template v-slot:activator="{ on, attrs }">
-            <v-icon
-              v-bind="attrs"
-              v-on="on"
-              small
-              class="mr-2"
-              @click="deleteItem(item)"
-            >
-              mdi-delete
-            </v-icon>
-          </template>
-          <span>Delete</span>
-        </v-tooltip>
-        <v-tooltip bottom>
-          <template v-slot:activator="{ on, attrs }">
-            <v-icon v-bind="attrs" v-on="on" small @click="deleteItem(item)">
-              mdi-account
+              mdi-lock-reset
             </v-icon>
           </template>
           <span>Change Password</span>
@@ -204,58 +211,66 @@
 
 <script>
 export default {
-  data: () => ({
-    roles: [],
-    assignedRoles: [],
-    unassignedRoles: [],
-    roleSwitch: true,
-    switchLable: 'Assign',
-    search: '',
-    dialog: false,
-    dialogDelete: false,
-    headers: [
-      {
-        text: 'ID',
-        align: 'start',
-        sortable: false,
-        value: 'id',
+  props: {
+    users: {
+      type: Array,
+    },
+  },
+  data() {
+    return {
+      roles: [],
+      assignedRoles: [],
+      unassignedRoles: [],
+      roleSwitch: true,
+      switchLable: 'Assign',
+      search: '',
+      dialog: false,
+      dialogDelete: false,
+      dialogPassword: false,
+      headers: [
+        {
+          text: 'ID',
+          align: 'start',
+          sortable: false,
+          value: 'id',
+        },
+        // { text: 'Institutional ID', value: 'institutionId' },
+        { text: 'First Name', value: 'firstName' },
+        { text: 'Middle Name', value: 'middleName' },
+        { text: 'Last Name', value: 'lastName' },
+        { text: 'E-mail', value: 'email' },
+        // { text: 'Password', value: 'password' },
+        // { text: 'Batch', value: 'batch' },
+        { text: 'Roles', value: 'roles' },
+        { text: 'Actions', value: 'actions', sortable: false },
+      ],
+      editPasswordIndex: -1,
+      editedIndex: -1,
+      editedItem: {
+        dbId: null,
+        // institutionId: '',
+        firstName: '',
+        middleName: '',
+        lastName: '',
+        email: '',
+        password: '',
+        // batch: 0,
+        roles: [],
       },
-      // { text: 'Institutional ID', value: 'institutionId' },
-      { text: 'First Name', value: 'firstName' },
-      { text: 'Middle Name', value: 'middleName' },
-      { text: 'Last Name', value: 'lastName' },
-      { text: 'E-mail', value: 'email' },
-      // { text: 'Password', value: 'password' },
-      // { text: 'Batch', value: 'batch' },
-      { text: 'Roles', value: 'roles' },
-      { text: 'Actions', value: 'actions', sortable: false },
-    ],
-    users: [],
-    editedIndex: -1,
-    editedItem: {
-      dbId: null,
-      // institutionId: '',
-      firstName: '',
-      middleName: '',
-      lastName: '',
-      email: '',
-      password: '',
-      // batch: 0,
-      roles: [],
-    },
-    defaultItem: {
-      dbId: null,
-      // institutionId: '',
-      firstName: '',
-      middleName: '',
-      lastName: '',
-      email: '',
-      password: '',
-      // batch: 0,
-      roles: [],
-    },
-  }),
-
+      defaultItem: {
+        dbId: null,
+        // institutionId: '',
+        firstName: '',
+        middleName: '',
+        lastName: '',
+        email: '',
+        password: '',
+        // batch: 0,
+        roles: [],
+      },
+      parsedUsers: this.users,
+    }
+  },
   computed: {
     formTitle() {
       return this.editedIndex === -1 ? 'New Item' : 'Edit Item'
@@ -269,41 +284,24 @@ export default {
     dialogDelete(val) {
       val || this.closeDelete()
     },
+    dialogPassword(val) {
+      val || this.closePassword()
+    },
   },
 
   created() {
-    this.initialize()
+    // this.initialize()
   },
 
   methods: {
     async initialize() {
-      const query = `query users {
-                        users {
-                          dbId :id
-                          firstName
-                          middleName
-                          lastName
-                          email
-                          password
-                          roles{
-                            name
-                          }
-                        }
-                      }`
-      const usersResponse = await this.$axios.post(
-        'http://localhost:4000/graphql',
-        { query }
-      )
-      if (usersResponse.data.errors?.length) {
-        console.log(usersResponse.data.errors[0].message)
-        throw new Error(usersResponse.data.errors[0].message)
-      }
-      this.users = usersResponse.data.data.users
-
       // quering for roles option
+
+      console.log('users', this.parsedUsers)
 
       const queryRole = `query roles{
                         roles{
+                          id
                           name
                         }
                       }`
@@ -321,64 +319,7 @@ export default {
       // )
       this.roles = rolesResponse.data.data.roles.map((role) => role.name)
 
-      // this.users = [
-      //   {
-      //     id: 1,
-      //     // institutionId: 'ETS0000/11',
-      //     firstName: 'John',
-      //     middleName: 'Doe',
-      //     lastName: 'Smith',
-      //     email: 'johndoe@gmail.com',
-      //     // department: 'Software Engineering',
-      //     // batch: 3,
-      //     roles: ['Student'],
-      //   },
-      //   {
-      //     id: 2,
-      //     // institutionId: 'ETS0000/11',
-      //     firstName: 'John',
-      //     middleName: 'Doe',
-      //     lastName: 'Smith',
-      //     email: 'johndoe@gmail.com',
-      //     // department: 'Software Engineering',
-      //     // batch: 3,
-      //     roles: ['Student', 'Teacher'],
-      //   },
-      //   {
-      //     id: 3,
-      //     // institutionId: 'ETS0000/11',
-      //     firstName: 'John',
-      //     middleName: 'Doe',
-      //     lastName: 'Smith',
-      //     email: 'johndoe@gmail.com',
-      //     // department: 'Software Engineering',
-      //     // batch: 3,
-      //     roles: ['Admin'],
-      //   },
-      //   {
-      //     id: 4,
-      //     // institutionId: 'ETS0000/11',
-      //     firstName: 'John',
-      //     middleName: 'Doe',
-      //     lastName: 'Smith',
-      //     email: 'johndoe@gmail.com',
-      //     // department: 'Software Engineering',
-      //     // batch: 3,
-      //     roles: ['Dep Admin'],
-      //   },
-      //   {
-      //     id: 5,
-      //     // firstName: 'ETS0000/11',
-      //     firstName: 'John',
-      //     middleName: 'Doe',
-      //     lastName: 'Smith',
-      //     email: 'johndoe@gmail.com',
-      //     // department: 'Software Engineering',
-      //     // batch: 3,
-      //     roles: ['Course Manager', 'Dep Admin'],
-      //   },
-      // ]
-      this.users = this.users.map((usr, idx) => {
+      this.parsedUsers = this.parsedUsers.map((usr, idx) => {
         return {
           ...usr,
           id: idx + 1,
@@ -402,10 +343,15 @@ export default {
     //         .toLowerCase()}`
     //     : `${tempRole[0].slice(0, 1)}${tempRole[0].slice(1).toLowerCase()}`
     // },
+    changePassword(item) {
+      this.editPasswordIndex = this.parsedUsers.indexOf(item)
+      this.editedItem = Object.assign({}, item)
+      this.dialogPassword = true
+    },
 
     editItem(item) {
-      this.editedIndex = this.users.indexOf(item)
-      this.editedItem = Object.assign({}, item)
+      this.editedIndex = this.parsedUsers.indexOf(item)
+      Object.assign(this.editedItem, item)
       const itemRoleNames = item.roles.map((role) => role.name)
       this.unassignedRoles = this.roles.filter((role) => {
         return !itemRoleNames.includes(role)
@@ -417,7 +363,7 @@ export default {
     },
 
     deleteItem(item) {
-      this.editedIndex = this.users.indexOf(item)
+      this.editedIndex = this.parsedUsers.indexOf(item)
       this.editedItem = Object.assign({}, item)
       this.dialogDelete = true
     },
@@ -437,16 +383,24 @@ export default {
         console.log(deletedUser.data.errors[0].message)
         throw new Error(deletedUser.data.errors[0].message)
       }
-      this.users.splice(this.editedIndex, 1)
+      this.parsedUsers.splice(this.editedIndex, 1)
       this.closeDelete()
+    },
+
+    closePassword() {
+      this.dialogPassword = false
+      this.$nextTick(() => {
+        this.editedItem = Object.assign({}, this.defaultItem)
+        this.editPasswordIndex = -1
+      })
     },
 
     close() {
       this.dialog = false
-      this.$nextTick(() => {
-        this.editedItem = Object.assign({}, this.defaultItem)
-        this.editedIndex = -1
-      })
+      // this.$nextTick(() => {
+      this.editedItem = Object.assign({}, this.defaultItem)
+      this.editedIndex = -1
+      // })
     },
 
     closeDelete() {
@@ -457,6 +411,31 @@ export default {
       })
     },
     // fix password pls
+
+    async savePassword() {
+      const query = `mutation changePassword($id: ID! $password: String) {
+                        updateUser (updateUserInput: {id: $id password: $password}) {
+                          dbId: id
+                        }
+                      }`
+      const variables = {
+        id: this.editedItem.dbId,
+        password: this.editedItem.password,
+      }
+      const newPassword = await this.$axios.post(
+        'http://localhost:4000/graphql',
+        {
+          query,
+          variables,
+        }
+      )
+      if (newPassword.data.errors?.length) {
+        console.log(newPassword.data.errors[0].message)
+        throw new Error(newPassword.data.errors[0].message)
+      }
+      this.closePassword()
+    },
+
     async save() {
       if (this.editedIndex > -1) {
         const query = `mutation editUser(
@@ -495,15 +474,31 @@ export default {
           email: this.editedItem.email || null,
           roleName: this.editedItem.roles || null,
         }
-        const editedUser = await this.$axios.post(
+        let editedUser = await this.$axios.post(
           'http://localhost:4000/graphql',
           { query, variables }
         )
+        if (!this.roleSwitch) {
+          const revokeQuery = `mutation revoke ($userId: ID! $roleName: RoleName!) {
+                            revokeUserRole (userId: $userId roleName: $roleName) {
+                              dbId: id
+                              firstName
+                            }
+                          }`
+          const revokeVariables = {
+            userId: this.editedItem.dbId,
+            roleName: this.editedItem.roles || null,
+          }
+          editedUser = await this.$axios.post('http://localhost:4000/graphql', {
+            query: revokeQuery,
+            variables: revokeVariables,
+          })
+        }
         if (editedUser.data.errors?.length) {
           console.log(editedUser.data.errors[0].message)
           throw new Error(editedUser.data.errors[0].message)
         }
-        Object.assign(this.users[this.editedIndex], this.editedItem)
+        this.initialize()
       } else {
         const query = `mutation createUser(
                           $firstName: String!
@@ -550,7 +545,7 @@ export default {
           console.log(newUser.data.errors[0].message)
           throw new Error(newUser.data.errors[0].message)
         }
-        this.users.push(this.editedItem)
+        this.parsedUsers.push(this.editedItem)
       }
       this.close()
     },

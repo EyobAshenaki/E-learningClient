@@ -4,8 +4,8 @@
     <!-- <CourseWhatYoullLearn />
   <CourseCourseContent />
   <CourseRequirements /> -->
-    <AdminClassesClasses />
-    <AdminAllAccounts />
+    <TrialComponent />
+    <!-- <AdminAllAccounts /> -->
   </div>
 </template>
 <script>
