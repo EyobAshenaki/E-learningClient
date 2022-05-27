@@ -17,11 +17,11 @@
                       Welcome Back,
                     </p>
                   </v-col>
-                  <v-col cols="11" class="py-0">
+                  <v-col v-if="user" cols="11" class="py-0">
                     <p
                       class="orange--text text--darken-4 text-h4 text-left font-weight-medium"
                     >
-                      Adem
+                      {{ user.firstName }}
                     </p>
                   </v-col>
                 </v-row>
@@ -48,7 +48,6 @@
                 <v-spacer></v-spacer>
                 <v-col cols="4" class="d-flex justify-end">
                   <v-btn outlined color="orange darken-4" @click="createCourse">
-                    <v-icon>mdi-plus</v-icon>
                     Create Course
                   </v-btn>
                 </v-col>
@@ -86,21 +85,21 @@
                           </v-col>
                           <!-- Course Button Group -->
                           <v-col cols="12" class="p-0">
-                            <v-btn-toggle v-model="chosenAction">
+                            <v-btn-toggle>
                               <v-btn
-                                @click="goToCourseDetail(course)"
-                                @mouseenter="detailEnter($event)"
-                                @mouseleave="detailLeave()"
+                                @click="assignCourseTeacher(course.id)"
+                                @mouseenter="assignEnter($event)"
+                                @mouseleave="leaveBtn()"
                               >
                                 <v-icon color="#25327F"
-                                  >mdi-format-list-bulleted</v-icon
+                                  >mdi-account-plus</v-icon
                                 >
                               </v-btn>
 
                               <v-btn
-                                @click="editCourse(course)"
+                                @click="goToCourseEdit(course.id)"
                                 @mouseenter="editEnter($event)"
-                                @mouseleave="editLeave()"
+                                @mouseleave="leaveBtn()"
                               >
                                 <v-icon color="orange darken-4"
                                   >mdi-pencil</v-icon
@@ -110,7 +109,7 @@
                               <v-btn
                                 @click="deleteCourse(course)"
                                 @mouseenter="deleteEnter($event)"
-                                @mouseleave="deleteLeave()"
+                                @mouseleave="leaveBtn()"
                               >
                                 <v-icon color="error">mdi-delete</v-icon>
                               </v-btn>
@@ -158,13 +157,14 @@
                             </v-card>
                           </v-dialog>
 
-                          <!-- Course Create/Edit Dialog -->
-                          <v-dialog v-model="courseDialog" max-width="50%">
+                          <!-- Create Course Dialog -->
+                          <v-dialog
+                            v-model="createCourseDialog"
+                            max-width="50%"
+                          >
                             <v-card>
                               <v-card-title>
-                                <span class="text-h5">{{
-                                  courseFormTitle
-                                }}</span>
+                                <span class="text-h5"> New Course </span>
                               </v-card-title>
 
                               <v-card-text>
@@ -172,26 +172,26 @@
                                   <v-row>
                                     <v-col cols="12" sm="6" md="6">
                                       <v-text-field
-                                        v-model="editedCourse.name"
+                                        v-model="newCourse.name"
                                         label="Name"
                                       ></v-text-field>
                                     </v-col>
                                     <v-col cols="12" sm="6" md="3">
                                       <v-text-field
-                                        v-model="editedCourse.code"
+                                        v-model="newCourse.code"
                                         label="Code"
                                       ></v-text-field>
                                     </v-col>
                                     <v-col cols="12" sm="6" md="3">
                                       <v-text-field
-                                        v-model="editedCourse.creditHour"
+                                        v-model="newCourse.creditHour"
                                         label="Credit Hour"
                                         type="number"
                                       ></v-text-field>
                                     </v-col>
                                     <v-col cols="12">
                                       <v-textarea
-                                        v-model="editedCourse.overview"
+                                        v-model="newCourse.overview"
                                         label="Overview"
                                         auto-grow
                                         filled
@@ -199,7 +199,7 @@
                                     </v-col>
                                     <v-col cols="12">
                                       <v-textarea
-                                        v-model="editedCourse.description"
+                                        v-model="newCourse.description"
                                         label="description"
                                         auto-grow
                                         filled
@@ -221,6 +221,50 @@
                                 <v-btn color="#25327F" text @click="saveCourse">
                                   Save
                                 </v-btn>
+                              </v-card-actions>
+                            </v-card>
+                          </v-dialog>
+
+                          <!-- Assign Teacher to a Course -->
+                          <v-dialog
+                            v-model="assignTeacherDialog"
+                            max-width="25%"
+                          >
+                            <v-card>
+                              <v-card-title class="pb-7"
+                                >Assign Teacher</v-card-title
+                              >
+                              <v-card-text class="pb-0">
+                                <v-row>
+                                  <v-col cols="12" class="py-0">
+                                    <v-select
+                                      v-model="selectedTeacher"
+                                      :items="unassignedTeachers"
+                                      item-text="unassignedTeacherFullName"
+                                      item-value="unassignedTeacher"
+                                      label="Select Teacher"
+                                      outlined
+                                    ></v-select>
+                                  </v-col>
+                                  <v-col cols="12" class="py-0">
+                                    <v-select
+                                      v-model="selectedTeacherType"
+                                      :items="teacherTypes"
+                                      label="Teacher Type"
+                                      outlined
+                                    ></v-select>
+                                  </v-col>
+                                </v-row>
+                              </v-card-text>
+                              <v-card-actions
+                                class="pb-4 px-6 d-flex justify-space-between"
+                              >
+                                <v-btn @click="assignCourseTeacherClose"
+                                  >Cancel</v-btn
+                                >
+                                <v-btn @click="assignCourseTeacherConfirm"
+                                  >Save</v-btn
+                                >
                               </v-card-actions>
                             </v-card>
                           </v-dialog>
@@ -255,7 +299,7 @@
                       <v-col cols="5" class="pt-0 px-0">
                         <v-list-item class="px-0">
                           <v-list-item-avatar color="grey lighten-3">
-                            <v-icon color="#25327F">mdi-folder</v-icon>
+                            <v-icon color="#25327F">mdi-timer-outline</v-icon>
                           </v-list-item-avatar>
                           <v-list-item-content>
                             <v-list-item-title>
@@ -291,7 +335,12 @@
             </v-col>
           </v-row>
         </v-col>
-        <v-col v-for="n in 4" :key="n" cols="12" class="py-1">
+        <v-col
+          v-for="teacher in teachers"
+          :key="teacher.id"
+          cols="12"
+          class="py-1"
+        >
           <v-card outlined class="py-3">
             <v-row>
               <v-col cols="4" class="pr-0 d-flex justify-end">
@@ -300,8 +349,12 @@
                 </v-avatar>
               </v-col>
               <v-col>
-                <v-card-title>Betel Desalegn</v-card-title>
-                <v-card-subtitle>Software enginnering</v-card-subtitle>
+                <v-card-title>{{
+                  `${teacher.firstName} ${teacher.middleName} ${teacher.lastName}`
+                }}</v-card-title>
+                <v-card-subtitle>{{
+                  teacher.department ? teacher.department.name : 'N/A'
+                }}</v-card-subtitle>
               </v-col>
             </v-row>
           </v-card>
@@ -317,28 +370,10 @@ export default {
 
   data() {
     return {
-      courses: [
-        {
-          id: 1,
-          code: 'sweg4052',
-          name: 'Requirement and Design',
-          description:
-            'lorem this itjdnf dfnadkj fakdjfakdfkjadbsf kajdsfbakj fbkajbsf',
-          overview:
-            'dfhuf aiuf aif iuafb aifaif afafn ajdfuia faf aif aidfbaf ajdbfiabf',
-          creditHour: '4',
-          chapters: [
-            { id: 1, title: 'Introduction', sequenceNumber: 1 },
-            { id: 2, title: 'Requirement Elicitaion', sequenceNumber: 2 },
-            { id: 3, title: 'Design and Architecture', sequenceNumber: 3 },
-            { id: 4, title: 'Testing', sequenceNumber: 4 },
-            { id: 5, title: 'Assurance', sequenceNumber: 5 },
-            { id: 6, title: 'Security', sequenceNumber: 6 },
-          ],
-        },
-      ],
-      editedIndex: -1,
-      editedCourse: {
+      user: null,
+      courses: [],
+      teachers: [],
+      newCourse: {
         code: '',
         name: '',
         description: '',
@@ -352,30 +387,177 @@ export default {
         overview: '',
         creditHour: '',
       },
-      courseDialog: false,
+      createCourseDialog: false,
       courseDialogDelete: false,
       tooltipValue: '',
       showTooltip: false,
       tooltipPositionX: null,
       tooltipPositionY: null,
-      chosenAction: undefined,
+      unassignedTeachers: [],
+      teacherTypes: [],
+      selectedTeacher: '',
+      selectedTeacherType: '',
+      selectedCourseId: null,
+      assignTeacherDialog: false,
     }
   },
 
   computed: {
     tooltipText() {
-      if (this.tooltipValue === 'detail') return 'Course Detail'
+      if (this.tooltipValue === 'assign') return 'Assign Teacher'
       else if (this.tooltipValue === 'edit') return 'Edit Course'
       else if (this.tooltipValue === 'delete') return 'Delete Course'
       else return null
     },
+  },
 
-    courseFormTitle() {
-      return this.editedIndex === -1 ? 'New Course' : 'Edit Course'
-    },
+  created() {
+    this.initializeUser()
+    this.initializeCourses()
+    this.initializeTeachers()
   },
 
   methods: {
+    async initializeUser() {
+      const query = `query user ($id: ID!) {
+                      user (id: $id) {
+                        id
+                        firstName
+                        middleName
+                        lastName
+                      }
+                    }`
+
+      const variables = {
+        id: this.$nuxt.context.params.id,
+      }
+
+      const userResponse = await this.$axios.post('/graphql', {
+        query,
+        variables,
+      })
+
+      this.user = userResponse.data.data.user
+    },
+
+    async initializeCourses() {
+      // const userId = this.$nuxt.context.params.id
+
+      const query = `query courses {
+                      courses {
+                        id
+                        name
+                        code
+                        description
+                        overview
+                        creditHour
+                        chapters {
+                          id
+                          title
+                          sequenceNumber
+                        }
+                      }
+                    }`
+      const response = await this.$axios.post('/graphql', {
+        query,
+      })
+
+      this.courses = [...response.data.data.courses]
+    },
+
+    async initializeTeachers() {
+      this.teachers = JSON.parse(JSON.stringify(await this.getTeachers()))
+    },
+
+    async getTeachers() {
+      const roles = ['Teacher', 'Course Owner', 'Course Teacher']
+      const teachers = []
+
+      for (const role of roles) {
+        const users = await this.getUsersWithRole(role)
+
+        if (users === null) break
+
+        let duplicateFlag = false
+        for (const user of users) {
+          for (const teacher of teachers) {
+            if (user.id === teacher.id) {
+              duplicateFlag = true
+              break
+            }
+          }
+          if (!duplicateFlag) teachers.push(user)
+        }
+      }
+
+      return teachers
+    },
+
+    async getUsersWithRole(role) {
+      const queryRole = `query roles{
+                            roles{
+                              id
+                              name
+                            }
+                          }`
+      const rolesResponse = await this.$axios.post('/graphql', {
+        query: queryRole,
+      })
+      if (rolesResponse.data.errors?.length) {
+        console.warn(rolesResponse.data.errors[0].message)
+        throw new Error(rolesResponse.data.errors[0].message)
+      }
+
+      this.roles = rolesResponse.data.data.roles
+
+      const selectedRole = this.roles.filter((srole) => {
+        return this.getRoleName(role) === srole.name
+      })
+
+      if (selectedRole.length > 0) {
+        const roleId = selectedRole[0].id
+
+        const queryRoleMembers = `query role($id: ID!) {
+                                    role(id: $id) {
+                                      name
+                                      members {
+                                        id
+                                        firstName
+                                        middleName
+                                        lastName
+                                        email
+                                        department{
+                                          name
+                                        }
+                                      }
+                                    }
+                                  }`
+
+        const roleMembersvariables = { id: roleId }
+
+        const roleMembersResponse = await this.$axios.post('/graphql', {
+          query: queryRoleMembers,
+          variables: roleMembersvariables,
+        })
+
+        if (roleMembersResponse.data.errors?.length) {
+          console.warn(roleMembersResponse.data.errors[0].message)
+          throw new Error(roleMembersResponse.data.errors[0].message)
+        }
+
+        return roleMembersResponse.data.data.role.members
+      }
+
+      return null
+    },
+
+    getRoleName(role) {
+      const tempRole = role.split(' ')
+      return tempRole.length > 1
+        ? `${tempRole[0].toUpperCase()}_${tempRole[1].toUpperCase()}`
+        : `${tempRole[0].toUpperCase()}`
+    },
+
     goToTeachersPage() {
       this.$router.push({
         name: 'courseManager-id-teachers',
@@ -385,10 +567,10 @@ export default {
 
     // Tooltip functions
 
-    detailEnter(event) {
+    assignEnter(event) {
       this.tooltipPositionX = event.clientX
       this.tooltipPositionY = event.clientY - 20
-      this.tooltipValue = 'detail'
+      this.tooltipValue = 'assign'
       this.showTooltip = true
     },
     editEnter(event) {
@@ -404,76 +586,164 @@ export default {
       this.showTooltip = true
     },
 
-    detailLeave() {
-      this.showTooltip = false
-    },
-    editLeave() {
-      this.showTooltip = false
-    },
-    deleteLeave() {
+    leaveBtn() {
       this.showTooltip = false
     },
 
     // Course CRUD functions
 
     createCourse() {
-      this.courseDialog = true
+      this.createCourseDialog = true
     },
 
-    goToCourseDetail(course) {
+    async assignCourseTeacher(courseId) {
+      this.assignTeacherDialog = true
+
+      this.teacherTypes = ['Course Owner', 'Course Teacher']
+      this.selectedCourseId = courseId
+
+      this.unassignedTeachers = await this.getTeachers()
+      this.unassignedTeachers = this.unassignedTeachers.map(
+        (unassignedTeacher) => {
+          return {
+            unassignedTeacherFullName: `${unassignedTeacher.firstName} ${unassignedTeacher.middleName} ${unassignedTeacher.lastName}`,
+            unassignedTeacher,
+          }
+        }
+      )
+    },
+
+    goToCourseEdit(courseId) {
       this.$router.push({
         name: 'courseManager-id-courseEdit-courseId',
-        params: { courseId: course },
+        params: { courseId, userId: this.$nuxt.context.params.id },
       })
-      console.log('Go to ', course)
-    },
-
-    editCourse(course) {
-      this.editedIndex = course.id
-      this.editedCourse = Object.assign({}, course)
-      this.courseDialog = true
     },
 
     deleteCourse(course) {
-      this.editedCourse = Object.assign({}, course)
+      this.newCourse = Object.assign({}, course)
       this.courseDialogDelete = true
     },
 
-    deleteCourseConfirm() {
-      console.log('Course delete Confirm')
+    async deleteCourseConfirm() {
+      const query = `mutation removeCourse($id: ID!) {
+                      removeCourse(id: $id)
+                    }`
+      const variables = {
+        id: this.newCourse.id,
+      }
 
-      this.courseDialogDelete = false
-      this.deleteCourseClose()
+      const removeCourseResponse = await this.$axios.post('/graphql', {
+        query,
+        variables,
+      })
+
+      const isCourseRemoved = removeCourseResponse.data.data.removeCourse
+
+      this.deleteCourseClose(isCourseRemoved)
     },
 
-    deleteCourseClose() {
-      console.log('Course delete closed')
-
+    deleteCourseClose(isCourseRemoved) {
       this.courseDialogDelete = false
       this.$nextTick(() => {
-        this.editedCourse = Object.assign({}, this.defaultCourse)
-        this.editedIndex = -1
+        this.newCourse = Object.assign({}, this.defaultCourse)
+        if (isCourseRemoved) this.initializeCourses()
       })
     },
 
     saveCourseClose() {
-      console.log('Course create/edit Closed')
-
-      this.courseDialog = false
+      this.createCourseDialog = false
       this.$nextTick(() => {
-        this.editedCourse = Object.assign({}, this.defaultCourse)
-        this.editedIndex = -1
+        this.newCourse = Object.assign({}, this.defaultCourse)
       })
     },
 
-    saveCourse() {
-      if (this.editedIndex > -1) {
-        // Edit Course with an id of this.editedIndex
-      } else {
-        // Create a new Course
+    assignCourseTeacherClose() {
+      this.assignTeacherDialog = false
+    },
+
+    async saveCourse() {
+      const query = `mutation createCourse(
+                      $code: String!
+                      $name: String!
+                      $description: String!
+                      $overview: String!
+                      $creditHour: Int!
+                    ) {
+                      createCourse(
+                        createCourseInput: {
+                          code: $code
+                          name: $name
+                          description: $description
+                          overview: $overview
+                          creditHour: $creditHour
+                        }
+                      ) {
+                        id
+                      }
+                    }`
+
+      const variables = {
+        code: this.newCourse.code,
+        name: this.newCourse.name,
+        description: this.newCourse.description,
+        overview: this.newCourse.overview,
+        creditHour: parseInt(this.newCourse.creditHour),
       }
 
+      await this.$axios.post('/graphql', {
+        query,
+        variables,
+      })
+
+      this.$nextTick(() => {
+        this.initializeCourses()
+      })
+
       this.saveCourseClose()
+    },
+
+    async assignCourseTeacherConfirm() {
+      const query = `mutation assignUserToCourse ($courseId: ID! $userId: ID!) {
+                        assignUserToCourse (courseId: $courseId userId: $userId)
+                      }`
+      const variables = {
+        userId: this.selectedTeacher.id,
+        courseId: this.selectedCourseId,
+      }
+
+      const assignUserResponse = await this.$axios.post('/graphql', {
+        query,
+        variables,
+      })
+
+      const assignedRole = this.getRoleName(this.selectedTeacherType)
+
+      if (assignUserResponse.data.data.assignUserToCourse === true) {
+        // Change role to selectedTeacherType using Update user
+        const changeUserRoleQuery = `mutation updateUser ($id: ID! $roleName: RoleName) {
+                                      updateUser (updateUserInput: {id: $id roleName: $roleName}) {
+                                        id
+                                        roles {
+                                          id
+                                          name
+                                        }
+                                      }
+                                    }`
+        const changeUserRoleVariables = {
+          id: this.selectedTeacher.id,
+          roleName: assignedRole,
+        }
+
+        await this.$axios.post('/graphql', {
+          query: changeUserRoleQuery,
+          variables: changeUserRoleVariables,
+        })
+      }
+
+      this.initializeCourses()
+      this.initializeTeachers()
+      this.assignCourseTeacherClose()
     },
   },
 }
