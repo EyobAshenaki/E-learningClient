@@ -10,16 +10,15 @@
 </template>
 
 <script>
-export default {
-  methods: {
-    logout() {
-      this.$axios
-        .post('/api/auth/signout')
-        .then(() => {
-          this.$store.dispatch('auth/logout')
-        })
-        .catch((error) => this.$toast.error(error.message))
+  export default {
+    methods: {
+      logout() {
+        this.$axios
+          .post('/api/auth/signout')
+          .then(() => this.$store.dispatch('auth/logout'))
+          .then(() => this.$router.replace('/'))
+          .catch((error) => this.$toast.error(error.message))
+      },
     },
-  },
-}
+  }
 </script>

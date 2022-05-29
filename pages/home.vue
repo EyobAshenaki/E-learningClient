@@ -1,10 +1,10 @@
 <template>
   <div>
-    <h1>Landing Page</h1>
+    <h1>Home Page</h1>
   </div>
 </template>
 <script>
   export default {
-    layout: 'guest',
+    layout: 'authenticated',
   }
 </script>
