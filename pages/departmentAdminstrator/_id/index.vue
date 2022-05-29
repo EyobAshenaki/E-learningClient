@@ -2,59 +2,42 @@
   <v-row style="margin-top: 2em">
     <v-col cols="12">
       <v-row>
+        <!-- Welcome section -->
         <v-col cols="8">
-          <v-row>
-            <!-- Welcome section -->
-            <v-col cols="12">
-              <v-card height="250" elevation="0" color="grey lighten-4">
-                <v-row style="height: 100%">
-                  <v-col
-                    cols="6"
-                    class="d-flex align-center justify-center"
-                    style="height: 100%"
-                  >
-                    <v-row class="d-flex justify-end">
-                      <v-col cols="11" class="py-0">
-                        <p class="mb-0 text-h3 text-left font-weight-light">
-                          Welcome Back,
-                        </p>
-                      </v-col>
-                      <v-col v-if="user" cols="11" class="py-0">
-                        <p
-                          class="orange--text text--darken-4 text-h4 text-left font-weight-medium"
-                        >
-                          {{ user.firstName }}
-                        </p>
-                      </v-col>
-                    </v-row>
+          <v-card height="250" elevation="0" color="grey lighten-4">
+            <v-row style="height: 100%">
+              <v-col
+                cols="6"
+                class="d-flex align-center justify-center"
+                style="height: 100%"
+              >
+                <v-row class="d-flex justify-end">
+                  <v-col cols="11" class="py-0">
+                    <p class="mb-0 text-h3 text-left font-weight-light">
+                      Welcome Back,
+                    </p>
                   </v-col>
-                  <v-col cols="6">
-                    <img
-                      style="height: 120%; margin-top: -3.3em"
-                      src="@/assets/img/tourist-welcome.svg"
-                      alt=""
-                    />
+                  <v-col v-if="user" cols="11" class="py-0">
+                    <p
+                      class="orange--text text--darken-4 text-h4 text-left font-weight-medium"
+                    >
+                      {{ user.firstName }}
+                    </p>
                   </v-col>
                 </v-row>
-              </v-card>
-            </v-col>
-            <!-- Courses section -->
-            <v-col cols="12" class="mt-15">
-              <v-row>
-                <v-col cols="12">
-                  <v-row>
-                    <!-- Course header Section -->
-                    <v-col cols="3" class="text-h5 d-flex align-center"
-                      >Classes</v-col
-                    >
-                  </v-row>
-                </v-col>
-              </v-row>
-            </v-col>
-          </v-row>
+              </v-col>
+              <v-col cols="6">
+                <img
+                  style="height: 120%; margin-top: -3.3em"
+                  src="@/assets/img/tourist-welcome.svg"
+                  alt=""
+                />
+              </v-col>
+            </v-row>
+          </v-card>
         </v-col>
-        <!-- Classes section -->
-        <v-col cols="4">
+        <!-- Courses section -->
+        <v-col cols="4" class="px-0 overflow-hidden" style="height: 40vh">
           <v-row>
             <v-col cols="12">
               <v-row>
@@ -68,9 +51,113 @@
                 </v-col>
               </v-row>
             </v-col>
-            <v-col v-for="n in 3" :key="n" cols="12" class="py-1">
-              Course
+
+            <!-- Course card section -->
+            <v-col v-for="n in 4" :key="n" cols="12" class="py-1">
+              <v-col class="pb-0" cols="12">
+                <v-card elevation="0">
+                  <v-card-text>
+                    <v-row>
+                      <v-col cols="3" class="d-flex justify-end align-center">
+                        <v-avatar size="60" color="orange darken-4">
+                          <v-icon size="40" color="orange lighten-4"
+                            >mdi-book</v-icon
+                          >
+                        </v-avatar>
+                      </v-col>
+
+                      <v-col cols="9">
+                        <v-row>
+                          <v-col class="pa-2 pb-0" cols="12">
+                            <v-card-title class="pa-0">
+                              Database Design
+                            </v-card-title>
+                          </v-col>
+                          <!-- Card Body section -->
+                          <v-col class="py-5" cols="12">
+                            <v-row>
+                              <!-- First dection -->
+                              <v-col cols="6">
+                                <v-row>
+                                  <v-col
+                                    class="pa-1 d-flex align-center justify-center"
+                                    cols="4"
+                                  >
+                                    <v-icon size="28" color="orange darken-4">
+                                      mdi-clipboard-text-outline
+                                    </v-icon>
+                                  </v-col>
+                                  <v-col
+                                    class="pa-2 d-flex align-center"
+                                    cols="8"
+                                  >
+                                    <v-row class="pl-1">
+                                      <v-col class="pa-0" cols="12">
+                                        <span
+                                          class="text-subtitle-1 font-weight-bold"
+                                        >
+                                          Course code
+                                        </span>
+                                      </v-col>
+                                      <v-col class="pa-0 mt-n1" cols="12">
+                                        <span>Sweg0934</span>
+                                      </v-col>
+                                    </v-row>
+                                  </v-col>
+                                </v-row>
+                              </v-col>
+
+                              <!-- Secondary section -->
+                              <v-col cols="6">
+                                <v-row>
+                                  <v-col
+                                    class="pa-1 d-flex align-center justify-center"
+                                    cols="4"
+                                  >
+                                    <v-icon size="28" color="orange darken-4">
+                                      mdi-timer-outline
+                                    </v-icon>
+                                  </v-col>
+                                  <v-col
+                                    class="pa-2 d-flex align-center"
+                                    cols="8"
+                                  >
+                                    <v-row class="pl-1">
+                                      <v-col class="pa-0" cols="12">
+                                        <span
+                                          class="text-subtitle-1 font-weight-bold"
+                                        >
+                                          Credit Hour
+                                        </span>
+                                      </v-col>
+                                      <v-col class="pa-0 mt-n1" cols="12">
+                                        <span>4</span>
+                                      </v-col>
+                                    </v-row>
+                                  </v-col>
+                                </v-row>
+                              </v-col>
+                            </v-row>
+                          </v-col>
+                        </v-row>
+                      </v-col>
+                    </v-row>
+                  </v-card-text>
+                </v-card>
+              </v-col>
             </v-col>
+          </v-row>
+        </v-col>
+      </v-row>
+    </v-col>
+
+    <!-- Classes section -->
+    <v-col cols="12" class="mt-3">
+      <v-row>
+        <v-col cols="12">
+          <v-row>
+            <!-- Class header Section -->
+            <v-col cols="3" class="text-h5 d-flex align-center">Classes</v-col>
           </v-row>
         </v-col>
       </v-row>
