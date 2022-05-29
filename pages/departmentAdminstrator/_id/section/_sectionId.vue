@@ -135,60 +135,68 @@
                     </template>
                     <span>Remove Course</span>
                   </v-tooltip>
-
-                  <!-- Assign Course to Student Dialog -->
-                  <v-dialog v-model="assignCourseDialog" width="25%">
-                    <v-card>
-                      <v-card-title> Assign Course </v-card-title>
-                      <v-card-text class="pb-0">
-                        <v-select
-                          v-model="seletedAssignCourses"
-                          :items="unassignedCourses"
-                          :menu-props="{ bottom: true, offsetY: true }"
-                          multiple
-                          outlined
-                          clearable
-                          label="Courses"
-                        ></v-select>
-                      </v-card-text>
-                      <v-card-actions class="pt-0 d-flex justify-space-between">
-                        <v-btn text color="error" @click="closeAssignCourses">
-                          Cancel
-                        </v-btn>
-                        <v-btn text color="primary" @click="assignCourses">
-                          Assign
-                        </v-btn>
-                      </v-card-actions>
-                    </v-card>
-                  </v-dialog>
-
-                  <!-- Remove Course from Student Dialog -->
-                  <v-dialog v-model="removeCourseDialog" width="25%">
-                    <v-card>
-                      <v-card-title> Remove Course </v-card-title>
-                      <v-card-text class="pb-0">
-                        <v-select
-                          v-model="seletedRemoveCourses"
-                          :items="assignedCourses"
-                          :menu-props="{ bottom: true, offsetY: true }"
-                          multiple
-                          outlined
-                          clearable
-                          label="Courses"
-                        ></v-select>
-                      </v-card-text>
-                      <v-card-actions class="pt-0 d-flex justify-space-between">
-                        <v-btn text color="error" @click="closeRemoveCourses">
-                          Cancel
-                        </v-btn>
-                        <v-btn text color="primary" @click="removeCourses">
-                          Remove
-                        </v-btn>
-                      </v-card-actions>
-                    </v-card>
-                  </v-dialog>
                 </template>
               </v-data-table>
+
+              <!-- Assign Course to Student Dialog -->
+              <v-dialog
+                v-model="assignCourseDialog"
+                :retain-focus="false"
+                width="25%"
+              >
+                <v-card>
+                  <v-card-title> Assign Course </v-card-title>
+                  <v-card-text class="pb-0">
+                    <v-select
+                      v-model="seletedAssignCourses"
+                      :items="unassignedCourses"
+                      :menu-props="{ bottom: true, offsetY: true }"
+                      multiple
+                      outlined
+                      clearable
+                      label="Courses"
+                    ></v-select>
+                  </v-card-text>
+                  <v-card-actions class="pt-0 d-flex justify-space-between">
+                    <v-btn text color="error" @click="closeAssignCourses">
+                      Cancel
+                    </v-btn>
+                    <v-btn text color="primary" @click="assignCourses">
+                      Assign
+                    </v-btn>
+                  </v-card-actions>
+                </v-card>
+              </v-dialog>
+
+              <!-- Remove Course from Student Dialog -->
+              <v-dialog
+                v-model="removeCourseDialog"
+                :retain-focus="false"
+                width="25%"
+              >
+                <v-card>
+                  <v-card-title> Remove Course </v-card-title>
+                  <v-card-text class="pb-0">
+                    <v-select
+                      v-model="seletedRemoveCourses"
+                      :items="assignedCourses"
+                      :menu-props="{ bottom: true, offsetY: true }"
+                      multiple
+                      outlined
+                      clearable
+                      label="Courses"
+                    ></v-select>
+                  </v-card-text>
+                  <v-card-actions class="pt-0 d-flex justify-space-between">
+                    <v-btn text color="error" @click="closeRemoveCourses">
+                      Cancel
+                    </v-btn>
+                    <v-btn text color="primary" @click="removeCourses">
+                      Remove
+                    </v-btn>
+                  </v-card-actions>
+                </v-card>
+              </v-dialog>
             </v-col>
           </v-row>
         </v-col>
@@ -293,8 +301,105 @@
             </v-col>
 
             <!-- Teachers Section -->
-            <v-col cols="12" class="pb-0 pt-5">
+            <v-col cols="12" class="pb-0 pt-5 d-flex justify-space-between">
               <span class="text-h5"> Teachers </span>
+
+              <div>
+                <!-- Remove Teacher dialog -->
+                <v-dialog width="25%">
+                  <template #activator="{ on, attrs }">
+                    <v-btn
+                      outlined
+                      color="orange darken-4"
+                      v-bind="attrs"
+                      v-on="on"
+                    >
+                      Remove
+                    </v-btn>
+                  </template>
+                  <template #default="dialog">
+                    <v-card>
+                      <v-card-title> Remove Teacher from a Class </v-card-title>
+                      <v-card-text class="pb-0">
+                        <v-select
+                          v-model="seletedRemoveTeacher"
+                          :items="assignedTeachersOfCourse"
+                          :menu-props="{ bottom: true, offsetY: true }"
+                          outlined
+                          clearable
+                          label="Teacher"
+                        ></v-select>
+                      </v-card-text>
+                      <v-card-actions class="pt-0 justify-space-between">
+                        <v-btn
+                          text
+                          color="error"
+                          @click="closeRemoveTeacherFromClass(dialog)"
+                          >Cancel</v-btn
+                        >
+                        <v-btn
+                          text
+                          color="primary"
+                          @click="removeTeacherFromClass(dialog)"
+                        >
+                          Remove
+                        </v-btn>
+                      </v-card-actions>
+                    </v-card>
+                  </template>
+                </v-dialog>
+
+                <!-- Assign Tattcher dialog -->
+                <v-dialog width="25%">
+                  <template #activator="{ on, attrs }">
+                    <v-btn
+                      outlined
+                      color="orange darken-4"
+                      v-bind="attrs"
+                      v-on="on"
+                    >
+                      Assign
+                    </v-btn>
+                  </template>
+                  <template #default="dialog">
+                    <v-card>
+                      <v-card-title> Assign Teacher to a Class </v-card-title>
+                      <v-card-text class="pb-0">
+                        <v-select
+                          v-model="seletedCourse"
+                          :items="assignedCourses"
+                          :menu-props="{ bottom: true, offsetY: true }"
+                          outlined
+                          clearable
+                          label="Courses"
+                        ></v-select>
+                        <v-select
+                          v-model="seletedAssignTeacher"
+                          :items="unassignedTeachersOfCourse"
+                          :menu-props="{ bottom: true, offsetY: true }"
+                          outlined
+                          clearable
+                          label="Teacher"
+                        ></v-select>
+                      </v-card-text>
+                      <v-card-actions class="pt-0 justify-space-between">
+                        <v-btn
+                          text
+                          color="error"
+                          @click="closeAssignTeacherToClass(dialog)"
+                          >Cancel</v-btn
+                        >
+                        <v-btn
+                          text
+                          color="primary"
+                          @click="assignTeacherToClass(dialog)"
+                          >Assign</v-btn
+                        >
+                      </v-card-actions>
+                    </v-card>
+                  </template>
+                </v-dialog>
+              </div>
             </v-col>
 
             <v-col class="pb-0" cols="12">
@@ -554,6 +659,11 @@ export default {
       selectedStudentId: null,
       seletedAssignCourses: null,
       seletedRemoveCourses: null,
+      seletedCourse: null,
+      seletedAssignTeacher: null,
+      seletedRemoveTeacher: null,
+      unassignedTeachersOfCourse: [],
+      assignedTeachersOfCourse: [],
     }
   },
 
@@ -594,6 +704,30 @@ export default {
       console.log('Remove Courses')
 
       this.closeRemoveCourses()
+    },
+
+    closeAssignTeacherToClass(dialog) {
+      console.log('Close Assign Teacher to Course: ', dialog)
+
+      dialog.value = false
+    },
+
+    closeRemoveTeacherFromClass(dialog) {
+      console.log('Close Remove Teacher from Course: ', dialog)
+
+      dialog.value = false
+    },
+
+    assignTeacherToClass(dialog) {
+      console.log('Assign Teacher to Course')
+
+      this.closeAssignTeacherToClass(dialog)
+    },
+
+    removeTeacherFromClass(dialog) {
+      console.log('Assign Teacher to Course')
+
+      this.closeRemoveTeacherFromClass(dialog)
     },
   },
 }
