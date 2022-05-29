@@ -1,4 +1,5 @@
 import colors from 'vuetify/es5/util/colors'
+import minifyTheme from 'minify-css-string'
 
 export default function () {
   return {
@@ -60,6 +61,7 @@ export default function () {
     // Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify
     vuetify: {
       customVariables: ['~/assets/styles/variables.scss'],
+      treeshake: true,
       theme: {
         dark: false,
         themes: {
@@ -84,9 +86,12 @@ export default function () {
           },
         },
       },
+      minifyTheme,
     },
 
     // Build Configuration: https://go.nuxtjs.dev/config-build
-    build: {},
+    build: {
+      optimizeCss: true,
+    },
   }
 }
