@@ -164,7 +164,7 @@
     </v-col>
 
     <!-- Class cards Section -->
-    <v-col v-for="n in 1" :key="n" cols="12" md="4" class="mt-5">
+    <v-col v-for="n in 4" :key="n" cols="12" md="4" class="mt-5">
       <v-card elevation="0" outlined width="340">
         <v-card-text class="pa-3">
           <v-row>
@@ -264,97 +264,85 @@
             </v-icon>
             <span class="orange--text text--darken-4"> Remove Courses </span>
           </v-btn>
-
-          <!-- Assign Courses to Class Dialog -->
-          <v-dialog v-model="assignCoursesToClassesDialog" width="25%">
-            <v-card>
-              <v-card-title> Assign Courses to Classes </v-card-title>
-              <v-card-text class="pb-0">
-                <!-- <v-row>
-                  <v-col> -->
-                <v-select
-                  v-model="seletedAssignClasses"
-                  :items="classes"
-                  :menu-props="{ bottom: true, offsetY: true }"
-                  multiple
-                  outlined
-                  clearable
-                  label="Classes"
-                ></v-select>
-
-                <v-select
-                  v-model="seletedAssignCourses"
-                  :items="unassignedCourses"
-                  :menu-props="{ bottom: true, offsetY: true }"
-                  multiple
-                  outlined
-                  clearable
-                  label="Courses"
-                ></v-select>
-                <!-- </v-col>
-                </v-row> -->
-              </v-card-text>
-              <v-card-actions class="pt-0 d-flex justify-space-between">
-                <v-btn text color="error" @click="closeAssignCoursesToClasses">
-                  Cancel
-                </v-btn>
-                <v-btn
-                  text
-                  color="primary"
-                  @click="confirmAssignCoursesToClasses"
-                >
-                  Assign
-                </v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
-
-          <!-- Remove Courses to Class Dialog -->
-          <v-dialog v-model="removeCoursesFromClassesDialog" width="25%">
-            <v-card>
-              <v-card-title> Remove Courses from Classes </v-card-title>
-              <v-card-text class="pb-0">
-                <v-select
-                  v-model="seletedRemoveClasses"
-                  :items="classes"
-                  :menu-props="{ bottom: true, offsetY: true }"
-                  multiple
-                  outlined
-                  clearable
-                  label="Classes"
-                ></v-select>
-
-                <v-select
-                  v-model="seletedRemoveCourses"
-                  :items="assignedCourses"
-                  :menu-props="{ bottom: true, offsetY: true }"
-                  multiple
-                  outlined
-                  clearable
-                  label="Courses"
-                ></v-select>
-              </v-card-text>
-              <v-card-actions class="pt-0 d-flex justify-space-between">
-                <v-btn
-                  text
-                  color="error"
-                  @click="closeRemoveCoursesFromClasses"
-                >
-                  Cancel
-                </v-btn>
-                <v-btn
-                  text
-                  color="primary"
-                  @click="confirmRemoveCoursesFromClasses"
-                >
-                  Remove
-                </v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
         </v-card-actions>
       </v-card>
     </v-col>
+
+    <!-- Assign Courses to Class Dialog -->
+    <v-dialog v-model="assignCoursesToClassesDialog" width="25%">
+      <v-card>
+        <v-card-title> Assign Courses to Classes </v-card-title>
+        <v-card-text class="pb-0">
+          <!-- <v-row>
+                  <v-col> -->
+          <v-select
+            v-model="seletedAssignClasses"
+            :items="classes"
+            :menu-props="{ bottom: true, offsetY: true }"
+            multiple
+            outlined
+            clearable
+            label="Classes"
+          ></v-select>
+
+          <v-select
+            v-model="seletedAssignCourses"
+            :items="unassignedCourses"
+            :menu-props="{ bottom: true, offsetY: true }"
+            multiple
+            outlined
+            clearable
+            label="Courses"
+          ></v-select>
+          <!-- </v-col>
+                </v-row> -->
+        </v-card-text>
+        <v-card-actions class="pt-0 d-flex justify-space-between">
+          <v-btn text color="error" @click="closeAssignCoursesToClasses">
+            Cancel
+          </v-btn>
+          <v-btn text color="primary" @click="confirmAssignCoursesToClasses">
+            Assign
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <!-- Remove Courses to Class Dialog -->
+    <v-dialog v-model="removeCoursesFromClassesDialog" width="25%">
+      <v-card>
+        <v-card-title> Remove Courses from Classes </v-card-title>
+        <v-card-text class="pb-0">
+          <v-select
+            v-model="seletedRemoveClasses"
+            :items="classes"
+            :menu-props="{ bottom: true, offsetY: true }"
+            multiple
+            outlined
+            clearable
+            label="Classes"
+          ></v-select>
+
+          <v-select
+            v-model="seletedRemoveCourses"
+            :items="assignedCourses"
+            :menu-props="{ bottom: true, offsetY: true }"
+            multiple
+            outlined
+            clearable
+            label="Courses"
+          ></v-select>
+        </v-card-text>
+        <v-card-actions class="pt-0 d-flex justify-space-between">
+          <v-btn text color="error" @click="closeRemoveCoursesFromClasses">
+            Cancel
+          </v-btn>
+          <v-btn text color="primary" @click="confirmRemoveCoursesFromClasses">
+            Remove
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-row>
 </template>
 
