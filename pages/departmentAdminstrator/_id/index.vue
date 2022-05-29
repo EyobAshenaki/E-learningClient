@@ -45,7 +45,7 @@
                   Courses
                 </v-col>
                 <v-col cols="6" class="d-flex justify-end">
-                  <v-btn text color="orange darken-4" @click="goToClassesPage"
+                  <v-btn text color="orange darken-4" @click="goToCoursesPage"
                     >View all</v-btn
                   >
                 </v-col>
@@ -164,7 +164,7 @@
     </v-col>
 
     <!-- Class cards Section -->
-    <v-col v-for="n in 4" :key="n" cols="12" md="4" class="mt-5">
+    <v-col v-for="n in 1" :key="n" cols="12" md="4" class="mt-5">
       <v-card elevation="0" outlined width="340">
         <v-card-text class="pa-3">
           <v-row>
@@ -237,13 +237,15 @@
             </v-col>
           </v-row>
         </v-card-text>
+
+        <!-- Class Card footer -->
         <v-card-actions class="px-5 d-flex flex-column">
           <v-btn
             block
             outlined
             class="mb-2"
             color="#25327F lighten-4"
-            @click="assignCoursesToClasses()"
+            @click.stop="assignCoursesToClasses()"
           >
             <v-icon class="pr-2" style="color: #25327f">
               mdi-book-plus-multiple
@@ -257,13 +259,101 @@
             outlined
             class="ml-0"
             color="orange darken-4"
-            @click="removeCoursesToClasses()"
+            @click.stop="removeCoursesFromClasses()"
           >
             <v-icon class="pr-2" color="orange darken-4">
               mdi-book-minus-multiple
             </v-icon>
             <span class="orange--text text--darken-4"> Remove Courses </span>
           </v-btn>
+
+          <!-- Assign Courses to Class Dialog -->
+          <v-dialog v-model="assignCoursesToClassesDialog" width="25%">
+            <v-card>
+              <v-card-title> Assign Courses to Classes </v-card-title>
+              <v-card-text class="pb-0">
+                <!-- <v-row>
+                  <v-col> -->
+                <v-select
+                  v-model="seletedAssignClasses"
+                  :items="classes"
+                  :menu-props="{ bottom: true, offsetY: true }"
+                  multiple
+                  outlined
+                  clearable
+                  label="Classes"
+                ></v-select>
+
+                <v-select
+                  v-model="seletedAssignCourses"
+                  :items="unassignedCourses"
+                  :menu-props="{ bottom: true, offsetY: true }"
+                  multiple
+                  outlined
+                  clearable
+                  label="Courses"
+                ></v-select>
+                <!-- </v-col>
+                </v-row> -->
+              </v-card-text>
+              <v-card-actions class="pt-0 d-flex justify-space-between">
+                <v-btn text color="error" @click="closeAssignCoursesToClasses">
+                  Cancel
+                </v-btn>
+                <v-btn
+                  text
+                  color="primary"
+                  @click="confirmAssignCoursesToClasses"
+                >
+                  Assign
+                </v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+
+          <!-- Remove Courses to Class Dialog -->
+          <v-dialog v-model="removeCoursesFromClassesDialog" width="25%">
+            <v-card>
+              <v-card-title> Remove Courses from Classes </v-card-title>
+              <v-card-text class="pb-0">
+                <v-select
+                  v-model="seletedRemoveClasses"
+                  :items="classes"
+                  :menu-props="{ bottom: true, offsetY: true }"
+                  multiple
+                  outlined
+                  clearable
+                  label="Classes"
+                ></v-select>
+
+                <v-select
+                  v-model="seletedRemoveCourses"
+                  :items="assignedCourses"
+                  :menu-props="{ bottom: true, offsetY: true }"
+                  multiple
+                  outlined
+                  clearable
+                  label="Courses"
+                ></v-select>
+              </v-card-text>
+              <v-card-actions class="pt-0 d-flex justify-space-between">
+                <v-btn
+                  text
+                  color="error"
+                  @click="closeRemoveCoursesFromClasses"
+                >
+                  Cancel
+                </v-btn>
+                <v-btn
+                  text
+                  color="primary"
+                  @click="confirmRemoveCoursesFromClasses"
+                >
+                  Remove
+                </v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
         </v-card-actions>
       </v-card>
     </v-col>
@@ -277,6 +367,15 @@ export default {
   data() {
     return {
       user: null,
+      assignCoursesToClassesDialog: false,
+      removeCoursesFromClassesDialog: false,
+      seletedAssignClasses: [],
+      seletedRemoveClasses: [],
+      classes: [],
+      seletedAssignCourses: [],
+      seletedRemoveCourses: [],
+      unassignedCourses: [],
+      assignedCourses: [],
     }
   },
 
@@ -304,16 +403,20 @@ export default {
       this.user = userResponse.data.data.user
     },
 
-    goToClassesPage() {
+    goToCoursesPage() {
       console.log('Classes Page')
     },
 
     assignCoursesToClasses() {
       console.log('Assign Courses')
+
+      this.assignCoursesToClassesDialog = true
     },
 
-    removeCoursesToClasses() {
+    removeCoursesFromClasses() {
       console.log('Remove Courses')
+
+      this.removeCoursesFromClassesDialog = true
     },
 
     goToSectionPage() {
@@ -322,6 +425,30 @@ export default {
         name: 'departmentAdminstrator-id-section-sectionId',
         params: { id: this.$nuxt.context.params.id, sectionId: 1 },
       })
+    },
+
+    closeAssignCoursesToClasses() {
+      console.log('Close Assign Courses to Classes')
+
+      this.assignCoursesToClassesDialog = false
+    },
+
+    closeRemoveCoursesFromClasses() {
+      console.log('Close Remove Courses from Classes')
+
+      this.removeCoursesFromClassesDialog = false
+    },
+
+    confirmAssignCoursesToClasses() {
+      console.log('Confirm Assign Courses to Classes')
+
+      this.closeAssignCoursesToClasses()
+    },
+
+    confirmRemoveCoursesFromClasses() {
+      console.log('Confirm Remove Courses to Classes')
+
+      this.closeRemoveCoursesFromClasses()
     },
   },
 }
