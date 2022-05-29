@@ -24,10 +24,10 @@ export default {
     login() {
       this.$refs.login_form.submit()
     },
-    onLoginSucess(data) {
-      const roles = data.roles.map((role) => role.toLowerCase())
-      const id = data.id
-
+    onLoginSucess(user) {
+      const roles = user.roles.map((role) => role.toLowerCase())
+      const id = user.id
+      this.$store.dispatch('auth/login', user)
       this.$router.push({ path: `${roles[0]}/${id}`, params: { id } })
     },
     onLoginError(error) {
