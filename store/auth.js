@@ -6,11 +6,11 @@ export const getters = {
   id(state) {
     return state.user?.id
   },
-  name(state) {
-    return state.user?.firstName
+  name({ user }) {
+    return user ? user.firstName : null
   },
   fullName({ user }) {
-    return user ? `${user.firstName} ${user.lastName}` : ''
+    return user ? `${user.firstName} ${user.lastName}` : null
   },
   isLoggedIn(state) {
     return !!state?.user?.id
