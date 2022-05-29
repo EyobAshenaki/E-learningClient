@@ -19,7 +19,7 @@
                   </v-col>
                   <v-col v-if="user" cols="11" class="py-0">
                     <p
-                      class="orange--text text--darken-4 text-h4 text-left font-weight-medium"
+                      class="orange--text text--darken-2 text-h4 text-left font-weight-medium"
                     >
                       {{ user.firstName }}
                     </p>
@@ -59,8 +59,8 @@
                   <v-card-text>
                     <v-row>
                       <v-col cols="3" class="d-flex justify-end align-center">
-                        <v-avatar size="60" color="orange darken-4">
-                          <v-icon size="40" color="orange lighten-4"
+                        <v-avatar size="70" color="orange lighten-4">
+                          <v-icon size="40" color="orange darken-2"
                             >mdi-book</v-icon
                           >
                         </v-avatar>
@@ -83,7 +83,7 @@
                                     class="pa-1 d-flex align-center justify-center"
                                     cols="4"
                                   >
-                                    <v-icon size="28" color="orange darken-4">
+                                    <v-icon size="28" color="orange darken-2">
                                       mdi-clipboard-text-outline
                                     </v-icon>
                                   </v-col>
@@ -114,7 +114,7 @@
                                     class="pa-1 d-flex align-center justify-center"
                                     cols="4"
                                   >
-                                    <v-icon size="28" color="orange darken-4">
+                                    <v-icon size="28" color="orange darken-2">
                                       mdi-timer-outline
                                     </v-icon>
                                   </v-col>
@@ -171,9 +171,9 @@
             <!-- Class Card head -->
             <v-col cols="12">
               <v-row>
-                <v-col cols="12" class="d-flex justify-center">
-                  <v-avatar size="50" color="orange lighten-4">
-                    <v-icon size="40" color="orange darken-4"
+                <v-col cols="12" class="pt-4 d-flex justify-center">
+                  <v-avatar size="60" color="orange lighten-4">
+                    <v-icon size="50" color="orange darken-3"
                       >mdi-roman-numeral-1</v-icon
                     >
                   </v-avatar>
@@ -192,7 +192,7 @@
                 <v-col cols="12" class="pa-0 pl-5 pb-3">
                   <v-avatar
                     size="40"
-                    color="orange darken-4"
+                    color="orange darken-3"
                     class="mr-2"
                     rounded
                   >
@@ -217,7 +217,7 @@
                       >
                         <v-avatar
                           size="30"
-                          color="orange darken-4"
+                          color="orange darken-3"
                           class="pl-3 ml-n1 mr-2"
                         >
                           <v-icon left color="orange lighten-5" size="28">
@@ -250,9 +250,7 @@
             <v-icon class="pr-2" style="color: #25327f">
               mdi-book-plus-multiple
             </v-icon>
-            <span class="text--darken-4" style="color: #25327f">
-              Assign Courses
-            </span>
+            <span style="color: #25327f"> Assign Courses </span>
           </v-btn>
           <v-btn
             block

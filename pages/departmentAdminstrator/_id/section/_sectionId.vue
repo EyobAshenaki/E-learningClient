@@ -11,8 +11,8 @@
             <v-card-text>
               <v-row>
                 <v-col cols="4" class="d-flex justify-center align-center">
-                  <v-avatar size="50" color="orange darken-4">
-                    <v-icon size="35" color="orange lighten-4">
+                  <v-avatar size="64" color="orange lighten-4">
+                    <v-icon size="40" color="orange darken-2">
                       mdi-account-group
                     </v-icon>
                   </v-avatar>
@@ -31,8 +31,8 @@
             <v-card-text>
               <v-row>
                 <v-col cols="4" class="d-flex justify-center align-center">
-                  <v-avatar size="50" color="orange darken-4">
-                    <v-icon size="35" color="orange lighten-4">
+                  <v-avatar size="64" color="orange lighten-4">
+                    <v-icon size="40" color="orange darken-2">
                       mdi-book-multiple
                     </v-icon>
                   </v-avatar>
@@ -51,8 +51,8 @@
             <v-card-text>
               <v-row>
                 <v-col cols="4" class="d-flex justify-center align-center">
-                  <v-avatar size="50" color="orange darken-4">
-                    <v-icon size="35" color="orange lighten-4">
+                  <v-avatar size="64" color="orange lighten-4">
+                    <v-icon size="40" color="orange darken-2">
                       mdi-account-group
                     </v-icon>
                   </v-avatar>
@@ -71,8 +71,8 @@
             <v-card-text>
               <v-row>
                 <v-col cols="4" class="d-flex justify-center align-center">
-                  <v-avatar size="50" color="orange darken-4">
-                    <v-icon size="35" color="orange lighten-4">
+                  <v-avatar size="64" color="orange lighten-4">
+                    <v-icon size="40" color="orange darken-2">
                       mdi-timer
                     </v-icon>
                   </v-avatar>
@@ -110,7 +110,7 @@
                       <v-icon
                         size="20"
                         class="mr-1"
-                        color="primary lighten-1"
+                        color="primary lighten-2"
                         v-bind="attrs"
                         v-on="on"
                         @click.stop="enrollStudentToCourses(item)"
@@ -125,7 +125,7 @@
                     <template #activator="{ on, attrs }">
                       <v-icon
                         size="20"
-                        color="error"
+                        color="error lighten-1"
                         v-bind="attrs"
                         v-on="on"
                         @click.stop="removeStudentFromCourses(item)"
@@ -213,8 +213,8 @@
                 <v-card-text>
                   <v-row>
                     <v-col cols="3" class="d-flex justify-end align-center">
-                      <v-avatar size="60" color="orange darken-4">
-                        <v-icon size="40" color="orange lighten-4"
+                      <v-avatar size="70" color="orange lighten-4">
+                        <v-icon size="40" color="orange darken-2"
                           >mdi-book</v-icon
                         >
                       </v-avatar>
@@ -237,7 +237,7 @@
                                   class="pa-1 d-flex align-center justify-center"
                                   cols="4"
                                 >
-                                  <v-icon size="28" color="orange darken-4">
+                                  <v-icon size="28" color="orange darken-2">
                                     mdi-clipboard-text-outline
                                   </v-icon>
                                 </v-col>
@@ -268,7 +268,7 @@
                                   class="pa-1 d-flex align-center justify-center"
                                   cols="4"
                                 >
-                                  <v-icon size="28" color="orange darken-4">
+                                  <v-icon size="28" color="orange darken-2">
                                     mdi-timer-outline
                                   </v-icon>
                                 </v-col>
@@ -407,8 +407,8 @@
                 <v-card-text>
                   <v-row>
                     <v-col cols="3" class="d-flex justify-end align-center">
-                      <v-avatar size="70" color="orange darken-4">
-                        <v-icon size="50" color="orange lighten-4"
+                      <v-avatar size="70" color="orange lighten-4">
+                        <v-icon size="50" color="orange darken-2"
                           >mdi-account</v-icon
                         >
                       </v-avatar>
@@ -431,7 +431,7 @@
                                   class="pa-1 d-flex align-center justify-center mr-1"
                                   cols="2"
                                 >
-                                  <v-icon size="28" color="orange darken-4">
+                                  <v-icon size="28" color="orange darken-2">
                                     mdi-clipboard-text-outline
                                   </v-icon>
                                 </v-col>
@@ -462,7 +462,7 @@
                                   class="pa-1 d-flex align-center justify-center mr-1"
                                   cols="2"
                                 >
-                                  <v-icon size="28" color="orange darken-4">
+                                  <v-icon size="28" color="orange darken-2">
                                     mdi-timer-outline
                                   </v-icon>
                                 </v-col>
