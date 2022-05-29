@@ -1,7 +1,9 @@
 <template>
-  <v-container class="main-container">
-    <Nuxt />
-  </v-container>
+  <v-app>
+    <v-container class="main-container" fluid>
+      <Nuxt />
+    </v-container>
+  </v-app>
 </template>
 
 <script>
@@ -12,13 +14,3 @@ export default {
   },
 }
 </script>
-
-<style scoped>
-.main-container {
-  /* background-image: linear-gradient(to bottom right, #0156d2, #d20156); */
-  background-color: #f8f8ff;
-  max-width: 100%;
-  max-height: 100%;
-  margin: auto;
-}
-</style>

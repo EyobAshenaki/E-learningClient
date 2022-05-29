@@ -19,7 +19,7 @@ export default function () {
     },
 
     // Global CSS: https://go.nuxtjs.dev/config-css
-    css: [],
+    css: ['~/assets/styles/main.scss'],
 
     // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
     plugins: ['~/plugins/vuex-persist.client'],
@@ -49,13 +49,17 @@ export default function () {
     },
 
     proxy: {
-      '/api': { target: process.env.BASE_URL, changeOrigin:true, pathRewrite: { '^/api/': '/' } },
-      '/graphql': {target: process.env.BASE_URL, changeOrigin:false },
+      '/api': {
+        target: process.env.BASE_URL,
+        changeOrigin: true,
+        pathRewrite: { '^/api/': '/' },
+      },
+      '/graphql': { target: process.env.BASE_URL, changeOrigin: false },
     },
 
     // Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify
     vuetify: {
-      customVariables: ['~/assets/variables.scss'],
+      customVariables: ['~/assets/styles/variables.scss'],
       theme: {
         dark: false,
         themes: {

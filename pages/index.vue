@@ -1,5 +1,5 @@
 <template>
-  <v-container class="index-container">
+  <v-container class="page-wrapper">
     <login-page />
   </v-container>
 </template>
@@ -11,15 +11,3 @@ export default {
   components: { loginPage },
 }
 </script>
-
-<style scoped>
-.index-container {
-  box-sizing: border-box;
-  padding: 0;
-  margin: auto;
-  height: 96vh;
-  display: flex;
-  justify-content: center;
-  align-content: center;
-}
-</style>
