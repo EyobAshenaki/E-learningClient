@@ -97,6 +97,7 @@
             <v-col cols="12" class="pb-0">
               <span class="text-h5"> Students </span>
             </v-col>
+            <!-- Students section -->
             <v-col cols="12">
               <v-data-table
                 :headers="headers"
@@ -104,21 +105,36 @@
                 class="elevation-0 pa-3"
               >
                 <template #item.actions="{ item }">
-                  <v-icon
-                    size="20"
-                    class="mr-1"
-                    color="primary lighten-1"
-                    @click.stop="enrollStudentToCourses(item)"
-                  >
-                    mdi-account-plus
-                  </v-icon>
-                  <v-icon
-                    size="20"
-                    color="error"
-                    @click.stop="removeStudentFromCourses(item)"
-                  >
-                    mdi-account-minus
-                  </v-icon>
+                  <v-tooltip top>
+                    <template #activator="{ on, attrs }">
+                      <v-icon
+                        size="20"
+                        class="mr-1"
+                        color="primary lighten-1"
+                        v-bind="attrs"
+                        v-on="on"
+                        @click.stop="enrollStudentToCourses(item)"
+                      >
+                        mdi-account-plus
+                      </v-icon>
+                    </template>
+                    <span>Assign Course</span>
+                  </v-tooltip>
+
+                  <v-tooltip top>
+                    <template #activator="{ on, attrs }">
+                      <v-icon
+                        size="20"
+                        color="error"
+                        v-bind="attrs"
+                        v-on="on"
+                        @click.stop="removeStudentFromCourses(item)"
+                      >
+                        mdi-account-minus
+                      </v-icon>
+                    </template>
+                    <span>Remove Course</span>
+                  </v-tooltip>
 
                   <!-- Assign Course to Student Dialog -->
                   <v-dialog v-model="assignCourseDialog" width="25%">
