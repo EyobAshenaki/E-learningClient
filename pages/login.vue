@@ -46,75 +46,89 @@
         this.$toast.error(error.message)
         this.loading = false
       },
+      // onLoginSucess(data) {
+      //   const roles = data.roles.map((role) => {
+      //     const tempRole = role.split('_')
+      //     return tempRole.length > 1
+      //       ? `${tempRole[0].toLowerCase()}${tempRole[1].slice(
+      //           0,
+      //           1
+      //         )}${tempRole[1].slice(1).toLowerCase()}`
+      //       : role.toLowerCase()
+      //   })
+      //   const id = data.id
+
+      //   this.$router.push({ path: `${roles[0]}/${id}`, params: { id } })
+      // },
     },
   }
 </script>
 
 <style scoped>
-/* * {
+  /* * {
   border: 1px black dashed;
 } */
 
-.login-container {
-  box-sizing: border-box;
-  margin-left: 20em;
-  padding: 0;
-  height: 100vh;
-  align-self: center;
-}
+  .login-container {
+    box-sizing: border-box;
+    margin-left: 20em;
+    padding: 0;
+    height: 100vh;
+    align-self: center;
+  }
 
-.section-svg {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  background-color: #f8f8ff;
-}
+  .section-svg {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background-color: #f8f8ff;
+  }
 
-.section-svg .svg {
-  height: 50vh;
-}
+  .section-svg .svg {
+    height: 50vh;
+  }
 
-.section-form {
-  /* background-color: #000; */
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-content: center;
-  align-self: center;
-  border-radius: 0.3em;
-  box-sizing: border-box;
-  box-shadow: rgba(0 0 0 7%) 0 1 2, rgba(0 0 0 7%) 0 2 4, rgba(0 0 0 7%) 0 4 8,
-    rgba(0 0 0 7%) 0 8 16, rgba(0 0 0 7%) 0 16 32, rgba(0 0 0 7%) 0 32 64;
-}
+  .section-form {
+    /* background-color: #000; */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-content: center;
+    align-self: center;
+    border-radius: 0.3em;
+    box-sizing: border-box;
+    box-shadow: rgba(0 0 0 7%) 0 1 2, rgba(0 0 0 7%) 0 2 4, rgba(0 0 0 7%) 0 4 8,
+      rgba(0 0 0 7%) 0 8 16, rgba(0 0 0 7%) 0 16 32, rgba(0 0 0 7%) 0 32 64;
+  }
 
-.form-title {
-  font-size: 3em;
-  color: #086cfe;
-  text-align: left;
-  width: 90%;
-  margin: 0 auto;
-  margin-bottom: 0.5em;
-}
+  .form-title {
+    font-size: 3em;
+    color: #086cfe;
+    text-align: left;
+    width: 90%;
+    margin: 0 auto;
+    margin-bottom: 0.5em;
+  }
 
-.form-link {
-  display: block;
-  width: 90%;
-  font-size: 0.96em;
-  text-decoration: none;
-  color: gray;
-  margin: 0 auto;
-  margin-top: 1.4em;
-}
+  .form-link {
+    display: block;
+    width: 90%;
+    font-size: 0.96em;
+    text-decoration: none;
+    color: gray;
+    margin: 0 auto;
+    margin-top: 1.4em;
+  }
 
-.form-button {
-  display: block;
-  width: 90%;
-  font-size: 1.2em;
-  font-weight: 800;
-  color: white;
-  text-align: center;
-  margin: 0 auto;
-  margin-top: 0.7em;
-}
+  .form-button {
+    display: block;
+    width: 90%;
+    font-size: 1.2em;
+    font-weight: 800;
+    color: white;
+    text-align: center;
+    margin: 0 auto;
+    margin-top: 0.7em;
+  }
 </style>
