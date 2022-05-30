@@ -1,11 +1,15 @@
 <template>
   <v-row>
     <v-col cols="12">
-      <v-row>
+      <!-- Header Section -->
+      <v-row v-if="studentClass">
         <v-col cols="12">
-          <span class="text-h4">Year 1 - Section A</span>
+          <span class="text-h4">
+            {{ `Year ${studentClass.year} - Section ${studentClass.section}` }}
+          </span>
         </v-col>
 
+        <!-- Students Card -->
         <v-col cols="3">
           <v-card elevation="0" outlined>
             <v-card-text>
@@ -19,13 +23,16 @@
                 </v-col>
                 <v-col cols="8">
                   <v-card-title class="pa-0 text-h5"> Students </v-card-title>
-                  <v-card-title class="pa-0 text-h5"> 50 </v-card-title>
+                  <v-card-title class="pa-0 text-h5">
+                    {{ studentClass.students.length }}
+                  </v-card-title>
                 </v-col>
               </v-row>
             </v-card-text>
           </v-card>
         </v-col>
 
+        <!-- Courses Card -->
         <v-col cols="3">
           <v-card elevation="0" outlined>
             <v-card-text>
@@ -39,13 +46,16 @@
                 </v-col>
                 <v-col cols="8">
                   <v-card-title class="pa-0 text-h5"> Courses </v-card-title>
-                  <v-card-title class="pa-0 text-h5"> 5 </v-card-title>
+                  <v-card-title class="pa-0 text-h5">
+                    {{ studentClass.attendingCourses.length }}
+                  </v-card-title>
                 </v-col>
               </v-row>
             </v-card-text>
           </v-card>
         </v-col>
 
+        <!-- Teachers Card -->
         <v-col cols="3">
           <v-card elevation="0" outlined>
             <v-card-text>
@@ -59,13 +69,16 @@
                 </v-col>
                 <v-col cols="8">
                   <v-card-title class="pa-0 text-h5"> Teachers </v-card-title>
-                  <v-card-title class="pa-0 text-h5"> 10 </v-card-title>
+                  <v-card-title class="pa-0 text-h5">
+                    {{ studentClass.teachers.length }}
+                  </v-card-title>
                 </v-col>
               </v-row>
             </v-card-text>
           </v-card>
         </v-col>
 
+        <!-- Creadit hours Card -->
         <v-col cols="3">
           <v-card elevation="0" outlined>
             <v-card-text>
@@ -81,7 +94,9 @@
                   <v-card-title class="pa-0 text-h5">
                     Credit Hours
                   </v-card-title>
-                  <v-card-title class="pa-0 text-h5"> 19 </v-card-title>
+                  <v-card-title class="pa-0 text-h5">
+                    {{ getTotalCreditHour }}
+                  </v-card-title>
                 </v-col>
               </v-row>
             </v-card-text>
@@ -90,20 +105,24 @@
       </v-row>
     </v-col>
 
+    <!-- Body Section -->
     <v-col cols="12">
-      <v-row>
+      <v-row v-if="studentClass">
         <v-col cols="8">
           <v-row>
             <v-col cols="12" class="pb-0">
               <span class="text-h5"> Students </span>
             </v-col>
             <!-- Students section -->
-            <v-col cols="12">
+            <v-col v-if="studentClass.students" cols="12">
               <v-data-table
                 :headers="headers"
-                :items="students"
+                :items="studentClass.students"
                 class="elevation-0 pa-3"
               >
+                <template #item.fullName="{ item }">
+                  {{ fullName(item) }}
+                </template>
                 <template #item.actions="{ item }">
                   <v-tooltip top>
                     <template #activator="{ on, attrs }">
@@ -203,13 +222,18 @@
 
         <v-col cols="4">
           <v-row>
-            <!-- Courses Section -->
+            <!-- Courses Head Section -->
             <v-col cols="12" class="pb-0">
               <span class="text-h5"> Courses </span>
             </v-col>
 
-            <v-col class="pb-0" cols="12">
-              <v-card elevation="0">
+            <!-- Courses Body Section -->
+            <v-col v-if="studentClass.attendingCourses" class="pb-0" cols="12">
+              <v-card
+                v-for="course in studentClass.attendingCourses"
+                :key="course.id"
+                elevation="0"
+              >
                 <v-card-text>
                   <v-row>
                     <v-col cols="3" class="d-flex justify-end align-center">
@@ -224,7 +248,7 @@
                       <v-row>
                         <v-col class="pa-2 pb-0" cols="12">
                           <v-card-title class="pa-0">
-                            Database Design
+                            {{ course.name }}
                           </v-card-title>
                         </v-col>
                         <!-- Card Body section -->
@@ -254,7 +278,9 @@
                                       </span>
                                     </v-col>
                                     <v-col class="pa-0 mt-n1" cols="12">
-                                      <span>Sweg0934</span>
+                                      <span>
+                                        {{ course.code }}
+                                      </span>
                                     </v-col>
                                   </v-row>
                                 </v-col>
@@ -285,7 +311,9 @@
                                       </span>
                                     </v-col>
                                     <v-col class="pa-0 mt-n1" cols="12">
-                                      <span>4</span>
+                                      <span>
+                                        {{ course.creditHour }}
+                                      </span>
                                     </v-col>
                                   </v-row>
                                 </v-col>
@@ -300,7 +328,7 @@
               </v-card>
             </v-col>
 
-            <!-- Teachers Section -->
+            <!-- Teachers Head Section -->
             <v-col cols="12" class="pb-0 pt-5 d-flex justify-space-between">
               <span class="text-h5"> Teachers </span>
 
@@ -402,8 +430,13 @@
               </div>
             </v-col>
 
-            <v-col class="pb-0" cols="12">
-              <v-card elevation="0">
+            <!-- Teacher Bodu Section -->
+            <v-col v-if="studentClass.teachers" class="pb-0" cols="12">
+              <v-card
+                v-for="teacher in studentClass.teachers"
+                :key="teacher.id"
+                elevation="0"
+              >
                 <v-card-text>
                   <v-row>
                     <v-col cols="3" class="d-flex justify-end align-center">
@@ -418,7 +451,7 @@
                       <v-row>
                         <v-col class="pa-2 pb-0" cols="12">
                           <v-card-title class="pa-0">
-                            Eyob Aschenaki
+                            {{ fullName(teacher) }}
                           </v-card-title>
                         </v-col>
                         <!-- Card Body section -->
@@ -448,7 +481,9 @@
                                       </span>
                                     </v-col>
                                     <v-col class="pa-0 mt-n2 mb-1" cols="12">
-                                      <span>ethioeyoba@gmail.com</span>
+                                      <span>
+                                        {{ teacher.email }}
+                                      </span>
                                     </v-col>
                                   </v-row>
                                 </v-col>
@@ -470,7 +505,7 @@
                                   class="pa-2 d-flex align-center"
                                   cols="9"
                                 >
-                                  <v-row class="pl-1">
+                                  <v-row v-if="teacher.department" class="pl-1">
                                     <v-col class="pa-0" cols="12">
                                       <span
                                         class="text-subtitle-1 font-weight-bold"
@@ -479,7 +514,9 @@
                                       </span>
                                     </v-col>
                                     <v-col class="pa-0 mt-n1 mb-1" cols="12">
-                                      <span>Software Engineering</span>
+                                      <span>
+                                        {{ teacher.department.name }}
+                                      </span>
                                     </v-col>
                                   </v-row>
                                 </v-col>
@@ -514,143 +551,10 @@ export default {
         },
         { text: 'Email', value: 'email' },
         { text: 'Section', value: 'section' },
-        { text: 'Entrance Year', value: 'entranceYear' },
+        { text: 'Year', value: 'year' },
         { text: 'Actions', value: 'actions', sortable: false },
       ],
-      students: [
-        {
-          fullName: 'Benat Endale',
-          email: 'ben10@gmail,com',
-          section: 'A',
-          entranceYear: '2009',
-        },
-        {
-          fullName: 'Benat Endale',
-          email: 'ben10@gmail,com',
-          section: 'A',
-          entranceYear: '2009',
-        },
-        {
-          fullName: 'Benat Endale',
-          email: 'ben10@gmail,com',
-          section: 'A',
-          entranceYear: '2009',
-        },
-        {
-          fullName: 'Benat Endale',
-          email: 'ben10@gmail,com',
-          section: 'A',
-          entranceYear: '2009',
-        },
-        {
-          fullName: 'Benat Endale',
-          email: 'ben10@gmail,com',
-          section: 'A',
-          entranceYear: '2009',
-        },
-        {
-          fullName: 'Benat Endale',
-          email: 'ben10@gmail,com',
-          section: 'A',
-          entranceYear: '2009',
-        },
-        {
-          fullName: 'Benat Endale',
-          email: 'ben10@gmail,com',
-          section: 'A',
-          entranceYear: '2009',
-        },
-        {
-          fullName: 'Benat Endale',
-          email: 'ben10@gmail,com',
-          section: 'A',
-          entranceYear: '2009',
-        },
-        {
-          fullName: 'Benat Endale',
-          email: 'ben10@gmail,com',
-          section: 'A',
-          entranceYear: '2009',
-        },
-        {
-          fullName: 'Benat Endale',
-          email: 'ben10@gmail,com',
-          section: 'A',
-          entranceYear: '2009',
-        },
-        {
-          fullName: 'Benat Endale',
-          email: 'ben10@gmail,com',
-          section: 'A',
-          entranceYear: '2009',
-        },
-        {
-          fullName: 'Benat Endale',
-          email: 'ben10@gmail,com',
-          section: 'A',
-          entranceYear: '2009',
-        },
-        {
-          fullName: 'Benat Endale',
-          email: 'ben10@gmail,com',
-          section: 'A',
-          entranceYear: '2009',
-        },
-        {
-          fullName: 'Benat Endale',
-          email: 'ben10@gmail,com',
-          section: 'A',
-          entranceYear: '2009',
-        },
-        {
-          fullName: 'Benat Endale',
-          email: 'ben10@gmail,com',
-          section: 'A',
-          entranceYear: '2009',
-        },
-        {
-          fullName: 'Benat Endale',
-          email: 'ben10@gmail,com',
-          section: 'A',
-          entranceYear: '2009',
-        },
-        {
-          fullName: 'Benat Endale',
-          email: 'ben10@gmail,com',
-          section: 'A',
-          entranceYear: '2009',
-        },
-        {
-          fullName: 'Benat Endale',
-          email: 'ben10@gmail,com',
-          section: 'A',
-          entranceYear: '2009',
-        },
-        {
-          fullName: 'Benat Endale',
-          email: 'ben10@gmail,com',
-          section: 'A',
-          entranceYear: '2009',
-        },
-        {
-          fullName: 'Benat Endale',
-          email: 'ben10@gmail,com',
-          section: 'A',
-          entranceYear: '2009',
-        },
-        {
-          fullName: 'Benat Endale',
-          email: 'ben10@gmail,com',
-          section: 'A',
-          entranceYear: '2009',
-        },
-        {
-          fullName: 'Benat Endale',
-          email: 'ben10@gmail,com',
-          section: 'A',
-          entranceYear: '2009',
-        },
-      ],
+      studentClass: null,
       courses: [],
       assignedCourses: [],
       unassignedCourses: [],
@@ -667,7 +571,80 @@ export default {
     }
   },
 
+  computed: {
+    getTotalCreditHour() {
+      return this.studentClass.attendingCourses.reduce(
+        (prev, cur) => prev + parseInt(cur.creditHour),
+        0
+      )
+    },
+  },
+
+  async created() {
+    await this.initilizeClass()
+  },
+
   methods: {
+    async initilizeClass() {
+      const query = `query class($id: ID!) {
+                      studentClass(id: $id) {
+                        year
+                        section
+                        attendingCourses {
+                          id
+                          name
+                          code
+                          creditHour
+                        }
+                        teachers {
+                          id
+                          firstName
+                          middleName
+                          lastName
+                          department {
+                            id
+                            name
+                          }
+                        }
+                        students {
+                          id
+                          firstName
+                          middleName
+                          lastName
+                          attendingCourses {
+                            id
+                            name
+                          }
+                        }
+                      }
+                    }`
+
+      const variables = { id: this.$nuxt.context.params.sectionId }
+
+      const studentClassResponse = await this.$axios.post('/graphql', {
+        query,
+        variables,
+      })
+
+      this.studentClass = studentClassResponse.data.data.studentClass
+
+      console.log(this.studentClass)
+    },
+
+    fullName(item) {
+      return (
+        `${item.firstName.substr(0, 1).toUpperCase()}${item.firstName
+          .substr(1)
+          .toLowerCase()}` +
+        ` ${item.father.firstName
+          .substr(0, 1)
+          .toUpperCase()}${item.father.firstName.substr(1).toLowerCase()}` +
+        ` ${item.father.lastName
+          .substr(0, 1)
+          .toUpperCase()}${item.father.lastName.substr(1).toLowerCase()}`
+      )
+    },
+
     enrollStudentToCourses(item) {
       console.log('Enroll Student:', item.fullName)
 

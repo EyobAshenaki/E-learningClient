@@ -220,7 +220,7 @@
                       <v-chip
                         class="ma-2 elevation-3"
                         color="white"
-                        @click="goToSectionPage()"
+                        @click="goToSectionPage(clss.id)"
                       >
                         <v-avatar
                           size="30"
@@ -417,12 +417,6 @@ export default {
                           id
                           year
                           section
-                          teachers {
-                            id
-                            firstName
-                            middleName
-                            lastName
-                          }
                           students {
                             id
                           }
@@ -488,11 +482,11 @@ export default {
       this.removeCoursesFromClassesDialog = true
     },
 
-    goToSectionPage() {
-      console.log('Section Page')
+    goToSectionPage(sectionId) {
+      console.log('Section Page: ', sectionId)
       this.$router.push({
         name: 'departmentAdminstrator-id-section-sectionId',
-        params: { id: this.$nuxt.context.params.id, sectionId: 1 },
+        params: { id: this.$nuxt.context.params.id, sectionId },
       })
     },
 
