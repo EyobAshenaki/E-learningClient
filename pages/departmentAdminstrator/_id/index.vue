@@ -164,7 +164,13 @@
     </v-col>
 
     <!-- Class cards Section -->
-    <v-col v-for="n in 4" :key="n" cols="12" md="4" class="mt-5">
+    <v-col
+      v-for="(year, idx) in classesByYear"
+      :key="idx"
+      cols="12"
+      md="4"
+      class="mt-5"
+    >
       <v-card elevation="0" outlined width="340">
         <v-card-text class="pa-3">
           <v-row>
@@ -173,14 +179,14 @@
               <v-row>
                 <v-col cols="12" class="pt-4 d-flex justify-center">
                   <v-avatar size="60" color="orange lighten-4">
-                    <v-icon size="50" color="orange darken-3"
-                      >mdi-roman-numeral-1</v-icon
-                    >
+                    <v-icon size="50" color="orange darken-3">
+                      {{ `mdi-roman-numeral-${idx}` }}
+                    </v-icon>
                   </v-avatar>
                 </v-col>
                 <v-col cols="12" class="pt-0 d-flex justify-center">
                   <span class="pa-0 text-h6 font-weight-regular black--text">
-                    1st year
+                    {{ `${idx}st year` }}
                   </span>
                 </v-col>
               </v-row>
@@ -204,9 +210,10 @@
                 </v-col>
                 <v-col cols="12" class="">
                   <v-row>
+                    <!-- Section chips -->
                     <v-col
-                      v-for="s in 3"
-                      :key="s"
+                      v-for="(clss, i) in year"
+                      :key="i"
                       cols="6"
                       class="pa-0 d-flex justify-center"
                     >
@@ -221,11 +228,12 @@
                           class="pl-3 ml-n1 mr-2"
                         >
                           <v-icon left color="orange lighten-5" size="28">
-                            mdi-alpha-a
+                            {{ `mdi-alpha-${getSection(clss)}` }}
                           </v-icon>
                         </v-avatar>
-
-                        Students - 50
+                        <span>
+                          {{ `Students - ${clss.students.length}` }}
+                        </span>
                       </v-chip>
                     </v-col>
                   </v-row>
@@ -233,7 +241,9 @@
               </v-row>
             </v-col>
             <v-col cols="12" class="pl-5">
-              <span class="text-subtitle-1">Total students - 150</span>
+              <span class="text-subtitle-1">
+                {{ `Total students - ${totalStudents}` }}
+              </span>
             </v-col>
           </v-row>
         </v-card-text>
@@ -353,6 +363,9 @@ export default {
   data() {
     return {
       user: null,
+      department: null,
+      classesByYear: null,
+      totalStudents: null,
       assignCoursesToClassesDialog: false,
       removeCoursesFromClassesDialog: false,
       seletedAssignClasses: [],
@@ -365,8 +378,10 @@ export default {
     }
   },
 
-  created() {
-    this.initializeUser()
+  async created() {
+    await this.initializeUser()
+    await this.initializeDepartment()
+    this.classesByYear = this.organizeClassesByYear(this.department.classes)
   },
 
   methods: {
@@ -377,16 +392,84 @@ export default {
                         firstName
                         middleName
                         lastName
+                        department {
+                          id
+                        }
                       }
                     }`
+
       const variables = {
         id: this.$nuxt.context.params.id,
       }
+
       const userResponse = await this.$axios.post('/graphql', {
         query,
         variables,
       })
       this.user = userResponse.data.data.user
+    },
+
+    async initializeDepartment() {
+      const query = `query department($id: ID!) {
+                      department(id: $id) {
+                        name
+                        classes {
+                          id
+                          year
+                          section
+                          teachers {
+                            id
+                            firstName
+                            middleName
+                            lastName
+                          }
+                          students {
+                            id
+                          }
+                          attendingCourses {
+                            id
+                            name
+                            code
+                            creditHour
+                          }
+                        }
+                      }
+                    }`
+
+      const variables = {
+        id: this.user.department.id,
+      }
+
+      const departmentResponse = await this.$axios.post('/graphql', {
+        query,
+        variables,
+      })
+
+      this.department = departmentResponse.data.data.department
+    },
+
+    organizeClassesByYear(classes) {
+      const classesByYear = classes.reduce((acc, cur) => {
+        if (!acc[cur.year]) acc[cur.year] = []
+
+        acc[cur.year].push(cur)
+
+        return acc
+      }, {})
+
+      for (const classes in classesByYear) {
+        for (const clss of classesByYear[classes]) {
+          if (!clss.totalStudents) clss.totalStudents = 0
+          clss.totalStudents += clss.students.length
+        }
+      }
+
+      return classesByYear
+    },
+
+    getSection(clss) {
+      this.totalStudents = clss.totalStudents
+      return clss.section.toLowerCase()
     },
 
     goToCoursesPage() {
