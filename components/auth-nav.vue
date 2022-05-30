@@ -22,21 +22,21 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-export default {
-  computed: {
-    ...mapGetters({ name: 'auth/name' }),
-  },
-}
+  import { mapGetters } from 'vuex'
+  export default {
+    computed: {
+      ...mapGetters({ name: 'auth/name' }),
+    },
+  }
 </script>
 <style lang="scss" scoped>
-.avatar-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  .user-name {
-    max-width: 100px;
-    display: inline-block;
+  .avatar-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    .user-name {
+      max-width: 100px;
+      display: inline-block;
+    }
   }
-}
 </style>
