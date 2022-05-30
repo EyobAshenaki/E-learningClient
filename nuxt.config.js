@@ -1,4 +1,5 @@
 import colors from 'vuetify/es5/util/colors'
+import minifyTheme from 'minify-css-string'
 
 export default function () {
   return {
@@ -19,10 +20,10 @@ export default function () {
     },
 
     // Global CSS: https://go.nuxtjs.dev/config-css
-    css: [],
+    css: ['~/assets/styles/main.scss'],
 
     // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-    plugins: [],
+    plugins: ['~/plugins/vuex-persist.client', '~/plugins/toast'],
 
     // Auto import components: https://go.nuxtjs.dev/config-components
     components: true,
@@ -49,13 +50,18 @@ export default function () {
     },
 
     proxy: {
-      '/api': { target: process.env.BASE_URL, changeOrigin:true, pathRewrite: { '^/api/': '/' } },
-      '/graphql': {target: process.env.BASE_URL, changeOrigin:false },
+      '/api': {
+        target: process.env.BASE_URL,
+        changeOrigin: true,
+        pathRewrite: { '^/api/': '/' },
+      },
+      '/graphql': { target: process.env.BASE_URL, changeOrigin: false },
     },
 
     // Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify
     vuetify: {
-      customVariables: ['~/assets/variables.scss'],
+      customVariables: ['~/assets/styles/variables.scss'],
+      treeshake: true,
       theme: {
         dark: false,
         themes: {
@@ -80,9 +86,17 @@ export default function () {
           },
         },
       },
+      minifyTheme,
     },
 
     // Build Configuration: https://go.nuxtjs.dev/config-build
-    build: {},
+    build: {
+      optimizeCss: true,
+      extend(config, ctx) {
+        if (ctx.isDev) {
+          config.devtool = ctx.isClient ? 'source-map' : 'inline-source-map'
+        }
+      },
+    },
   }
 }

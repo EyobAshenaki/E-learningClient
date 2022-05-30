@@ -1,8 +1,8 @@
-function GraphqlError (errors) {
-  this.errors = errors;
+function GraphqlError(errors) {
+  this.errors = errors
   this.name = 'GRAPHQL ERROR'
 }
 
-module.exports= {
-  GraphqlError
+module.exports = {
+  GraphqlError,
 }
