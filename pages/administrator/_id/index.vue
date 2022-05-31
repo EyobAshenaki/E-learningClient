@@ -12,20 +12,14 @@
 </template>
 
 <script>
-// import { mapState, mapActions } from 'vuex'
-export default {
-  layout: 'administrator',
-  name: 'AdminIndexPage',
-  data: () => ({
-    items: [
-      {
-        text: 'Dashboard',
-      },
-    ],
-  }),
-  // computed: mapState(['studentToggle']),
-  // methods: {
-  //   ...mapActions(['viewStudents']),
-  // },
-}
-</script>
+  export default {
+    name: 'AdminIndexPage',
+    layout: 'admin',
+    data: () => ({
+      items: [
+        {
+          text: 'Dashboard',
+        },
+      ],
+    }),
+  }

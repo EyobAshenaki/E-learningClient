@@ -1,17 +1,10 @@
 <template>
   <div>
-    <v-row justify="center" align="center"> </v-row>
-    <!-- <CourseWhatYoullLearn />
-  <CourseCourseContent />
-  <CourseRequirements /> -->
-    <TrialComponent />
-    <!-- <AdminAllAccounts /> -->
+    <h1>Landing Page</h1>
   </div>
 </template>
-
 <script>
-export default {
-  layout: 'administrator',
-  name: 'IndexPage',
-}
+  export default {
+    layout: 'guest',
+  }
 </script>
