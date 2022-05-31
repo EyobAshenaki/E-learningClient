@@ -223,8 +223,97 @@
         <v-col cols="4">
           <v-row>
             <!-- Courses Head Section -->
-            <v-col cols="12" class="pb-0">
+            <v-col cols="12" class="pb-0 pt-5 d-flex justify-space-between">
               <span class="text-h5"> Courses </span>
+
+              <div>
+                <!-- Remove Course dialog -->
+                <v-dialog width="25%">
+                  <template #activator="{ on, attrs }">
+                    <v-btn
+                      outlined
+                      color="orange darken-4"
+                      v-bind="attrs"
+                      v-on="on"
+                    >
+                      Remove
+                    </v-btn>
+                  </template>
+                  <template #default="dialog">
+                    <v-card>
+                      <v-card-title> Remove Course from a Class </v-card-title>
+                      <v-card-text class="pb-0">
+                        <v-select
+                          v-model="seletedRemoveCourse"
+                          :items="assignedCourses"
+                          :menu-props="{ bottom: true, offsetY: true }"
+                          outlined
+                          clearable
+                          label="Course"
+                        ></v-select>
+                      </v-card-text>
+                      <v-card-actions class="pt-0 justify-space-between">
+                        <v-btn
+                          text
+                          color="error"
+                          @click="closeRemoveCourseFromClass(dialog)"
+                          >Cancel</v-btn
+                        >
+                        <v-btn
+                          text
+                          color="primary"
+                          @click="removeCourseFromClass(dialog)"
+                        >
+                          Remove
+                        </v-btn>
+                      </v-card-actions>
+                    </v-card>
+                  </template>
+                </v-dialog>
+
+                <!-- Assign Course dialog -->
+                <v-dialog width="25%">
+                  <template #activator="{ on, attrs }">
+                    <v-btn
+                      outlined
+                      color="orange darken-4"
+                      v-bind="attrs"
+                      v-on="on"
+                    >
+                      Assign
+                    </v-btn>
+                  </template>
+                  <template #default="dialog">
+                    <v-card>
+                      <v-card-title> Assign Course to a Class </v-card-title>
+                      <v-card-text class="pb-0">
+                        <v-select
+                          v-model="seletedAssignCourse"
+                          :items="unassignedCourses"
+                          :menu-props="{ bottom: true, offsetY: true }"
+                          outlined
+                          clearable
+                          label="Course"
+                        ></v-select>
+                      </v-card-text>
+                      <v-card-actions class="pt-0 justify-space-between">
+                        <v-btn
+                          text
+                          color="error"
+                          @click="closeAssignCourseToClass(dialog)"
+                          >Cancel</v-btn
+                        >
+                        <v-btn
+                          text
+                          color="primary"
+                          @click="assignCourseToClass(dialog)"
+                          >Assign</v-btn
+                        >
+                      </v-card-actions>
+                    </v-card>
+                  </template>
+                </v-dialog>
+              </div>
             </v-col>
 
             <!-- Courses Body Section -->
@@ -377,7 +466,7 @@
                   </template>
                 </v-dialog>
 
-                <!-- Assign Tattcher dialog -->
+                <!-- Assign Teacher dialog -->
                 <v-dialog width="25%">
                   <template #activator="{ on, attrs }">
                     <v-btn
@@ -568,6 +657,8 @@ export default {
       seletedRemoveTeacher: null,
       unassignedTeachersOfCourse: [],
       assignedTeachersOfCourse: [],
+      seletedAssignCourse: null,
+      seletedRemoveCourse: null,
     }
   },
 
@@ -681,6 +772,30 @@ export default {
       console.log('Remove Courses')
 
       this.closeRemoveCourses()
+    },
+
+    closeAssignCourseToClass(dialog) {
+      console.log('Close Assign Course to Course: ', dialog)
+
+      dialog.value = false
+    },
+
+    closeRemoveCourseFromClass(dialog) {
+      console.log('Close Remove Course from Course: ', dialog)
+
+      dialog.value = false
+    },
+
+    assignCourseToClass(dialog) {
+      console.log('Assign Course to Course')
+
+      this.closeAssignCourseToClass(dialog)
+    },
+
+    removeCourseFromClass(dialog) {
+      console.log('Assign Course to Course')
+
+      this.closeRemoveCourseFromClass(dialog)
     },
 
     closeAssignTeacherToClass(dialog) {
