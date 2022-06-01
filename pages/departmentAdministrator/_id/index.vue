@@ -458,7 +458,7 @@ export default {
 
       this.department = departmentResponse.data.data.department
 
-      console.log(this.department)
+      // console.log(this.department)
     },
 
     organizeClassesByYear(classes) {

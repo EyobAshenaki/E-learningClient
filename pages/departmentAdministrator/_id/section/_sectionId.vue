@@ -290,9 +290,11 @@
                         <v-select
                           v-model="seletedAssignCourse"
                           :items="unassignedCourses"
+                          item-text="name"
                           :menu-props="{ bottom: true, offsetY: true }"
                           outlined
                           clearable
+                          return-object
                           label="Course"
                         ></v-select>
                       </v-card-text>
@@ -317,12 +319,13 @@
             </v-col>
 
             <!-- Courses Body Section -->
-            <v-col v-if="studentClass.attendingCourses" class="pb-0" cols="12">
-              <v-card
-                v-for="course in studentClass.attendingCourses"
-                :key="course.id"
-                elevation="0"
-              >
+            <v-col
+              v-for="course in assignedCourses"
+              :key="course.id"
+              class="pb-2"
+              cols="12"
+            >
+              <v-card elevation="0">
                 <v-card-text>
                   <v-row>
                     <v-col cols="3" class="d-flex justify-end align-center">
@@ -672,11 +675,12 @@ export default {
   },
 
   async created() {
-    await this.initilizeClass()
+    await this.initializeClass()
+    await this.initializeDepartmentCourses()
   },
 
   methods: {
-    async initilizeClass() {
+    async initializeClass() {
       const query = `query class($id: ID!) {
                       studentClass(id: $id) {
                         year
@@ -718,8 +722,51 @@ export default {
       })
 
       this.studentClass = studentClassResponse.data.data.studentClass
+    },
 
-      console.log(this.studentClass)
+    async initializeDepartmentCourses() {
+      const query = `query user($id: ID!) {
+                      user(id: $id) {
+                        department{
+                          name
+                          ownedCourses {
+                            id
+                            code
+                            name
+                            creditHour
+                          }
+                        }
+                      }
+                    }`
+
+      const variables = {
+        id: this.$nuxt.context.params.id,
+      }
+
+      const departmentCouresesResponse = await this.$axios.post('/graphql', {
+        query,
+        variables,
+      })
+
+      const departmentCourses =
+        departmentCouresesResponse.data.data.user.department.ownedCourses
+
+      this.organizeCourses(departmentCourses)
+    },
+
+    organizeCourses(courses) {
+      this.assignedCourses = [...this.studentClass.attendingCourses]
+
+      for (const course of courses) {
+        let existsFlag = false
+        for (const assignedCourse of this.assignedCourses) {
+          if (assignedCourse.id === course.id) {
+            existsFlag = true
+            break
+          }
+        }
+        if (!existsFlag) this.unassignedCourses.push(course)
+      }
     },
 
     fullName(item) {
@@ -775,19 +822,36 @@ export default {
     },
 
     closeAssignCourseToClass(dialog) {
-      console.log('Close Assign Course to Course: ', dialog)
-
       dialog.value = false
     },
 
     closeRemoveCourseFromClass(dialog) {
-      console.log('Close Remove Course from Course: ', dialog)
-
       dialog.value = false
     },
 
-    assignCourseToClass(dialog) {
-      console.log('Assign Course to Course')
+    async assignCourseToClass(dialog) {
+      const query = `mutation assignClassToCourse($courseId: ID!, $classId: ID!) {
+                      assignClassToCourse(courseId: $courseId, classId: $classId)
+                    }`
+
+      const variables = {
+        courseId: this.seletedAssignCourse.id,
+        classId: this.$nuxt.context.params.sectionId,
+      }
+
+      const assignClassToCourseResponse = await this.$axios.post('/graphql', {
+        query,
+        variables,
+      })
+
+      const isCourseAssigned =
+        assignClassToCourseResponse.data.data.assignClassToCourse
+
+      if (isCourseAssigned) {
+        console.log('Course Assigned')
+
+        this.initializeDepartmentCourses()
+      }
 
       this.closeAssignCourseToClass(dialog)
     },
