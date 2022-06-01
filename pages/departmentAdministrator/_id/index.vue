@@ -36,8 +36,14 @@
             </v-row>
           </v-card>
         </v-col>
+
         <!-- Courses section -->
-        <v-col cols="4" class="px-0 overflow-hidden" style="height: 40vh">
+        <v-col
+          v-if="department"
+          cols="4"
+          class="px-0 overflow-hidden"
+          style="height: 40vh"
+        >
           <v-row>
             <v-col cols="12">
               <v-row>
@@ -53,7 +59,12 @@
             </v-col>
 
             <!-- Course card section -->
-            <v-col v-for="n in 4" :key="n" cols="12" class="py-1">
+            <v-col
+              v-for="course in department.ownedCourses"
+              :key="course.id"
+              cols="12"
+              class="py-1"
+            >
               <v-col class="pb-0" cols="12">
                 <v-card elevation="0">
                   <v-card-text>
@@ -70,7 +81,7 @@
                         <v-row>
                           <v-col class="pa-2 pb-0" cols="12">
                             <v-card-title class="pa-0">
-                              Database Design
+                              {{ course.name }}
                             </v-card-title>
                           </v-col>
                           <!-- Card Body section -->
@@ -100,7 +111,9 @@
                                         </span>
                                       </v-col>
                                       <v-col class="pa-0 mt-n1" cols="12">
-                                        <span>Sweg0934</span>
+                                        <span>
+                                          {{ course.code }}
+                                        </span>
                                       </v-col>
                                     </v-row>
                                   </v-col>
@@ -131,7 +144,9 @@
                                         </span>
                                       </v-col>
                                       <v-col class="pa-0 mt-n1" cols="12">
-                                        <span>4</span>
+                                        <span>
+                                          {{ course.creditHour }}
+                                        </span>
                                       </v-col>
                                     </v-row>
                                   </v-col>
@@ -283,8 +298,6 @@
       <v-card>
         <v-card-title> Assign Courses to Classes </v-card-title>
         <v-card-text class="pb-0">
-          <!-- <v-row>
-                  <v-col> -->
           <v-select
             v-model="seletedAssignClasses"
             :items="classes"
@@ -304,8 +317,6 @@
             clearable
             label="Courses"
           ></v-select>
-          <!-- </v-col>
-                </v-row> -->
         </v-card-text>
         <v-card-actions class="pt-0 d-flex justify-space-between">
           <v-btn text color="error" @click="closeAssignCoursesToClasses">
@@ -413,6 +424,12 @@ export default {
       const query = `query department($id: ID!) {
                       department(id: $id) {
                         name
+                        ownedCourses {
+                          id
+                          code
+                          name
+                          creditHour
+                        }
                         classes {
                           id
                           year
@@ -440,6 +457,8 @@ export default {
       })
 
       this.department = departmentResponse.data.data.department
+
+      console.log(this.department)
     },
 
     organizeClassesByYear(classes) {
@@ -485,7 +504,7 @@ export default {
     goToSectionPage(sectionId) {
       console.log('Section Page: ', sectionId)
       this.$router.push({
-        name: 'departmentAdminstrator-id-section-sectionId',
+        name: 'departmentAdministrator-id-section-sectionId',
         params: { id: this.$nuxt.context.params.id, sectionId },
       })
     },
