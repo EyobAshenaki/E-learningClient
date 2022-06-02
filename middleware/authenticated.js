@@ -1,5 +1,5 @@
 export default function ({ store, redirect }) {
-  if (!store.getters['auth/isLoggedIn']) {
+  if (!process.server && !store.getters['auth/isLoggedIn']) {
     return redirect('/login')
   }
 }
