@@ -325,7 +325,7 @@
               <v-col
                 v-for="course in studentClass.attendingCourses"
                 :key="course.id"
-                class="pb-2"
+                class="pa-2"
                 cols="12"
               >
                 <v-card elevation="0">
@@ -447,10 +447,11 @@
                       <v-card-text class="pb-0">
                         <v-select
                           v-model="seletedRemoveTeacher"
-                          :items="assignedTeachersOfCourse"
+                          :items="studentClass.teachers"
                           :menu-props="{ bottom: true, offsetY: true }"
                           outlined
                           clearable
+                          return-object
                           label="Teacher"
                         ></v-select>
                       </v-card-text>
@@ -481,6 +482,7 @@
                       color="orange darken-4"
                       v-bind="attrs"
                       v-on="on"
+                      @click="getAllTeachersOfCourses"
                     >
                       Assign
                     </v-btn>
@@ -490,19 +492,13 @@
                       <v-card-title> Assign Teacher to a Class </v-card-title>
                       <v-card-text class="pb-0">
                         <v-select
-                          v-model="seletedCourse"
-                          :items="assignedCourses"
-                          :menu-props="{ bottom: true, offsetY: true }"
-                          outlined
-                          clearable
-                          label="Courses"
-                        ></v-select>
-                        <v-select
                           v-model="seletedAssignTeacher"
                           :items="unassignedTeachersOfCourse"
+                          item-text="firstName"
                           :menu-props="{ bottom: true, offsetY: true }"
                           outlined
                           clearable
+                          return-object
                           label="Teacher"
                         ></v-select>
                       </v-card-text>
@@ -527,10 +523,11 @@
             </v-col>
 
             <!-- Teacher Bodu Section -->
-            <v-col v-if="studentClass.teachers" class="pb-0" cols="12">
+            <v-col v-if="studentClass.teachers" class="pb-0 mb-10" cols="12">
               <v-card
                 v-for="teacher in studentClass.teachers"
                 :key="teacher.id"
+                class="mb-3"
                 elevation="0"
               >
                 <v-card-text>
@@ -587,7 +584,11 @@
                             </v-col>
 
                             <!-- Secondary section -->
-                            <v-col class="mt-1" cols="12">
+                            <v-col
+                              v-if="teacher.department"
+                              class="mt-1"
+                              cols="12"
+                            >
                               <v-row>
                                 <v-col
                                   class="pa-1 d-flex align-center justify-center mr-1"
@@ -601,7 +602,7 @@
                                   class="pa-2 d-flex align-center"
                                   cols="9"
                                 >
-                                  <v-row v-if="teacher.department" class="pl-1">
+                                  <v-row class="pl-1">
                                     <v-col class="pa-0" cols="12">
                                       <span
                                         class="text-subtitle-1 font-weight-bold"
@@ -694,12 +695,19 @@ export default {
                           name
                           code
                           creditHour
+                          teachers {
+                            id
+                            firstName
+                            middleName
+                            lastName
+                          }
                         }
                         teachers {
                           id
                           firstName
                           middleName
                           lastName
+                          email
                           department {
                             id
                             name
@@ -778,13 +786,30 @@ export default {
         `${item.firstName.substr(0, 1).toUpperCase()}${item.firstName
           .substr(1)
           .toLowerCase()}` +
-        ` ${item.father.firstName
-          .substr(0, 1)
-          .toUpperCase()}${item.father.firstName.substr(1).toLowerCase()}` +
-        ` ${item.father.lastName
-          .substr(0, 1)
-          .toUpperCase()}${item.father.lastName.substr(1).toLowerCase()}`
+        ` ${item.middleName.substr(0, 1).toUpperCase()}${item.middleName
+          .substr(1)
+          .toLowerCase()}` +
+        ` ${item.lastName.substr(0, 1).toUpperCase()}${item.lastName
+          .substr(1)
+          .toLowerCase()}`
       )
+    },
+
+    getAllTeachersOfCourses() {
+      this.unassignedTeachersOfCourse = []
+
+      for (const course of this.assignedCourses) {
+        for (const teacher of course.teachers) {
+          let existsFlag = false
+          for (const assignedTeacher of this.studentClass.teachers) {
+            if (teacher.id === assignedTeacher.id) {
+              existsFlag = true
+              break
+            }
+          }
+          if (!existsFlag) this.unassignedTeachersOfCourse.push(teacher)
+        }
+      }
     },
 
     enrollStudentToCourses(item) {
@@ -882,15 +907,18 @@ export default {
         classId: this.$nuxt.context.params.sectionId,
       }
 
-      const assignClassToCourseResponse = await this.$axios.post('/graphql', {
-        query,
-        variables,
-      })
+      const unassignClassFromCourseResponse = await this.$axios.post(
+        '/graphql',
+        {
+          query,
+          variables,
+        }
+      )
 
-      const isCourseAssigned =
-        assignClassToCourseResponse.data.data.assignClassToCourse
+      const isCourseRemoved =
+        unassignClassFromCourseResponse.data.data.unassignClassFromCourse
 
-      if (isCourseAssigned) {
+      if (isCourseRemoved) {
         console.log('Course Removed')
       }
 
@@ -898,19 +926,46 @@ export default {
     },
 
     closeAssignTeacherToClass(dialog) {
-      console.log('Close Assign Teacher to Course: ', dialog)
-
       dialog.value = false
+
+      this.$nextTick(async () => {
+        this.seletedAssignTeacher = null
+
+        await this.initializeClass()
+      })
     },
 
     closeRemoveTeacherFromClass(dialog) {
-      console.log('Close Remove Teacher from Course: ', dialog)
-
       dialog.value = false
+
+      this.$nextTick(async () => {
+        this.seletedRemoveTeacher = null
+
+        await this.initializeClass()
+      })
     },
 
-    assignTeacherToClass(dialog) {
-      console.log('Assign Teacher to Course')
+    async assignTeacherToClass(dialog) {
+      const query = `mutation assignTeacherToClass($teacherId: ID!, $classId: ID!) {
+                      assignTeacherToClass(teacherId: $teacherId, classId: $classId)
+                    }`
+
+      const variables = {
+        teacherId: this.seletedAssignTeacher.id,
+        classId: this.$nuxt.context.params.sectionId,
+      }
+
+      const assignTeacherToClassResponse = await this.$axios.post('/graphql', {
+        query,
+        variables,
+      })
+
+      const isTeacherAssigned =
+        assignTeacherToClassResponse.data.data.assignTeacherToClass
+
+      if (isTeacherAssigned) {
+        console.log('Teacher Assigned')
+      }
 
       this.closeAssignTeacherToClass(dialog)
     },
