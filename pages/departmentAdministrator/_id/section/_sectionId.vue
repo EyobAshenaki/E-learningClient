@@ -437,6 +437,7 @@
                       color="orange darken-4"
                       v-bind="attrs"
                       v-on="on"
+                      @click="getAllTeachersOfCourses"
                     >
                       Remove
                     </v-btn>
@@ -447,7 +448,8 @@
                       <v-card-text class="pb-0">
                         <v-select
                           v-model="seletedRemoveTeacher"
-                          :items="studentClass.teachers"
+                          :items="assignedTeachersOfCourse"
+                          item-text="firstName"
                           :menu-props="{ bottom: true, offsetY: true }"
                           outlined
                           clearable
@@ -796,6 +798,7 @@ export default {
     },
 
     getAllTeachersOfCourses() {
+      this.assignedTeachersOfCourse = []
       this.unassignedTeachersOfCourse = []
 
       for (const course of this.assignedCourses) {
@@ -803,6 +806,7 @@ export default {
           let existsFlag = false
           for (const assignedTeacher of this.studentClass.teachers) {
             if (teacher.id === assignedTeacher.id) {
+              this.assignedTeachersOfCourse.push(teacher)
               existsFlag = true
               break
             }
@@ -849,6 +853,8 @@ export default {
 
       this.closeRemoveCourses()
     },
+
+    // Course Assignation and Removal to and from Class
 
     closeAssignCourseToClass(dialog) {
       dialog.value = false
@@ -925,6 +931,8 @@ export default {
       this.closeRemoveCourseFromClass(dialog)
     },
 
+    // Teacher Assignation and Removal to and from Class
+
     closeAssignTeacherToClass(dialog) {
       dialog.value = false
 
@@ -970,8 +978,30 @@ export default {
       this.closeAssignTeacherToClass(dialog)
     },
 
-    removeTeacherFromClass(dialog) {
-      console.log('Assign Teacher to Course')
+    async removeTeacherFromClass(dialog) {
+      const query = `mutation dismissTeacherFromClass($teacherId: ID!, $classId: ID!) {
+                      dismissTeacherFromClass(teacherId: $teacherId, classId: $classId)
+                    }`
+
+      const variables = {
+        teacherId: this.seletedRemoveTeacher.id,
+        classId: this.$nuxt.context.params.sectionId,
+      }
+
+      const dismissTeacherFromClassResponse = await this.$axios.post(
+        '/graphql',
+        {
+          query,
+          variables,
+        }
+      )
+
+      const isTeacherDismissed =
+        dismissTeacherFromClassResponse.data.data.dismissTeacherFromClass
+
+      if (isTeacherDismissed) {
+        console.log('Teacher Dismissed')
+      }
 
       this.closeRemoveTeacherFromClass(dialog)
     },
