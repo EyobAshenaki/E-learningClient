@@ -3,6 +3,7 @@
     <slot name="nav">
       <AppNav />
     </slot>
+    <slot name="sideNav" />
     <v-main>
       <v-container class="main-container" fluid>
         <slot>
