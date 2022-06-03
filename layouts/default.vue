@@ -1,7 +1,9 @@
 <template>
   <v-app>
-    <app-header />
-    <admin-side-bar />
+    <slot name="nav">
+      <AppNav />
+    </slot>
+    <slot name="sideNav" />
     <v-main>
       <v-container class="main-container" fluid>
         <slot>

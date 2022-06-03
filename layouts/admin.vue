@@ -3,6 +3,9 @@
     <template #nav>
       <AuthNav />
     </template>
+    <template #sideNav>
+      <AdminSideBar />
+    </template>
     <Nuxt />
   </DefaultLayout>
 </template>
