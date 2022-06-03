@@ -113,7 +113,9 @@
             <v-col cols="12" class="pb-0">
               <span class="text-h5"> Students </span>
             </v-col>
+
             <!-- Students section -->
+            <!-- TODO: mass student asssign and remove -->
             <v-col v-if="studentClass.students" cols="12">
               <v-data-table
                 :headers="headers"
@@ -134,7 +136,7 @@
                         v-on="on"
                         @click.stop="enrollStudentToCourses(item)"
                       >
-                        mdi-account-plus
+                        mdi-book-plus
                       </v-icon>
                     </template>
                     <span>Assign Course</span>
@@ -149,7 +151,7 @@
                         v-on="on"
                         @click.stop="removeStudentFromCourses(item)"
                       >
-                        mdi-account-minus
+                        mdi-book-minus
                       </v-icon>
                     </template>
                     <span>Remove Course</span>
@@ -159,7 +161,7 @@
 
               <!-- Assign Course to Student Dialog -->
               <v-dialog
-                v-model="assignCourseDialog"
+                v-model="assignStudentCourseDialog"
                 :retain-focus="false"
                 width="25%"
               >
@@ -167,12 +169,14 @@
                   <v-card-title> Assign Course </v-card-title>
                   <v-card-text class="pb-0">
                     <v-select
-                      v-model="seletedAssignCourses"
-                      :items="unassignedCourses"
+                      v-model="seletedStudentAssignedCourses"
+                      :items="studentUnassignedCourses"
+                      item-text="name"
                       :menu-props="{ bottom: true, offsetY: true }"
                       multiple
                       outlined
                       clearable
+                      return-object
                       label="Courses"
                     ></v-select>
                   </v-card-text>
@@ -189,7 +193,7 @@
 
               <!-- Remove Course from Student Dialog -->
               <v-dialog
-                v-model="removeCourseDialog"
+                v-model="removeStudentCourseDialog"
                 :retain-focus="false"
                 width="25%"
               >
@@ -197,12 +201,14 @@
                   <v-card-title> Remove Course </v-card-title>
                   <v-card-text class="pb-0">
                     <v-select
-                      v-model="seletedRemoveCourses"
-                      :items="assignedCourses"
+                      v-model="seletedStudentRemovedCourses"
+                      :items="studentAssignedCourses"
+                      item-text="name"
                       :menu-props="{ bottom: true, offsetY: true }"
                       multiple
                       outlined
                       clearable
+                      return-object
                       label="Courses"
                     ></v-select>
                   </v-card-text>
@@ -321,7 +327,7 @@
             </v-col>
 
             <!-- Courses Body Section -->
-            <template v-if="studentClass">
+            <template v-if="studentClass.attendingCourses">
               <v-col
                 v-for="course in studentClass.attendingCourses"
                 :key="course.id"
@@ -649,19 +655,22 @@ export default {
           value: 'fullName',
         },
         { text: 'Email', value: 'email' },
-        { text: 'Section', value: 'section' },
-        { text: 'Year', value: 'year' },
+        { text: 'Section', value: 'attendingClass.section' },
+        { text: 'Year', value: 'attendingClass.year' },
         { text: 'Actions', value: 'actions', sortable: false },
       ],
+      updateDom: false,
       studentClass: null,
       courses: [],
       assignedCourses: [],
       unassignedCourses: [],
-      assignCourseDialog: false,
-      removeCourseDialog: false,
+      assignStudentCourseDialog: false,
+      removeStudentCourseDialog: false,
       selectedStudentId: null,
-      seletedAssignCourses: null,
-      seletedRemoveCourses: null,
+      seletedStudentAssignedCourses: null,
+      seletedStudentRemovedCourses: null,
+      studentAssignedCourses: [],
+      studentUnassignedCourses: [],
       seletedCourse: null,
       seletedAssignTeacher: null,
       seletedRemoveTeacher: null,
@@ -684,6 +693,14 @@ export default {
   async created() {
     await this.initializeClass()
     await this.initializeDepartmentCourses()
+  },
+
+  async beforeUpdate() {
+    if (this.updateDom) {
+      await this.initializeClass()
+      await this.initializeDepartmentCourses()
+      this.updateDom = false
+    }
   },
 
   methods: {
@@ -720,6 +737,12 @@ export default {
                           firstName
                           middleName
                           lastName
+                          email
+                          attendingClass {
+                            id
+                            year
+                            section
+                          }
                           attendingCourses {
                             id
                             name
@@ -765,10 +788,12 @@ export default {
       const departmentCourses =
         departmentCouresesResponse.data.data.user.department.ownedCourses
 
+      this.courses = [...departmentCourses]
       this.organizeCourses(departmentCourses)
     },
 
     organizeCourses(courses) {
+      this.unassignedCourses = []
       this.assignedCourses = [...this.studentClass.attendingCourses]
 
       for (const course of courses) {
@@ -797,59 +822,118 @@ export default {
       )
     },
 
-    getAllTeachersOfCourses() {
-      this.assignedTeachersOfCourse = []
-      this.unassignedTeachersOfCourse = []
+    // Courses Assignation and Removal to and from Student
 
-      for (const course of this.assignedCourses) {
-        for (const teacher of course.teachers) {
-          let existsFlag = false
-          for (const assignedTeacher of this.studentClass.teachers) {
-            if (teacher.id === assignedTeacher.id) {
-              this.assignedTeachersOfCourse.push(teacher)
-              existsFlag = true
-              break
-            }
+    organizeStudentCourses(item) {
+      for (const course of this.courses) {
+        let existsFlag = false
+        for (const attCourse of item.attendingCourses) {
+          if (attCourse.id === course.id) {
+            existsFlag = true
+            break
           }
-          if (!existsFlag) this.unassignedTeachersOfCourse.push(teacher)
         }
+        if (!existsFlag) this.studentUnassignedCourses.push(course)
       }
     },
 
-    enrollStudentToCourses(item) {
-      console.log('Enroll Student:', item.fullName)
+    async assignStudentToCourse(courseId, studentId) {
+      const query = `mutation assignStudentToCourse ($courseId: ID! $studentId: ID!) {
+                      assignStudentToCourse (courseId: $courseId studentId: $studentId)
+                    }`
 
-      // this.selectedStudentId = item.id
-      this.assignCourseDialog = true
+      const variables = {
+        courseId,
+        studentId,
+      }
+
+      const assignStudentToCourseResponse = await this.$axios.post('/graphql', {
+        query,
+        variables,
+      })
+
+      return assignStudentToCourseResponse.data.data.assignStudentToCourse
+    },
+
+    async unassignStudentFromCourse(courseId, studentId) {
+      const query = `mutation unassignStudentFromCourse ($courseId: ID! $studentId: ID!) {
+                      unassignStudentFromCourse (courseId: $courseId studentId: $studentId)
+                    }`
+
+      const variables = {
+        courseId,
+        studentId,
+      }
+
+      const unassignStudentToCourseFromsponse = await this.$axios.post(
+        '/graphql',
+        {
+          query,
+          variables,
+        }
+      )
+
+      return unassignStudentToCourseFromsponse.data.data
+        .unassignStudentFromCourse
+    },
+
+    enrollStudentToCourses(item) {
+      this.studentUnassignedCourses = []
+
+      this.organizeStudentCourses(item)
+
+      this.selectedStudentId = item.id
+      this.assignStudentCourseDialog = true
     },
 
     removeStudentFromCourses(item) {
-      console.log('Remove Student: ', item.fullName)
+      this.studentAssignedCourses = []
+      this.studentAssignedCourses = [...item.attendingCourses]
 
-      // this.selectedStudentId = item.id
-      this.removeCourseDialog = true
+      this.selectedStudentId = item.id
+      this.removeStudentCourseDialog = true
     },
 
     closeAssignCourses() {
-      console.log('Close Assign Dialog')
+      this.$nextTick(() => {
+        this.seletedStudentAssignedCourses = null
+        this.updateDom = true
+      })
 
-      this.assignCourseDialog = false
+      this.assignStudentCourseDialog = false
+      this.selectedStudentId = null
+    },
+
+    closeRemoveCourses() {
+      this.$nextTick(() => {
+        this.seletedStudentRemovedCourses = null
+        this.updateDom = true
+      })
+
+      this.removeStudentCourseDialog = false
+      this.selectedStudentId = null
     },
 
     assignCourses() {
-      console.log('Assign Courses')
+      for (const selectedCourse of this.seletedStudentAssignedCourses) {
+        const isCourseAssigned = this.assignStudentToCourse(
+          selectedCourse.id,
+          this.selectedStudentId
+        )
+        if (isCourseAssigned) console.log('Course Assigned')
+      }
 
       this.closeAssignCourses()
     },
 
-    closeRemoveCourses() {
-      console.log('Close Remove Dialog')
-
-      this.removeCourseDialog = false
-    },
-
     removeCourses() {
-      console.log('Remove Courses')
+      for (const selectedCourse of this.seletedStudentRemovedCourses) {
+        const isCourseRemoved = this.unassignStudentFromCourse(
+          selectedCourse.id,
+          this.selectedStudentId
+        )
+        if (isCourseRemoved) console.log('Course Removed')
+      }
 
       this.closeRemoveCourses()
     },
@@ -858,6 +942,7 @@ export default {
 
     closeAssignCourseToClass(dialog) {
       dialog.value = false
+      this.updateDom = true
 
       this.$nextTick(async () => {
         this.seletedAssignCourse = null
@@ -932,6 +1017,24 @@ export default {
     },
 
     // Teacher Assignation and Removal to and from Class
+    getAllTeachersOfCourses() {
+      this.unassignedTeachersOfCourse = []
+      this.assignedTeachersOfCourse = [...this.studentClass.teachers]
+
+      for (const course of this.assignedCourses) {
+        for (const teacher of course.teachers) {
+          let existsFlag = false
+          for (const assignedTeacher of this.studentClass.teachers) {
+            if (teacher.id === assignedTeacher.id) {
+              // this.assignedTeachersOfCourse.push(teacher)
+              existsFlag = true
+              break
+            }
+          }
+          if (!existsFlag) this.unassignedTeachersOfCourse.push(teacher)
+        }
+      }
+    },
 
     closeAssignTeacherToClass(dialog) {
       dialog.value = false
@@ -945,6 +1048,7 @@ export default {
 
     closeRemoveTeacherFromClass(dialog) {
       dialog.value = false
+      this.updateDom = true
 
       this.$nextTick(async () => {
         this.seletedRemoveTeacher = null
