@@ -4,7 +4,9 @@
     <admin-side-bar />
     <v-main>
       <v-container class="main-container" fluid>
-        <Nuxt />
+        <slot>
+          <Nuxt v-if="!$slots.default" />
+        </slot>
       </v-container>
     </v-main>
     <ToastSnackbar />

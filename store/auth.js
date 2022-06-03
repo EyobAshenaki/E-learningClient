@@ -15,6 +15,9 @@ export const getters = {
   isLoggedIn(state) {
     return !!state?.user?.id
   },
+  isAdmin(state) {
+    return !!state?.user?.roles.includes('ADMINISTRATOR')
+  },
   roles(state) {
     return state.user ? state.user.roles : []
   },
