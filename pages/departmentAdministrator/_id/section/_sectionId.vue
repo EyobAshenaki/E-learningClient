@@ -110,8 +110,36 @@
       <v-row v-if="studentClass">
         <v-col cols="8">
           <v-row>
-            <v-col cols="12" class="pb-0">
+            <!-- Student Head Section -->
+            <v-col cols="12" class="pb-0 d-flex justify-space-between">
               <span class="text-h5"> Students </span>
+
+              <div>
+                <!-- Remove Student dialog -->
+                <v-btn outlined color="orange darken-4"> Remove </v-btn>
+
+                <!-- Assign Student dialog -->
+                <v-dialog width="50%">
+                  <template #activator="{ on, attrs }">
+                    <v-btn
+                      outlined
+                      color="orange darken-4"
+                      v-bind="attrs"
+                      v-on="on"
+                    >
+                      Admit
+                    </v-btn>
+                  </template>
+                  <!-- <template #default="dialog">
+                    <v-card>
+                      <v-card-title> Admit Students to a Class </v-card-title>
+                      <v-card-text class="pb-0">
+                        Add Table here
+                      </v-card-text>
+                    </v-card>
+                  </template> -->
+                </v-dialog>
+              </div>
             </v-col>
 
             <!-- Students section -->
@@ -431,210 +459,12 @@
             </template>
 
             <!-- Teachers Head Section -->
-            <v-col cols="12" class="pb-0 pt-5 d-flex justify-space-between">
-              <span class="text-h5"> Teachers </span>
-
-              <div>
-                <!-- Remove Teacher dialog -->
-                <v-dialog width="25%">
-                  <template #activator="{ on, attrs }">
-                    <v-btn
-                      outlined
-                      color="orange darken-4"
-                      v-bind="attrs"
-                      v-on="on"
-                      @click="getAllTeachersOfCourses"
-                    >
-                      Remove
-                    </v-btn>
-                  </template>
-                  <template #default="dialog">
-                    <v-card>
-                      <v-card-title> Remove Teacher from a Class </v-card-title>
-                      <v-card-text class="pb-0">
-                        <v-select
-                          v-model="seletedRemoveTeacher"
-                          :items="assignedTeachersOfCourse"
-                          item-text="firstName"
-                          :menu-props="{ bottom: true, offsetY: true }"
-                          outlined
-                          clearable
-                          return-object
-                          label="Teacher"
-                        ></v-select>
-                      </v-card-text>
-                      <v-card-actions class="pt-0 justify-space-between">
-                        <v-btn
-                          text
-                          color="error"
-                          @click="closeRemoveTeacherFromClass(dialog)"
-                          >Cancel</v-btn
-                        >
-                        <v-btn
-                          text
-                          color="primary"
-                          @click="removeTeacherFromClass(dialog)"
-                        >
-                          Remove
-                        </v-btn>
-                      </v-card-actions>
-                    </v-card>
-                  </template>
-                </v-dialog>
-
-                <!-- Assign Teacher dialog -->
-                <v-dialog width="25%">
-                  <template #activator="{ on, attrs }">
-                    <v-btn
-                      outlined
-                      color="orange darken-4"
-                      v-bind="attrs"
-                      v-on="on"
-                      @click="getAllTeachersOfCourses"
-                    >
-                      Assign
-                    </v-btn>
-                  </template>
-                  <template #default="dialog">
-                    <v-card>
-                      <v-card-title> Assign Teacher to a Class </v-card-title>
-                      <v-card-text class="pb-0">
-                        <v-select
-                          v-model="seletedAssignTeacher"
-                          :items="unassignedTeachersOfCourse"
-                          item-text="firstName"
-                          :menu-props="{ bottom: true, offsetY: true }"
-                          outlined
-                          clearable
-                          return-object
-                          label="Teacher"
-                        ></v-select>
-                      </v-card-text>
-                      <v-card-actions class="pt-0 justify-space-between">
-                        <v-btn
-                          text
-                          color="error"
-                          @click="closeAssignTeacherToClass(dialog)"
-                          >Cancel</v-btn
-                        >
-                        <v-btn
-                          text
-                          color="primary"
-                          @click="assignTeacherToClass(dialog)"
-                          >Assign</v-btn
-                        >
-                      </v-card-actions>
-                    </v-card>
-                  </template>
-                </v-dialog>
-              </div>
-            </v-col>
-
-            <!-- Teacher Bodu Section -->
-            <v-col v-if="studentClass.teachers" class="pb-0 mb-10" cols="12">
-              <v-card
-                v-for="teacher in studentClass.teachers"
-                :key="teacher.id"
-                class="mb-3"
-                elevation="0"
-              >
-                <v-card-text>
-                  <v-row>
-                    <v-col cols="3" class="d-flex justify-end align-center">
-                      <v-avatar size="70" color="orange lighten-4">
-                        <v-icon size="50" color="orange darken-2"
-                          >mdi-account</v-icon
-                        >
-                      </v-avatar>
-                    </v-col>
-
-                    <v-col cols="9">
-                      <v-row>
-                        <v-col class="pa-2 pb-0" cols="12">
-                          <v-card-title class="pa-0">
-                            {{ fullName(teacher) }}
-                          </v-card-title>
-                        </v-col>
-                        <!-- Card Body section -->
-                        <v-col class="py-5" cols="12">
-                          <v-row>
-                            <!-- First Section -->
-                            <v-col cols="12">
-                              <v-row>
-                                <v-col
-                                  class="pa-1 d-flex align-center justify-center mr-1"
-                                  cols="2"
-                                >
-                                  <v-icon size="28" color="orange darken-2">
-                                    mdi-clipboard-text-outline
-                                  </v-icon>
-                                </v-col>
-                                <v-col
-                                  class="pa-2 d-flex align-center"
-                                  cols="9"
-                                >
-                                  <v-row class="pl-1">
-                                    <v-col class="pa-0" cols="12">
-                                      <span
-                                        class="text-subtitle-1 font-weight-bold"
-                                      >
-                                        Email
-                                      </span>
-                                    </v-col>
-                                    <v-col class="pa-0 mt-n2 mb-1" cols="12">
-                                      <span>
-                                        {{ teacher.email }}
-                                      </span>
-                                    </v-col>
-                                  </v-row>
-                                </v-col>
-                              </v-row>
-                            </v-col>
-
-                            <!-- Secondary section -->
-                            <v-col
-                              v-if="teacher.department"
-                              class="mt-1"
-                              cols="12"
-                            >
-                              <v-row>
-                                <v-col
-                                  class="pa-1 d-flex align-center justify-center mr-1"
-                                  cols="2"
-                                >
-                                  <v-icon size="28" color="orange darken-2">
-                                    mdi-timer-outline
-                                  </v-icon>
-                                </v-col>
-                                <v-col
-                                  class="pa-2 d-flex align-center"
-                                  cols="9"
-                                >
-                                  <v-row class="pl-1">
-                                    <v-col class="pa-0" cols="12">
-                                      <span
-                                        class="text-subtitle-1 font-weight-bold"
-                                      >
-                                        Department
-                                      </span>
-                                    </v-col>
-                                    <v-col class="pa-0 mt-n1 mb-1" cols="12">
-                                      <span>
-                                        {{ teacher.department.name }}
-                                      </span>
-                                    </v-col>
-                                  </v-row>
-                                </v-col>
-                              </v-row>
-                            </v-col>
-                          </v-row>
-                        </v-col>
-                      </v-row>
-                    </v-col>
-                  </v-row>
-                </v-card-text>
-              </v-card>
-            </v-col>
+            <department-admin-teachers-section
+              :class-id="$nuxt.context.params.sectionId"
+              :teachers="studentClass.teachers"
+              :courses="assignedCourses"
+              @updateComponent="initializeClass"
+            />
           </v-row>
         </v-col>
       </v-row>
@@ -1014,100 +844,6 @@ export default {
       }
 
       this.closeRemoveCourseFromClass(dialog)
-    },
-
-    // Teacher Assignation and Removal to and from Class
-    getAllTeachersOfCourses() {
-      this.unassignedTeachersOfCourse = []
-      this.assignedTeachersOfCourse = [...this.studentClass.teachers]
-
-      for (const course of this.assignedCourses) {
-        for (const teacher of course.teachers) {
-          let existsFlag = false
-          for (const assignedTeacher of this.studentClass.teachers) {
-            if (teacher.id === assignedTeacher.id) {
-              // this.assignedTeachersOfCourse.push(teacher)
-              existsFlag = true
-              break
-            }
-          }
-          if (!existsFlag) this.unassignedTeachersOfCourse.push(teacher)
-        }
-      }
-    },
-
-    closeAssignTeacherToClass(dialog) {
-      dialog.value = false
-
-      this.$nextTick(async () => {
-        this.seletedAssignTeacher = null
-
-        await this.initializeClass()
-      })
-    },
-
-    closeRemoveTeacherFromClass(dialog) {
-      dialog.value = false
-      this.updateDom = true
-
-      this.$nextTick(async () => {
-        this.seletedRemoveTeacher = null
-
-        await this.initializeClass()
-      })
-    },
-
-    async assignTeacherToClass(dialog) {
-      const query = `mutation assignTeacherToClass($teacherId: ID!, $classId: ID!) {
-                      assignTeacherToClass(teacherId: $teacherId, classId: $classId)
-                    }`
-
-      const variables = {
-        teacherId: this.seletedAssignTeacher.id,
-        classId: this.$nuxt.context.params.sectionId,
-      }
-
-      const assignTeacherToClassResponse = await this.$axios.post('/graphql', {
-        query,
-        variables,
-      })
-
-      const isTeacherAssigned =
-        assignTeacherToClassResponse.data.data.assignTeacherToClass
-
-      if (isTeacherAssigned) {
-        console.log('Teacher Assigned')
-      }
-
-      this.closeAssignTeacherToClass(dialog)
-    },
-
-    async removeTeacherFromClass(dialog) {
-      const query = `mutation dismissTeacherFromClass($teacherId: ID!, $classId: ID!) {
-                      dismissTeacherFromClass(teacherId: $teacherId, classId: $classId)
-                    }`
-
-      const variables = {
-        teacherId: this.seletedRemoveTeacher.id,
-        classId: this.$nuxt.context.params.sectionId,
-      }
-
-      const dismissTeacherFromClassResponse = await this.$axios.post(
-        '/graphql',
-        {
-          query,
-          variables,
-        }
-      )
-
-      const isTeacherDismissed =
-        dismissTeacherFromClassResponse.data.data.dismissTeacherFromClass
-
-      if (isTeacherDismissed) {
-        console.log('Teacher Dismissed')
-      }
-
-      this.closeRemoveTeacherFromClass(dialog)
     },
   },
 }
