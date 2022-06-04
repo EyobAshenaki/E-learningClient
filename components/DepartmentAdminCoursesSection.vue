@@ -1,6 +1,6 @@
 <template>
   <section style="width: 100%">
-    <v-col cols="12" class="pb-0 pt-5 d-flex justify-space-between">
+    <v-col cols="12" class="pb-0 d-flex justify-space-between">
       <span class="text-h5"> Courses </span>
 
       <div>
@@ -25,7 +25,7 @@
       <v-col
         v-for="course in assignedCourses"
         :key="course.id"
-        class="pa-2"
+        class="pl-2 pb-1"
         cols="12"
       >
         <course-info-card :course="course" />
