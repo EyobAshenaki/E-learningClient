@@ -143,113 +143,13 @@
             </v-col>
 
             <!-- Students section -->
-            <!-- TODO: mass student asssign and remove -->
+            <!-- TODO: mass student assign and remove -->
             <v-col v-if="studentClass.students" cols="12">
-              <v-data-table
-                :headers="headers"
-                :items="studentClass.students"
-                class="elevation-0 pa-3"
-              >
-                <template #item.fullName="{ item }">
-                  {{ fullName(item) }}
-                </template>
-                <template #item.actions="{ item }">
-                  <v-tooltip top>
-                    <template #activator="{ on, attrs }">
-                      <v-icon
-                        size="20"
-                        class="mr-1"
-                        color="primary lighten-2"
-                        v-bind="attrs"
-                        v-on="on"
-                        @click.stop="enrollStudentToCourses(item)"
-                      >
-                        mdi-book-plus
-                      </v-icon>
-                    </template>
-                    <span>Assign Course</span>
-                  </v-tooltip>
-
-                  <v-tooltip top>
-                    <template #activator="{ on, attrs }">
-                      <v-icon
-                        size="20"
-                        color="error lighten-1"
-                        v-bind="attrs"
-                        v-on="on"
-                        @click.stop="removeStudentFromCourses(item)"
-                      >
-                        mdi-book-minus
-                      </v-icon>
-                    </template>
-                    <span>Remove Course</span>
-                  </v-tooltip>
-                </template>
-              </v-data-table>
-
-              <!-- Assign Course to Student Dialog -->
-              <v-dialog
-                v-model="assignStudentCourseDialog"
-                :retain-focus="false"
-                width="25%"
-              >
-                <v-card>
-                  <v-card-title> Assign Course </v-card-title>
-                  <v-card-text class="pb-0">
-                    <v-select
-                      v-model="seletedStudentAssignedCourses"
-                      :items="studentUnassignedCourses"
-                      item-text="name"
-                      :menu-props="{ bottom: true, offsetY: true }"
-                      multiple
-                      outlined
-                      clearable
-                      return-object
-                      label="Courses"
-                    ></v-select>
-                  </v-card-text>
-                  <v-card-actions class="pt-0 d-flex justify-space-between">
-                    <v-btn text color="error" @click="closeAssignCourses">
-                      Cancel
-                    </v-btn>
-                    <v-btn text color="primary" @click="assignCourses">
-                      Assign
-                    </v-btn>
-                  </v-card-actions>
-                </v-card>
-              </v-dialog>
-
-              <!-- Remove Course from Student Dialog -->
-              <v-dialog
-                v-model="removeStudentCourseDialog"
-                :retain-focus="false"
-                width="25%"
-              >
-                <v-card>
-                  <v-card-title> Remove Course </v-card-title>
-                  <v-card-text class="pb-0">
-                    <v-select
-                      v-model="seletedStudentRemovedCourses"
-                      :items="studentAssignedCourses"
-                      item-text="name"
-                      :menu-props="{ bottom: true, offsetY: true }"
-                      multiple
-                      outlined
-                      clearable
-                      return-object
-                      label="Courses"
-                    ></v-select>
-                  </v-card-text>
-                  <v-card-actions class="pt-0 d-flex justify-space-between">
-                    <v-btn text color="error" @click="closeRemoveCourses">
-                      Cancel
-                    </v-btn>
-                    <v-btn text color="primary" @click="removeCourses">
-                      Remove
-                    </v-btn>
-                  </v-card-actions>
-                </v-card>
-              </v-dialog>
+              <students-table
+                :students="studentClass.students"
+                :courses="courses"
+                @updateComponent="initializeClass"
+              />
             </v-col>
           </v-row>
         </v-col>
@@ -284,29 +184,11 @@ export default {
 
   data() {
     return {
-      headers: [
-        {
-          text: 'Full Name',
-          align: 'start',
-          value: 'fullName',
-        },
-        { text: 'Email', value: 'email' },
-        { text: 'Section', value: 'attendingClass.section' },
-        { text: 'Year', value: 'attendingClass.year' },
-        { text: 'Actions', value: 'actions', sortable: false },
-      ],
       updateDom: false,
       studentClass: null,
       courses: [],
       assignedCourses: [],
       unassignedCourses: [],
-      assignStudentCourseDialog: false,
-      removeStudentCourseDialog: false,
-      selectedStudentId: null,
-      seletedStudentAssignedCourses: null,
-      seletedStudentRemovedCourses: null,
-      studentAssignedCourses: [],
-      studentUnassignedCourses: [],
     }
   },
 
@@ -332,6 +214,7 @@ export default {
 
   methods: {
     async initializeClass() {
+      this.updateDom = true
       const query = `query class($id: ID!) {
                       studentClass(id: $id) {
                         year
@@ -435,137 +318,6 @@ export default {
         if (!existsFlag) this.unassignedCourses.push(course)
       }
     },
-
-    fullName(item) {
-      return (
-        `${item.firstName.substr(0, 1).toUpperCase()}${item.firstName
-          .substr(1)
-          .toLowerCase()}` +
-        ` ${item.middleName.substr(0, 1).toUpperCase()}${item.middleName
-          .substr(1)
-          .toLowerCase()}` +
-        ` ${item.lastName.substr(0, 1).toUpperCase()}${item.lastName
-          .substr(1)
-          .toLowerCase()}`
-      )
-    },
-
-    // Courses Assignation and Removal to and from Student
-
-    organizeStudentCourses(item) {
-      for (const course of this.courses) {
-        let existsFlag = false
-        for (const attCourse of item.attendingCourses) {
-          if (attCourse.id === course.id) {
-            existsFlag = true
-            break
-          }
-        }
-        if (!existsFlag) this.studentUnassignedCourses.push(course)
-      }
-    },
-
-    async assignStudentToCourse(courseId, studentId) {
-      const query = `mutation assignStudentToCourse ($courseId: ID! $studentId: ID!) {
-                      assignStudentToCourse (courseId: $courseId studentId: $studentId)
-                    }`
-
-      const variables = {
-        courseId,
-        studentId,
-      }
-
-      const assignStudentToCourseResponse = await this.$axios.post('/graphql', {
-        query,
-        variables,
-      })
-
-      return assignStudentToCourseResponse.data.data.assignStudentToCourse
-    },
-
-    async unassignStudentFromCourse(courseId, studentId) {
-      const query = `mutation unassignStudentFromCourse ($courseId: ID! $studentId: ID!) {
-                      unassignStudentFromCourse (courseId: $courseId studentId: $studentId)
-                    }`
-
-      const variables = {
-        courseId,
-        studentId,
-      }
-
-      const unassignStudentToCourseFromsponse = await this.$axios.post(
-        '/graphql',
-        {
-          query,
-          variables,
-        }
-      )
-
-      return unassignStudentToCourseFromsponse.data.data
-        .unassignStudentFromCourse
-    },
-
-    enrollStudentToCourses(item) {
-      this.studentUnassignedCourses = []
-
-      this.organizeStudentCourses(item)
-
-      this.selectedStudentId = item.id
-      this.assignStudentCourseDialog = true
-    },
-
-    removeStudentFromCourses(item) {
-      this.studentAssignedCourses = []
-      this.studentAssignedCourses = [...item.attendingCourses]
-
-      this.selectedStudentId = item.id
-      this.removeStudentCourseDialog = true
-    },
-
-    closeAssignCourses() {
-      this.$nextTick(() => {
-        this.seletedStudentAssignedCourses = null
-        this.updateDom = true
-      })
-
-      this.assignStudentCourseDialog = false
-      this.selectedStudentId = null
-    },
-
-    closeRemoveCourses() {
-      this.$nextTick(() => {
-        this.seletedStudentRemovedCourses = null
-        this.updateDom = true
-      })
-
-      this.removeStudentCourseDialog = false
-      this.selectedStudentId = null
-    },
-
-    assignCourses() {
-      for (const selectedCourse of this.seletedStudentAssignedCourses) {
-        const isCourseAssigned = this.assignStudentToCourse(
-          selectedCourse.id,
-          this.selectedStudentId
-        )
-        if (isCourseAssigned) console.log('Course Assigned')
-      }
-
-      this.closeAssignCourses()
-    },
-
-    removeCourses() {
-      for (const selectedCourse of this.seletedStudentRemovedCourses) {
-        const isCourseRemoved = this.unassignStudentFromCourse(
-          selectedCourse.id,
-          this.selectedStudentId
-        )
-        if (isCourseRemoved) console.log('Course Removed')
-      }
-
-      this.closeRemoveCourses()
-    },
   },
 }
 </script>
-Save
