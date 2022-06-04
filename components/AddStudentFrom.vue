@@ -59,7 +59,7 @@
             }
           } catch (error) {
             if (error.isAxiosError && error.response) {
-              console.log(error)
+              this.$toast.error(error.response.data.errors[0].message)
             } else {
               this.$toast.error(error.message)
             }

@@ -11,7 +11,8 @@
       >
       <v-container fluid>
         <v-radio-group v-model="selectedComponent" row mandatory>
-          <v-radio label="Single Input" value="addStudentForm"></v-radio>
+          <v-radio label="Single Input" value="addStudentForm" />
+          <v-radio label="Multiple Input" value="importStudentsForm" />
         </v-radio-group>
       </v-container>
       <component
@@ -24,10 +25,12 @@
 </template>
 
 <script>
-  import addStudentForm from '../components/AddStudentFrom.vue'
+  import addStudentForm from '@/components/AddStudentFrom.vue'
+  import importStudentsForm from '@/components/ImportStudentsForm.vue'
   export default {
     components: {
       addStudentForm,
+      importStudentsForm,
     },
     data() {
       return {

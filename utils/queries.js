@@ -45,3 +45,17 @@ mutation ($firstName: String!,
     }
 }
 `
+export function multipleUserCreate(roleName, password) {
+  return {
+    operations: `{
+      "query" : "mutation createMany($file:Upload!, $roleName:RoleName!, $password:String ){ createMultipleUsers(input:{ roleName:$roleName password:$password file:$file }) }",
+      "variables": {
+        "file": null,
+        "roleName": "${roleName}", 
+        "password": "${password}"
+       },
+      "operationName": "createMany"
+    }`,
+    map: `{"0": ["variables.file"]}`,
+  }
+}
