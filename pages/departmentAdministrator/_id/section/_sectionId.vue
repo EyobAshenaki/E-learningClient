@@ -257,206 +257,12 @@
         <v-col cols="4">
           <v-row>
             <!-- Courses Head Section -->
-            <v-col cols="12" class="pb-0 pt-5 d-flex justify-space-between">
-              <span class="text-h5"> Courses </span>
-
-              <div>
-                <!-- Remove Course dialog -->
-                <v-dialog width="25%">
-                  <template #activator="{ on, attrs }">
-                    <v-btn
-                      outlined
-                      color="orange darken-4"
-                      v-bind="attrs"
-                      v-on="on"
-                    >
-                      Remove
-                    </v-btn>
-                  </template>
-                  <template #default="dialog">
-                    <v-card>
-                      <v-card-title> Remove Course from a Class </v-card-title>
-                      <v-card-text class="pb-0">
-                        <v-select
-                          v-model="seletedRemoveCourse"
-                          :items="assignedCourses"
-                          item-text="name"
-                          :menu-props="{ bottom: true, offsetY: true }"
-                          outlined
-                          clearable
-                          return-object
-                          label="Course"
-                        ></v-select>
-                      </v-card-text>
-                      <v-card-actions class="pt-0 justify-space-between">
-                        <v-btn
-                          text
-                          color="error"
-                          @click="closeRemoveCourseFromClass(dialog)"
-                          >Cancel</v-btn
-                        >
-                        <v-btn
-                          text
-                          color="primary"
-                          @click="removeCourseFromClass(dialog)"
-                        >
-                          Remove
-                        </v-btn>
-                      </v-card-actions>
-                    </v-card>
-                  </template>
-                </v-dialog>
-
-                <!-- Assign Course dialog -->
-                <v-dialog width="25%">
-                  <template #activator="{ on, attrs }">
-                    <v-btn
-                      outlined
-                      color="orange darken-4"
-                      v-bind="attrs"
-                      v-on="on"
-                    >
-                      Assign
-                    </v-btn>
-                  </template>
-                  <template #default="dialog">
-                    <v-card>
-                      <v-card-title> Assign Course to a Class </v-card-title>
-                      <v-card-text class="pb-0">
-                        <v-select
-                          v-model="seletedAssignCourse"
-                          :items="unassignedCourses"
-                          item-text="name"
-                          :menu-props="{ bottom: true, offsetY: true }"
-                          outlined
-                          clearable
-                          return-object
-                          label="Course"
-                        ></v-select>
-                      </v-card-text>
-                      <v-card-actions class="pt-0 justify-space-between">
-                        <v-btn
-                          text
-                          color="error"
-                          @click="closeAssignCourseToClass(dialog)"
-                          >Cancel</v-btn
-                        >
-                        <v-btn
-                          text
-                          color="primary"
-                          @click="assignCourseToClass(dialog)"
-                          >Assign</v-btn
-                        >
-                      </v-card-actions>
-                    </v-card>
-                  </template>
-                </v-dialog>
-              </div>
-            </v-col>
-
-            <!-- Courses Body Section -->
-            <template v-if="studentClass.attendingCourses">
-              <v-col
-                v-for="course in studentClass.attendingCourses"
-                :key="course.id"
-                class="pa-2"
-                cols="12"
-              >
-                <v-card elevation="0">
-                  <v-card-text>
-                    <v-row>
-                      <v-col cols="3" class="d-flex justify-end align-center">
-                        <v-avatar size="70" color="orange lighten-4">
-                          <v-icon size="40" color="orange darken-2"
-                            >mdi-book</v-icon
-                          >
-                        </v-avatar>
-                      </v-col>
-
-                      <v-col cols="9">
-                        <v-row>
-                          <v-col class="pa-2 pb-0" cols="12">
-                            <v-card-title class="pa-0">
-                              {{ course.name }}
-                            </v-card-title>
-                          </v-col>
-                          <!-- Card Body section -->
-                          <v-col class="py-5" cols="12">
-                            <v-row>
-                              <!-- First dection -->
-                              <v-col cols="6">
-                                <v-row>
-                                  <v-col
-                                    class="pa-1 d-flex align-center justify-center"
-                                    cols="4"
-                                  >
-                                    <v-icon size="28" color="orange darken-2">
-                                      mdi-clipboard-text-outline
-                                    </v-icon>
-                                  </v-col>
-                                  <v-col
-                                    class="pa-2 d-flex align-center"
-                                    cols="8"
-                                  >
-                                    <v-row class="pl-1">
-                                      <v-col class="pa-0" cols="12">
-                                        <span
-                                          class="text-subtitle-1 font-weight-bold"
-                                        >
-                                          Course code
-                                        </span>
-                                      </v-col>
-                                      <v-col class="pa-0 mt-n1" cols="12">
-                                        <span>
-                                          {{ course.code }}
-                                        </span>
-                                      </v-col>
-                                    </v-row>
-                                  </v-col>
-                                </v-row>
-                              </v-col>
-
-                              <!-- Secondary section -->
-                              <v-col cols="6">
-                                <v-row>
-                                  <v-col
-                                    class="pa-1 d-flex align-center justify-center"
-                                    cols="4"
-                                  >
-                                    <v-icon size="28" color="orange darken-2">
-                                      mdi-timer-outline
-                                    </v-icon>
-                                  </v-col>
-                                  <v-col
-                                    class="pa-2 d-flex align-center"
-                                    cols="8"
-                                  >
-                                    <v-row class="pl-1">
-                                      <v-col class="pa-0" cols="12">
-                                        <span
-                                          class="text-subtitle-1 font-weight-bold"
-                                        >
-                                          Credit Hour
-                                        </span>
-                                      </v-col>
-                                      <v-col class="pa-0 mt-n1" cols="12">
-                                        <span>
-                                          {{ course.creditHour }}
-                                        </span>
-                                      </v-col>
-                                    </v-row>
-                                  </v-col>
-                                </v-row>
-                              </v-col>
-                            </v-row>
-                          </v-col>
-                        </v-row>
-                      </v-col>
-                    </v-row>
-                  </v-card-text>
-                </v-card>
-              </v-col>
-            </template>
+            <department-admin-courses-section
+              :class-id="$nuxt.context.params.sectionId"
+              :assigned-courses="studentClass.attendingCourses"
+              :unassigned-courses="unassignedCourses"
+              @updateComponent="initializeClass"
+            />
 
             <!-- Teachers Head Section -->
             <department-admin-teachers-section
@@ -501,13 +307,6 @@ export default {
       seletedStudentRemovedCourses: null,
       studentAssignedCourses: [],
       studentUnassignedCourses: [],
-      seletedCourse: null,
-      seletedAssignTeacher: null,
-      seletedRemoveTeacher: null,
-      unassignedTeachersOfCourse: [],
-      assignedTeachersOfCourse: [],
-      seletedAssignCourse: null,
-      seletedRemoveCourse: null,
     }
   },
 
@@ -522,13 +321,11 @@ export default {
 
   async created() {
     await this.initializeClass()
-    await this.initializeDepartmentCourses()
   },
 
   async beforeUpdate() {
     if (this.updateDom) {
       await this.initializeClass()
-      await this.initializeDepartmentCourses()
       this.updateDom = false
     }
   },
@@ -589,6 +386,7 @@ export default {
       })
 
       this.studentClass = studentClassResponse.data.data.studentClass
+      await this.initializeDepartmentCourses()
     },
 
     async initializeDepartmentCourses() {
@@ -766,84 +564,6 @@ export default {
       }
 
       this.closeRemoveCourses()
-    },
-
-    // Course Assignation and Removal to and from Class
-
-    closeAssignCourseToClass(dialog) {
-      dialog.value = false
-      this.updateDom = true
-
-      this.$nextTick(async () => {
-        this.seletedAssignCourse = null
-
-        await this.initializeClass()
-        await this.initializeDepartmentCourses()
-      })
-    },
-
-    closeRemoveCourseFromClass(dialog) {
-      dialog.value = false
-
-      this.$nextTick(async () => {
-        this.seletedRemoveCourse = null
-
-        await this.initializeClass()
-        await this.initializeDepartmentCourses()
-      })
-    },
-
-    async assignCourseToClass(dialog) {
-      const query = `mutation assignClassToCourse($courseId: ID!, $classId: ID!) {
-                      assignClassToCourse(courseId: $courseId, classId: $classId)
-                    }`
-
-      const variables = {
-        courseId: this.seletedAssignCourse.id,
-        classId: this.$nuxt.context.params.sectionId,
-      }
-
-      const assignClassToCourseResponse = await this.$axios.post('/graphql', {
-        query,
-        variables,
-      })
-
-      const isCourseAssigned =
-        assignClassToCourseResponse.data.data.assignClassToCourse
-
-      if (isCourseAssigned) {
-        console.log('Course Assigned')
-      }
-
-      this.closeAssignCourseToClass(dialog)
-    },
-
-    async removeCourseFromClass(dialog) {
-      const query = `mutation unassignClassFromCourse($courseId: ID!, $classId: ID!) {
-                      unassignClassFromCourse(courseId: $courseId, classId: $classId)
-                    }`
-
-      const variables = {
-        courseId: this.seletedRemoveCourse.id,
-        classId: this.$nuxt.context.params.sectionId,
-      }
-
-      const unassignClassFromCourseResponse = await this.$axios.post(
-        '/graphql',
-        {
-          query,
-          variables,
-        }
-      )
-
-      const isCourseRemoved =
-        unassignClassFromCourseResponse.data.data.unassignClassFromCourse
-
-      if (isCourseRemoved) {
-        console.log('Course Removed')
-      }
-
-      this.closeRemoveCourseFromClass(dialog)
     },
   },
 }
