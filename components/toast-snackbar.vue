@@ -7,7 +7,7 @@
   >
     {{ message || 'Unknown Error' }}
     <template #action="{ attrs }">
-      <v-btn v-bind="attrs" icon @click="display = false">
+      <v-btn v-bind="attrs" icon @click="toast = false">
         <v-icon>mdi-close</v-icon>
       </v-btn>
     </template>
