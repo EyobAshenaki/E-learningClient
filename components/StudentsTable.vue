@@ -1,9 +1,15 @@
 <template>
-  <v-data-table :headers="headers" :items="students" class="elevation-0 pa-3">
+  <v-data-table
+    v-model="selectedStudents"
+    :headers="headers"
+    :items="students"
+    class="elevation-0 pa-3"
+    :show-select="isRowsInTableSelectable"
+  >
     <template #item.fullName="{ item }">
       {{ fullName(item) }}
     </template>
-    <template #item.actions="{ item }">
+    <template v-if="courses.length" #item.actions="{ item }">
       <!-- Assign Course to Student Dialog -->
       <assign-course-to-student-dialog
         :student="item"
@@ -29,7 +35,11 @@ export default {
     },
     courses: {
       type: Array,
-      required: true,
+      default: () => [],
+    },
+    isRowsInTableSelectable: {
+      type: Boolean,
+      default: () => false,
     },
   },
 
@@ -46,7 +56,27 @@ export default {
         { text: 'Year', value: 'attendingClass.year' },
         { text: 'Actions', value: 'actions', sortable: false },
       ],
+      selectedStudents: [],
     }
+  },
+
+  watch: {
+    isRowsInTableSelectable(isSelectable) {
+      if (!isSelectable) {
+        if (this.selectedStudents) {
+          console.log(this.selectedStudents)
+
+          /**
+           * TODO: - Write a query that deletes the selected students emit
+           * TODO:  'updateComponent' event if the deletion was a success
+           */
+        }
+      }
+    },
+
+    selectedStudents(students) {
+      this.$emit('selectionChange', students)
+    },
   },
 
   methods: {

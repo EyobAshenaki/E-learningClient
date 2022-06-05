@@ -116,29 +116,15 @@
 
               <div>
                 <!-- Remove Student dialog -->
-                <v-btn outlined color="orange darken-4"> Remove </v-btn>
+                <v-btn outlined color="error lighten-1" @click="deleteStudents">
+                  Remove
+                </v-btn>
 
                 <!-- Assign Student dialog -->
-                <v-dialog width="50%">
-                  <template #activator="{ on, attrs }">
-                    <v-btn
-                      outlined
-                      color="orange darken-4"
-                      v-bind="attrs"
-                      v-on="on"
-                    >
-                      Admit
-                    </v-btn>
-                  </template>
-                  <!-- <template #default="dialog">
-                    <v-card>
-                      <v-card-title> Admit Students to a Class </v-card-title>
-                      <v-card-text class="pb-0">
-                        Add Table here
-                      </v-card-text>
-                    </v-card>
-                  </template> -->
-                </v-dialog>
+                <admit-students-dialog
+                  :class-id="$nuxt.context.params.sectionId"
+                  @updateComponent="initializeClass"
+                />
               </div>
             </v-col>
 
@@ -148,6 +134,7 @@
               <students-table
                 :students="studentClass.students"
                 :courses="courses"
+                :is-rows-in-table-selectable="isDeletable"
                 @updateComponent="initializeClass"
               />
             </v-col>
@@ -189,6 +176,7 @@ export default {
       courses: [],
       assignedCourses: [],
       unassignedCourses: [],
+      isDeletable: false,
     }
   },
 
@@ -317,6 +305,10 @@ export default {
         }
         if (!existsFlag) this.unassignedCourses.push(course)
       }
+    },
+
+    deleteStudents() {
+      this.isDeletable = !this.isDeletable
     },
   },
 }
