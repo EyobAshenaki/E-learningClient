@@ -116,12 +116,19 @@
 
               <div>
                 <!-- Remove Student dialog -->
-                <v-btn outlined color="error lighten-1" @click="deleteStudents">
-                  Remove
+                <v-btn
+                  outlined
+                  :color="
+                    !isDeletable ? 'error lighten-1' : 'primary ligthen-1'
+                  "
+                  @click="deleteStudents"
+                >
+                  {{ isDeletable ? 'Save' : 'Remove' }}
                 </v-btn>
 
                 <!-- Assign Student dialog -->
                 <admit-students-dialog
+                  v-if="!isDeletable"
                   :class-id="$nuxt.context.params.sectionId"
                   @updateComponent="initializeClass"
                 />
@@ -129,12 +136,12 @@
             </v-col>
 
             <!-- Students section -->
-            <!-- TODO: mass student assign and remove -->
             <v-col v-if="studentClass.students" cols="12">
               <students-table
                 :students="studentClass.students"
                 :courses="courses"
                 :is-rows-in-table-selectable="isDeletable"
+                @selectionChange="updateSelectedStudents($event)"
                 @updateComponent="initializeClass"
               />
             </v-col>
@@ -177,6 +184,7 @@ export default {
       assignedCourses: [],
       unassignedCourses: [],
       isDeletable: false,
+      selectedStudents: [],
     }
   },
 
@@ -307,7 +315,51 @@ export default {
       }
     },
 
+    updateSelectedStudents(selectedStudents) {
+      this.selectedStudents = selectedStudents
+    },
+
+    async dismissStudnetsFromClass(studentIds, classId) {
+      const query = `mutation promoteStudentsFromClass($studentIds: UUIDArrayDto!, $classId: ID!) {
+                      promoteStudentsFromClass(studentIds: $studentIds, classId: $classId)
+                    }`
+
+      const variables = {
+        studentIds,
+        classId,
+      }
+
+      const promoteStudentsFromClassResponse = await this.$axios.post(
+        '/graphql',
+        {
+          query,
+          variables,
+        }
+      )
+
+      return promoteStudentsFromClassResponse.data.data.promoteStudentsFromClass
+    },
+
     deleteStudents() {
+      if (this.isDeletable) {
+        const studentIds = {
+          ids: this.selectedStudents.map(
+            (selectedStudent) => selectedStudent.id
+          ),
+        }
+
+        this.dismissStudnetsFromClass(
+          studentIds,
+          this.$nuxt.context.params.sectionId
+        )
+
+        this.$nextTick(() => {
+          this.selectedStudents = []
+
+          this.initializeClass()
+        })
+      }
+
       this.isDeletable = !this.isDeletable
     },
   },

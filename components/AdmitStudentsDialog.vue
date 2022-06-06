@@ -117,6 +117,8 @@ export default {
     closeAdmitStudents(dialog) {
       this.$nextTick(() => {
         this.selectedStudents = []
+
+        this.$emit('updateComponent')
       })
 
       dialog.value = false
@@ -126,8 +128,8 @@ export default {
       const studentIds = {
         ids: this.selectedStudents.map((selectedStudent) => selectedStudent.id),
       }
+
       this.admitStudentsToClass(studentIds, this.classId)
-      this.$emit('updateComponent')
 
       this.closeAdmitStudents(dialog)
     },
