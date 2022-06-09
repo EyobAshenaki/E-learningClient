@@ -39,7 +39,7 @@
             icon: 'mdi-bookshelf',
             route: '/administrator/students',
           },
-          { title: 'Teachers', icon: 'mdi-note-edit', route: 'teachers' },
+          { title: 'Teachers', icon: 'mdi-note-edit', route: '/administrator/teachers' },
           {
             title: 'Course Managers',
             icon: 'mdi-text-box-check',
