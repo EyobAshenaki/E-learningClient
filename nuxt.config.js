@@ -55,7 +55,7 @@ export default function () {
         changeOrigin: true,
         pathRewrite: { '^/api/': '/' },
       },
-      '/graphql': { target: process.env.BASE_URL, changeOrigin: false },
+      '/graphql': { target: process.env.BASE_URL, changeOrigin: true },
     },
 
     // Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify
