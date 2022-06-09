@@ -1,8 +1,25 @@
 export const ALL_STUDENTS = `#graphql
 query {
-  users(filter: {
-    roleName: STUDENT
-  }) {
+  users {
+    id
+    firstName
+    middleName
+    lastName
+    email
+    roles {
+      name
+    }
+    attendingClass{
+      id
+      year
+      section
+    }
+  }
+}`
+
+export const ALL_TEACHERS = `#graphql
+query {
+  users {
     id
     firstName
     middleName
