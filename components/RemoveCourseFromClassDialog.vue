@@ -1,13 +1,41 @@
 <template>
   <v-dialog width="25%">
     <template #activator="{ on, attrs }">
-      <v-btn outlined color="orange darken-4" v-bind="attrs" v-on="on">
+      <v-btn
+        v-if="isSingleRemove"
+        outlined
+        color="orange darken-4"
+        v-bind="attrs"
+        v-on="on"
+        @click="getAssignedCourses"
+      >
         Remove
+      </v-btn>
+      <v-btn
+        v-else
+        block
+        outlined
+        class="ml-0"
+        color="orange darken-4"
+        v-bind="attrs"
+        v-on="on"
+        @click="getAssignedCourses"
+      >
+        <v-icon class="pr-2" color="orange darken-4">
+          mdi-book-minus-multiple
+        </v-icon>
+        <span class="orange--text text--darken-4"> Remove Courses </span>
       </v-btn>
     </template>
     <template #default="dialog">
       <v-card>
-        <v-card-title> Remove Course from a Class </v-card-title>
+        <v-card-title>
+          {{
+            isSingleRemove
+              ? 'Remove Course from a Class'
+              : 'Remove Courses from a Classes'
+          }}
+        </v-card-title>
         <v-card-text class="pb-0">
           <v-select
             v-model="seletedRemoveCourse"
@@ -16,6 +44,7 @@
             :menu-props="{ bottom: true, offsetY: true }"
             outlined
             clearable
+            :multiple="!isSingleRemove"
             return-object
             label="Course"
           ></v-select>
@@ -42,7 +71,15 @@ export default {
     },
     classId: {
       type: String,
-      required: true,
+      default: '',
+    },
+    isSingleRemove: {
+      type: Boolean,
+      default: true,
+    },
+    classesIds: {
+      type: Array,
+      default: () => [],
     },
   },
 
@@ -53,6 +90,10 @@ export default {
   },
 
   methods: {
+    getAssignedCourses() {
+      this.$emit('getAssignedCourses')
+    },
+
     closeRemoveCourseFromClass(dialog) {
       dialog.value = false
 
@@ -63,14 +104,14 @@ export default {
       })
     },
 
-    async removeCourseFromClass(dialog) {
+    async unassignCourseFromClass(courseId, classId) {
       const query = `mutation unassignClassFromCourse($courseId: ID!, $classId: ID!) {
                       unassignClassFromCourse(courseId: $courseId, classId: $classId)
                     }`
 
       const variables = {
-        courseId: this.seletedRemoveCourse.id,
-        classId: this.classId,
+        courseId,
+        classId,
       }
 
       const unassignClassFromCourseResponse = await this.$axios.post(
@@ -81,11 +122,57 @@ export default {
         }
       )
 
-      const isCourseRemoved =
-        unassignClassFromCourseResponse.data.data.unassignClassFromCourse
+      return unassignClassFromCourseResponse.data.data.unassignClassFromCourse
+    },
 
-      if (isCourseRemoved) {
-        console.log('Course Removed')
+    async unassignClassesFromCourses(coursesIds, classesIds) {
+      const query = `mutation unassignClassesFromCourses ($coursesIds: UUIDArrayDto! $classesIds: UUIDArrayDto!) {
+                      unassignClassesFromCourses (coursesIds: $coursesIds classesIds: $classesIds)
+                    }`
+
+      const variables = {
+        coursesIds,
+        classesIds,
+      }
+
+      const unassignClassesFromCoursesResponse = await this.$axios.post(
+        '/graphql',
+        {
+          query,
+          variables,
+        }
+      )
+
+      return unassignClassesFromCoursesResponse.data.data
+        .unassignClassesFromCourses
+    },
+
+    removeCourseFromClass(dialog) {
+      if (!this.isSingleRemove) {
+        const coursesIds = {
+          ids: this.seletedRemoveCourse.map((course) => course.id),
+        }
+        const classesIds = {
+          ids: this.classesIds,
+        }
+
+        const isCoursesRemoved = this.unassignClassesFromCourses(
+          coursesIds,
+          classesIds
+        )
+
+        if (isCoursesRemoved) {
+          console.log('Courses Removed')
+        }
+      } else if (this.isSingleRemove) {
+        const isCourseRemoved = this.unassignCourseFromClass(
+          this.seletedRemoveCourse.id,
+          this.classId
+        )
+
+        if (isCourseRemoved) {
+          console.log('Course Removed')
+        }
       }
 
       this.closeRemoveCourseFromClass(dialog)

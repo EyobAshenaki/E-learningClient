@@ -269,60 +269,19 @@
             :is-single-assign="false"
             :classes-ids="year.map((section) => section.id)"
             :unassigned-courses="unassignedCourses"
-            @getUnassignedCourses="getClassUnassignedCourses(year)"
+            @getUnassignedCourses="organizeClassCourses(year)"
             @updateComponent="initializeDepartment"
           />
-          <v-btn
-            block
-            outlined
-            class="ml-0"
-            color="orange darken-4"
-            @click.stop="removeCoursesFromClasses()"
-          >
-            <v-icon class="pr-2" color="orange darken-4">
-              mdi-book-minus-multiple
-            </v-icon>
-            <span class="orange--text text--darken-4"> Remove Courses </span>
-          </v-btn>
+          <remove-course-from-class-dialog
+            :is-single-remove="false"
+            :classes-ids="year.map((section) => section.id)"
+            :assigned-courses="assignedCourses"
+            @getAssignedCourses="organizeClassCourses(year)"
+            @updateComponent="initializeDepartment"
+          />
         </v-card-actions>
       </v-card>
     </v-col>
-
-    <!-- Remove Courses to Class Dialog -->
-    <v-dialog v-model="removeCoursesFromClassesDialog" width="25%">
-      <v-card>
-        <v-card-title> Remove Courses from Classes </v-card-title>
-        <v-card-text class="pb-0">
-          <v-select
-            v-model="seletedRemoveClasses"
-            :items="classes"
-            :menu-props="{ bottom: true, offsetY: true }"
-            multiple
-            outlined
-            clearable
-            label="Classes"
-          ></v-select>
-
-          <v-select
-            v-model="seletedRemoveCourses"
-            :items="assignedCourses"
-            :menu-props="{ bottom: true, offsetY: true }"
-            multiple
-            outlined
-            clearable
-            label="Courses"
-          ></v-select>
-        </v-card-text>
-        <v-card-actions class="pt-0 d-flex justify-space-between">
-          <v-btn text color="error" @click="closeRemoveCoursesFromClasses">
-            Cancel
-          </v-btn>
-          <v-btn text color="primary" @click="confirmRemoveCoursesFromClasses">
-            Remove
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
   </v-row>
 </template>
 
@@ -337,13 +296,7 @@ export default {
       department: null,
       classesByYear: null,
       totalStudents: null,
-      assignCoursesToClassesDialog: false,
-      removeCoursesFromClassesDialog: false,
-      seletedAssignClasses: [],
-      seletedRemoveClasses: [],
       classes: [],
-      seletedAssignCourses: [],
-      seletedRemoveCourses: [],
       unassignedCourses: [],
       assignedCourses: [],
     }
@@ -449,8 +402,9 @@ export default {
       return classesByYear
     },
 
-    getClassUnassignedCourses(year) {
+    organizeClassCourses(year) {
       this.unassignedCourses = []
+      this.assignedCourses = []
 
       for (const section of year) {
         for (const attendingCourse of section.attendingCourses) {
@@ -492,29 +446,11 @@ export default {
       console.log('Classes Page')
     },
 
-    removeCoursesFromClasses() {
-      console.log('Remove Courses')
-
-      this.removeCoursesFromClassesDialog = true
-    },
-
     goToSectionPage(sectionId) {
       this.$router.push({
         name: 'departmentAdministrator-id-section-sectionId',
         params: { id: this.$nuxt.context.params.id, sectionId },
       })
-    },
-
-    closeRemoveCoursesFromClasses() {
-      console.log('Close Remove Courses from Classes')
-
-      this.removeCoursesFromClassesDialog = false
-    },
-
-    confirmRemoveCoursesFromClasses() {
-      console.log('Confirm Remove Courses to Classes')
-
-      this.closeRemoveCoursesFromClasses()
     },
   },
 }
