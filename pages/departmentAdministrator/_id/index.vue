@@ -184,7 +184,7 @@
       :key="idx"
       cols="12"
       md="4"
-      class="mt-5"
+      class="mt-3"
     >
       <v-card elevation="0" outlined width="340">
         <v-card-text class="pa-3">
@@ -201,7 +201,7 @@
                 </v-col>
                 <v-col cols="12" class="pt-0 d-flex justify-center">
                   <span class="pa-0 text-h6 font-weight-regular black--text">
-                    {{ `${idx}st year` }}
+                    {{ `${idx}${getPostfix(idx)} year` }}
                   </span>
                 </v-col>
               </v-row>
@@ -243,7 +243,7 @@
                           class="pl-3 ml-n1 mr-2"
                         >
                           <v-icon left color="orange lighten-5" size="28">
-                            {{ `mdi-alpha-${getSection(clss)}` }}
+                            {{ `mdi-alpha-${clss.section.toLowerCase()}` }}
                           </v-icon>
                         </v-avatar>
                         <span>
@@ -257,7 +257,7 @@
             </v-col>
             <v-col cols="12" class="pl-5">
               <span class="text-subtitle-1">
-                {{ `Total students - ${totalStudents}` }}
+                {{ `Total students - ${getTotalStudents(idx)}` }}
               </span>
             </v-col>
           </v-row>
@@ -265,18 +265,13 @@
 
         <!-- Class Card footer -->
         <v-card-actions class="px-5 d-flex flex-column">
-          <v-btn
-            block
-            outlined
-            class="mb-2"
-            color="#25327F lighten-4"
-            @click.stop="assignCoursesToClasses()"
-          >
-            <v-icon class="pr-2" style="color: #25327f">
-              mdi-book-plus-multiple
-            </v-icon>
-            <span style="color: #25327f"> Assign Courses </span>
-          </v-btn>
+          <assign-course-to-class-dialog
+            :is-single-assign="false"
+            :classes-ids="year.map((section) => section.id)"
+            :unassigned-courses="unassignedCourses"
+            @getUnassignedCourses="getClassUnassignedCourses(year)"
+            @updateComponent="initializeDepartment"
+          />
           <v-btn
             block
             outlined
@@ -292,42 +287,6 @@
         </v-card-actions>
       </v-card>
     </v-col>
-
-    <!-- Assign Courses to Class Dialog -->
-    <v-dialog v-model="assignCoursesToClassesDialog" width="25%">
-      <v-card>
-        <v-card-title> Assign Courses to Classes </v-card-title>
-        <v-card-text class="pb-0">
-          <v-select
-            v-model="seletedAssignClasses"
-            :items="classes"
-            :menu-props="{ bottom: true, offsetY: true }"
-            multiple
-            outlined
-            clearable
-            label="Classes"
-          ></v-select>
-
-          <v-select
-            v-model="seletedAssignCourses"
-            :items="unassignedCourses"
-            :menu-props="{ bottom: true, offsetY: true }"
-            multiple
-            outlined
-            clearable
-            label="Courses"
-          ></v-select>
-        </v-card-text>
-        <v-card-actions class="pt-0 d-flex justify-space-between">
-          <v-btn text color="error" @click="closeAssignCoursesToClasses">
-            Cancel
-          </v-btn>
-          <v-btn text color="primary" @click="confirmAssignCoursesToClasses">
-            Assign
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
 
     <!-- Remove Courses to Class Dialog -->
     <v-dialog v-model="removeCoursesFromClassesDialog" width="25%">
@@ -373,6 +332,7 @@ export default {
 
   data() {
     return {
+      updateDom: false,
       user: null,
       department: null,
       classesByYear: null,
@@ -392,7 +352,14 @@ export default {
   async created() {
     await this.initializeUser()
     await this.initializeDepartment()
-    this.classesByYear = this.organizeClassesByYear(this.department.classes)
+  },
+
+  async beforeUpdate() {
+    if (this.updateDom) {
+      await this.initializeDepartment()
+      this.classesByYear = this.organizeClassesByYear(this.department.classes)
+      this.updateDom = false
+    }
   },
 
   methods: {
@@ -421,6 +388,7 @@ export default {
     },
 
     async initializeDepartment() {
+      this.updateDom = true
       const query = `query department($id: ID!) {
                       department(id: $id) {
                         name
@@ -457,8 +425,6 @@ export default {
       })
 
       this.department = departmentResponse.data.data.department
-
-      // console.log(this.department)
     },
 
     organizeClassesByYear(classes) {
@@ -472,27 +438,58 @@ export default {
 
       for (const classes in classesByYear) {
         for (const clss of classesByYear[classes]) {
-          if (!clss.totalStudents) clss.totalStudents = 0
-          clss.totalStudents += clss.students.length
+          if (!this.totalStudents) this.totalStudents = {}
+
+          if (!this.totalStudents[classes]) this.totalStudents[classes] = 0
+
+          this.totalStudents[classes] += clss.students.length
         }
       }
 
       return classesByYear
     },
 
-    getSection(clss) {
-      this.totalStudents = clss.totalStudents
-      return clss.section.toLowerCase()
+    getClassUnassignedCourses(year) {
+      this.unassignedCourses = []
+
+      for (const section of year) {
+        for (const attendingCourse of section.attendingCourses) {
+          let existsFlag = false
+          for (const course of this.assignedCourses) {
+            if (course.id === attendingCourse.id) {
+              existsFlag = true
+              break
+            }
+          }
+          if (!existsFlag) this.assignedCourses.push(attendingCourse)
+        }
+      }
+
+      for (const course of this.department.ownedCourses) {
+        let existsFlag = false
+        for (const assignedCourse of this.assignedCourses) {
+          if (assignedCourse.id === course.id) {
+            existsFlag = true
+            break
+          }
+        }
+        if (!existsFlag) this.unassignedCourses.push(course)
+      }
+    },
+
+    getPostfix(idx) {
+      if (idx === '1') return 'st'
+      else if (idx === '2') return 'nd'
+      else if (idx === '3') return 'rd'
+      else return 'th'
+    },
+
+    getTotalStudents(year) {
+      return this.totalStudents[year]
     },
 
     goToCoursesPage() {
       console.log('Classes Page')
-    },
-
-    assignCoursesToClasses() {
-      console.log('Assign Courses')
-
-      this.assignCoursesToClassesDialog = true
     },
 
     removeCoursesFromClasses() {
@@ -502,29 +499,16 @@ export default {
     },
 
     goToSectionPage(sectionId) {
-      console.log('Section Page: ', sectionId)
       this.$router.push({
         name: 'departmentAdministrator-id-section-sectionId',
         params: { id: this.$nuxt.context.params.id, sectionId },
       })
     },
 
-    closeAssignCoursesToClasses() {
-      console.log('Close Assign Courses to Classes')
-
-      this.assignCoursesToClassesDialog = false
-    },
-
     closeRemoveCoursesFromClasses() {
       console.log('Close Remove Courses from Classes')
 
       this.removeCoursesFromClassesDialog = false
-    },
-
-    confirmAssignCoursesToClasses() {
-      console.log('Confirm Assign Courses to Classes')
-
-      this.closeAssignCoursesToClasses()
     },
 
     confirmRemoveCoursesFromClasses() {
