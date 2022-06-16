@@ -16,15 +16,8 @@
 </template>
 
 <script>
-  import AppHeader from '@/components/AppHeader.vue'
-  import AdminSideBar from '~/components/AdminSideBar.vue'
   export default {
     name: 'DefaultLayout',
-    components: { AppHeader, AdminSideBar },
-    // comments: {
-    //   AppHeader,
-    //   AdminSideBar
-    // },
     data() {
       return {}
     },
