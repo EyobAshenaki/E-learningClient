@@ -1,24 +1,19 @@
 <template>
-  <v-navigation-drawer
-    v-model="drawer"
-    :mini-variant.sync="mini"
-    mini-variant-width="100"
-    clipped
-    app
-    permanent
-  >
+  <v-navigation-drawer v-model="drawer" clipped app permanent>
     <v-list>
-      <v-list-item v-for="item in items" :key="item.title" link>
-        <v-list-item-icon>
-          <v-btn depressed>
-            <v-icon medium>{{ item.icon }}</v-icon>
-          </v-btn>
-        </v-list-item-icon>
-
-        <v-list-item-content>
-          <v-list-item-title>{{ item.title }}</v-list-item-title>
-        </v-list-item-content>
-      </v-list-item>
+      <v-tooltip v-for="item in items" :key="item.title" right>
+        <template #activator="{ on, attrs }">
+          <v-list-item v-bind="attrs" exact nuxt :to="item.route" v-on="on">
+            <v-list-item-icon>
+              <v-icon size="30">{{ item.icon }}</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content>
+              <v-list-item-title>{{ item.title }}</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </template>
+        <span>{{ item.description || item.title }}</span>
+      </v-tooltip>
     </v-list>
   </v-navigation-drawer>
 </template>
@@ -29,14 +24,32 @@ export default {
     return {
       drawer: true,
       items: [
-        { title: 'Dashboard', icon: 'mdi-view-dashboard' },
-        { title: 'Classes', icon: 'mdi-home-city' },
-        { title: 'Students', icon: 'mdi-account-group-outline' },
+        {
+          title: 'Dashboard',
+          icon: 'mdi-view-dashboard',
+          route: {
+            name: 'departmentAdministrator-id',
+            params: { id: this.$nuxt.context.params.id },
+          },
+        },
+        {
+          title: 'Classes',
+          icon: 'mdi-home-city',
+          route: {
+            name: 'departmentAdministrator-id-classes',
+            params: { id: this.$nuxt.context.params.id },
+          },
+        },
+        {
+          title: 'Students',
+          icon: 'mdi-account-group-outline',
+          route: {
+            name: 'departmentAdministrator-id-students',
+            params: { id: this.$nuxt.context.params.id },
+          },
+        },
       ],
-      mini: true,
     }
   },
 }
 </script>
-
-<style lang="scss" scoped></style>
