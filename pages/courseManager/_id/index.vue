@@ -160,7 +160,7 @@
                           <!-- Create Course Dialog -->
                           <v-dialog
                             v-model="createCourseDialog"
-                            max-width="50%"
+                            max-width="60%"
                           >
                             <v-card>
                               <v-card-title>
@@ -170,11 +170,24 @@
                               <v-card-text>
                                 <v-container>
                                   <v-row>
-                                    <v-col cols="12" sm="6" md="6">
+                                    <v-col cols="12" sm="6" md="4">
                                       <v-text-field
                                         v-model="newCourse.name"
                                         label="Name"
                                       ></v-text-field>
+                                    </v-col>
+                                    <v-col cols="12" sm="6" md="3">
+                                      <v-select
+                                        v-model="newCourse.department"
+                                        :items="departments"
+                                        :menu-props="{
+                                          bottom: true,
+                                          offsetY: true,
+                                        }"
+                                        label="Department"
+                                        item-text="name"
+                                        return-object
+                                      ></v-select>
                                     </v-col>
                                     <v-col cols="12" sm="6" md="3">
                                       <v-text-field
@@ -182,7 +195,7 @@
                                         label="Code"
                                       ></v-text-field>
                                     </v-col>
-                                    <v-col cols="12" sm="6" md="3">
+                                    <v-col cols="12" sm="6" md="2">
                                       <v-text-field
                                         v-model="newCourse.creditHour"
                                         label="Credit Hour"
@@ -373,12 +386,14 @@ export default {
       user: null,
       courses: [],
       teachers: [],
+      departments: [],
       newCourse: {
         code: '',
         name: '',
         description: '',
         overview: '',
         creditHour: '',
+        department: '',
       },
       defaultCourse: {
         code: '',
@@ -386,6 +401,7 @@ export default {
         description: '',
         overview: '',
         creditHour: '',
+        department: '',
       },
       createCourseDialog: false,
       courseDialogDelete: false,
@@ -415,6 +431,7 @@ export default {
     this.initializeUser()
     this.initializeCourses()
     this.initializeTeachers()
+    this.initializeDepartments()
   },
 
   methods: {
@@ -441,8 +458,6 @@ export default {
     },
 
     async initializeCourses() {
-      // const userId = this.$nuxt.context.params.id
-
       const query = `query courses {
                       courses {
                         id
@@ -458,6 +473,7 @@ export default {
                         }
                       }
                     }`
+
       const response = await this.$axios.post('/graphql', {
         query,
       })
@@ -494,61 +510,51 @@ export default {
     },
 
     async getUsersWithRole(role) {
-      const queryRole = `query roles{
-                            roles{
-                              id
-                              name
-                            }
-                          }`
-      const rolesResponse = await this.$axios.post('/graphql', {
-        query: queryRole,
-      })
-      if (rolesResponse.data.errors?.length) {
-        console.warn(rolesResponse.data.errors[0].message)
-        throw new Error(rolesResponse.data.errors[0].message)
+      const query = `query users($filter: UserFilter) {
+                      users(filter: $filter) {
+                        id
+                        firstName
+                        middleName
+                        lastName
+                        email
+                        department{
+                          name
+                        }
+                        attendingClass {
+                          id
+                          year
+                          section
+                        }
+                      }
+                    }`
+
+      const variables = {
+        filter: {
+          roleName: this.getRoleName(role),
+        },
       }
 
-      this.roles = rolesResponse.data.data.roles
-
-      const selectedRole = this.roles.filter((srole) => {
-        return this.getRoleName(role) === srole.name
+      const userResponse = await this.$axios.post('/graphql', {
+        query,
+        variables,
       })
 
-      if (selectedRole.length > 0) {
-        const roleId = selectedRole[0].id
+      return userResponse.data.data.users
+    },
 
-        const queryRoleMembers = `query role($id: ID!) {
-                                    role(id: $id) {
-                                      name
-                                      members {
-                                        id
-                                        firstName
-                                        middleName
-                                        lastName
-                                        email
-                                        department{
-                                          name
-                                        }
-                                      }
-                                    }
-                                  }`
+    async initializeDepartments() {
+      const query = `query departments {
+                      departments {
+                        id
+                        name
+                      }
+                    }`
 
-        const roleMembersvariables = { id: roleId }
+      const departmentsResponse = await this.$axios.post('/graphql', {
+        query,
+      })
 
-        const roleMembersResponse = await this.$axios.post('/graphql', {
-          query: queryRoleMembers,
-          variables: roleMembersvariables,
-        })
-
-        if (roleMembersResponse.data.errors?.length) {
-          console.warn(roleMembersResponse.data.errors[0].message)
-          throw new Error(roleMembersResponse.data.errors[0].message)
-        }
-
-        return roleMembersResponse.data.data.role.members
-      }
-
-      return null
+      this.departments = departmentsResponse.data.data.departments
     },
 
     getRoleName(role) {
@@ -561,7 +567,6 @@ export default {
     goToTeachersPage() {
       this.$router.push({
         name: 'courseManager-id-teachers',
-        params: { id: 1 },
       })
     },
 
@@ -669,6 +674,7 @@ export default {
                       $description: String!
                       $overview: String!
                       $creditHour: Int!
+                      $departmentId: ID!
                     ) {
                       createCourse(
                         createCourseInput: {
@@ -677,6 +683,7 @@ export default {
                           description: $description
                           overview: $overview
                           creditHour: $creditHour
+                          departmentId: $departmentId
                         }
                       ) {
                         id
@@ -689,6 +696,7 @@ export default {
         description: this.newCourse.description,
         overview: this.newCourse.overview,
         creditHour: parseInt(this.newCourse.creditHour),
+        departmentId: this.newCourse.department.id,
       }
 
       await this.$axios.post('/graphql', {
