@@ -33,7 +33,7 @@
             >
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn color="error" text @click="deleteCourseClose"
+              <v-btn color="error" text @click="deleteCourseClose(false)"
                 >Cancel</v-btn
               >
               <v-btn color="#25327F" text @click="deleteCourseConfirm"
@@ -228,51 +228,105 @@
     <v-col cols="4">
       <v-row>
         <v-col cols="8" class="text-h6">Assigned Teachers</v-col>
-        <v-col cols="4" class="d-flex justify-end">
+        <v-col cols="4" class="d-flex justify-end mb-4">
           <v-btn outlined color="orange darken-4" @click="assignCourseTeacher">
             <v-icon class="pr-1">mdi-account-plus-outline</v-icon>
             Assign
           </v-btn>
         </v-col>
+
+        <!-- Course Owner  -->
+        <v-col v-if="owner" cols="12" class="py-2">
+          <v-card outlined class="py-1">
+            <v-card-text class="pa-0 pb-5">
+              <v-row>
+                <v-col cols="4" class="pr-0 d-flex justify-end align-center">
+                  <v-avatar size="80" color="grey lighten-3">
+                    <v-icon size="70" color="#25327F"
+                      >mdi-account-outline</v-icon
+                    >
+                  </v-avatar>
+                </v-col>
+                <v-col cols="8">
+                  <v-row>
+                    <v-col cols="12" class="pb-0">
+                      <v-card-title>
+                        {{
+                          `${owner.firstName} ${owner.middleName} ${owner.lastName}`
+                        }}
+                      </v-card-title>
+                      <v-card-subtitle class="pb-0">
+                        {{ owner.department ? owner.department.name : 'N/A' }}
+                      </v-card-subtitle>
+                      <v-chip color="blue darken-2" dark> Course Owner </v-chip>
+                    </v-col>
+                    <v-col cols="12" class="pb-0 pl-6 pr-15">
+                      <v-btn
+                        block
+                        outlined
+                        color="error"
+                        @click="removeCourseTeacher(owner.id, 'owner')"
+                      >
+                        <v-icon class="pr-1">mdi-account-minus-outline</v-icon>
+                        Remove
+                      </v-btn>
+                    </v-col>
+                  </v-row>
+                </v-col>
+              </v-row>
+            </v-card-text>
+          </v-card>
+        </v-col>
+
+        <!-- Course Teachers -->
         <v-col
           v-for="teacher in teachers"
           :key="teacher.id"
           cols="12"
-          class="py-1"
+          class="py-2"
         >
-          <v-card outlined class="py-1" height="130%">
-            <v-row>
-              <v-col cols="4" class="pr-0 d-flex justify-end align-center">
-                <v-avatar size="80" color="grey lighten-3">
-                  <v-icon size="70" color="#25327F">mdi-account-outline</v-icon>
-                </v-avatar>
-              </v-col>
-              <v-col cols="8">
-                <v-row>
-                  <v-col cols="12" class="pb-0">
-                    <v-card-title>
-                      {{
-                        `${teacher.firstName} ${teacher.middleName} ${teacher.lastName}`
-                      }}
-                    </v-card-title>
-                    <v-card-subtitle class="pb-0">
-                      {{ teacher.department ? teacher.department.name : 'N/A' }}
-                    </v-card-subtitle>
-                  </v-col>
-                  <v-col cols="12" class="pb-0 pl-6 pr-15">
-                    <v-btn
-                      block
-                      outlined
-                      color="error"
-                      @click="removeCourseTeacher(teacher.id)"
+          <v-card outlined class="py-1">
+            <v-card-text class="pa-0 pb-5">
+              <v-row>
+                <v-col cols="4" class="pr-0 d-flex justify-end align-center">
+                  <v-avatar size="80" color="grey lighten-3">
+                    <v-icon size="70" color="#25327F"
+                      >mdi-account-outline</v-icon
                     >
-                      <v-icon class="pr-1">mdi-account-minus-outline</v-icon>
-                      Remove
-                    </v-btn>
-                  </v-col>
-                </v-row>
-              </v-col>
-            </v-row>
+                  </v-avatar>
+                </v-col>
+                <v-col cols="8">
+                  <v-row>
+                    <v-col cols="12" class="pb-0">
+                      <v-card-title>
+                        {{
+                          `${teacher.firstName} ${teacher.middleName} ${teacher.lastName}`
+                        }}
+                      </v-card-title>
+                      <v-card-subtitle class="pb-0">
+                        {{
+                          teacher.department ? teacher.department.name : 'N/A'
+                        }}
+                      </v-card-subtitle>
+                      <v-chip color="blue darken-2" class="ml-3" dark>
+                        Course Teacher
+                      </v-chip>
+                    </v-col>
+                    <v-col cols="12" class="pb-0 pl-6 pr-15">
+                      <v-btn
+                        block
+                        outlined
+                        color="error"
+                        @click="removeCourseTeacher(teacher.id, 'teacher')"
+                      >
+                        <v-icon class="pr-1">mdi-account-minus-outline</v-icon>
+                        Remove
+                      </v-btn>
+                    </v-col>
+                  </v-row>
+                </v-col>
+              </v-row>
+            </v-card-text>
           </v-card>
         </v-col>
 
@@ -288,6 +342,10 @@
                     :items="unassignedTeachers"
                     item-text="unassignedTeacherFullName"
                     item-value="unassignedTeacher"
+                    :menu-props="{
+                      bottom: true,
+                      offsetY: true,
+                    }"
                     label="Select Teacher"
                     outlined
                   ></v-select>
@@ -296,6 +354,10 @@
                   <v-select
                     v-model="selectedTeacherType"
                     :items="teacherTypes"
+                    :menu-props="{
+                      bottom: true,
+                      offsetY: true,
+                    }"
                     label="Teacher Type"
                     outlined
                   ></v-select>
@@ -321,6 +383,7 @@ export default {
     return {
       course: null,
       teachers: [],
+      owner: null,
       courseId: this.$nuxt.context.params.courseId,
       overviewPanel: [0, 1],
       editedIndex: -1,
@@ -371,15 +434,21 @@ export default {
                           title
                           sequenceNumber
                         }
-                        users {
+                        teachers {
                           id
                           firstName
                           middleName
                           lastName
-                          roles {
+                          department {
                             id
                             name
                           }
+                        }
+                        owner {
+                          id
+                          firstName
+                          middleName
+                          lastName
                           department {
                             id
                             name
@@ -396,19 +465,8 @@ export default {
       })
 
       this.course = courseResponse.data.data.course
-
-      this.teachers = []
-      for (const user of this.course.users) {
-        for (const role of user.roles) {
-          if (
-            role !== 'TEACHER' ||
-            role !== 'COURSE_OWNER' ||
-            role !== 'COURSE_TEACHER'
-          )
-            break
-        }
-        this.teachers.push(user)
-      }
+      this.teachers = courseResponse.data.data.course.teachers
+      this.owner = courseResponse.data.data.course.owner
     },
 
     async editCourse() {
@@ -611,61 +669,37 @@ export default {
     },
 
     async getUsersWithRole(role) {
-      const queryRole = `query roles{
-                            roles{
-                              id
-                              name
-                            }
-                          }`
-      const rolesResponse = await this.$axios.post('/graphql', {
-        query: queryRole,
-      })
-      if (rolesResponse.data.errors?.length) {
-        console.warn(rolesResponse.data.errors[0].message)
-        throw new Error(rolesResponse.data.errors[0].message)
+      const query = `query users($filter: UserFilter) {
+                      users(filter: $filter) {
+                        id
+                        firstName
+                        middleName
+                        lastName
+                        email
+                        email
+                        department{
+                          name
+                        }
+                        attendingClass {
+                          id
+                          year
+                          section
+                        }
+                      }
+                    }`
+
+      const variables = {
+        filter: {
+          roleName: this.getRoleName(role),
+        },
       }
 
-      this.roles = rolesResponse.data.data.roles
-
-      const selectedRole = this.roles.filter((srole) => {
-        return this.getRoleName(role) === srole.name
+      const userResponse = await this.$axios.post('/graphql', {
+        query,
+        variables,
       })
 
-      if (selectedRole.length > 0) {
-        const roleId = selectedRole[0].id
-
-        const queryRoleMembers = `query role($id: ID!) {
-                                    role(id: $id) {
-                                      name
-                                      members {
-                                        id
-                                        firstName
-                                        middleName
-                                        lastName
-                                        email
-                                        department{
-                                          name
-                                        }
-                                      }
-                                    }
-                                  }`
-
-        const roleMembersvariables = { id: roleId }
-
-        const roleMembersResponse = await this.$axios.post('/graphql', {
-          query: queryRoleMembers,
-          variables: roleMembersvariables,
-        })
-
-        if (roleMembersResponse.data.errors?.length) {
-          console.warn(roleMembersResponse.data.errors[0].message)
-          throw new Error(roleMembersResponse.data.errors[0].message)
-        }
-
-        return roleMembersResponse.data.data.role.members
-      }
-
-      return null
+      return userResponse.data.data.users
     },
 
     getRoleName(role) {
@@ -704,84 +738,48 @@ export default {
 
       this.teacherTypes = ['Course Owner', 'Course Teacher']
 
-      this.unassignedTeachers = await this.getTeachers()
-      this.unassignedTeachers = this.unassignedTeachers.map(
-        (unassignedTeacher) => {
+      const allTeachers = await this.getTeachers()
+
+      this.unassignedTeachers = allTeachers
+        .filter((teacher) => {
+          return !this.teachers.map((teach) => teach.id).includes(teacher.id)
+        })
+        .filter((teacher) => {
+          return this.owner.id !== teacher.id
+        })
+        .map((unassignedTeacher) => {
           return {
             unassignedTeacherFullName: `${unassignedTeacher.firstName} ${unassignedTeacher.middleName} ${unassignedTeacher.lastName}`,
             unassignedTeacher,
           }
-        }
-      )
+        })
     },
 
-    async removeCourseTeacher(teacherId) {
-      const query = `mutation unassignUserFromCourse ($courseId: ID! $userId: ID!) {
-                      unassignUserFromCourse (courseId: $courseId userId: $userId)
-                    }`
-
-      const variables = {
-        courseId: this.courseId,
-        userId: teacherId,
-      }
-
-      const unassignedTeacherResponse = await this.$axios.post('/graphql', {
-        query,
-        variables,
-      })
-
-      const unassignedTeacher =
-        unassignedTeacherResponse.data.data.unassignUserFromCourse
-
-      if (unassignedTeacher) {
-        // // Then revoke 'teacher' Role from assigned user
-        // const revokeUserRoleQuery = `mutation revokeUserRole ($userId: ID! $roleName: RoleName!) {
-        //                               revokeUserRole (userId: $userId roleName: $roleName) {
-        //                                 id
-        //                                 roles {
-        //                                   id
-        //                                   name
-        //                                 }
-        //                               }
-        //                             }`
-        // const revokeUserRoleVariables = {
-        //   userId: this.selectedTeacher.id,
-        //   roleName: 'TEACHER',
-        // }
-        // const revokeUserRoleResponse = await this.$axios.post('/graphql', {
-        //   query: revokeUserRoleQuery,
-        //   variables: revokeUserRoleVariables,
-        // })
-        // console.log('revokeUserRoleResponse', revokeUserRoleResponse)
-      }
-
-      this.initialize()
-    },
-
-    assignCourseTeacherClose() {
-      this.assignTeacherDialog = false
-    },
-
-    async assignCourseTeacherConfirm() {
-      const query = `mutation assignUserToCourse ($courseId: ID! $userId: ID!) {
-                        assignUserToCourse (courseId: $courseId userId: $userId)
+    async removeCourseTeacher(teacherId, teacherType) {
+      if (teacherType === 'teacher') {
+        const query = `mutation unassignTeacherFromCourse($courseId: ID!, $teacherId: ID!) {
+                        unassignTeacherFromCourse(courseId: $courseId, teacherId: $teacherId)
                       }`
-      const variables = {
-        userId: this.selectedTeacher.id,
-        courseId: this.courseId,
-      }
 
-      const assignUserResponse = await this.$axios.post('/graphql', {
-        query,
-        variables,
-      })
+        const variables = {
+          teacherId,
+          courseId: this.courseId,
+        }
 
-      const assignedRole = this.getRoleName(this.selectedTeacherType)
+        const unassignedTeacherResponse = await this.$axios.post('/graphql', {
+          query,
+          variables,
+        })
 
-      if (assignUserResponse.data.data.assignUserToCourse === true) {
-        // Change role to selectedTeacherType using Update user
-        const changeUserRoleQuery = `mutation updateUser ($id: ID! $roleName: RoleName) {
-                                      updateUser (updateUserInput: {id: $id roleName: $roleName}) {
+        const unassignedTeacher =
+          unassignedTeacherResponse.data.data.unassignTeacherFromCourse
+
+        console.log('unassign teacher', unassignedTeacher)
+
+        if (unassignedTeacher) {
+          // Then revoke 'teacher' Role from assigned user
+          const revokeUserRoleQuery = `mutation revokeUserRole ($userId: ID! $roleName: RoleName!) {
+                                      revokeUserRole (userId: $userId roleName: $roleName) {
                                         id
                                         roles {
                                           id
@@ -789,15 +787,154 @@ export default {
                                         }
                                       }
                                     }`
-        const changeUserRoleVariables = {
-          id: this.selectedTeacher.id,
-          roleName: assignedRole,
+
+          const revokeUserRoleVariables = {
+            userId: this.selectedTeacher.id,
+            roleName: 'COURSE_TEACHER',
+          }
+
+          const revokeUserRoleResponse = await this.$axios.post('/graphql', {
+            query: revokeUserRoleQuery,
+            variables: revokeUserRoleVariables,
+          })
+
+          const revokeUserRoles =
+            revokeUserRoleResponse.data.data.revokeUserRole.roles.map(
+              (role) => role.name
+            )
+
+          console.log('revokeUserRoleResponse', revokeUserRoles)
+        }
+      } else if (teacherType === 'owner') {
+        const query = `mutation unassignOwnerFromCourse($courseId: ID!, $ownerId: ID!) {
+                        unassignOwnerFromCourse(courseId: $courseId, ownerId: $ownerId)
+                      }`
+
+        const variables = {
+          ownerId: teacherId,
+          courseId: this.courseId,
         }
 
-        await this.$axios.post('/graphql', {
-          query: changeUserRoleQuery,
-          variables: changeUserRoleVariables,
+        const unassignedOwnerResponse = await this.$axios.post('/graphql', {
+          query,
+          variables,
         })
+
+        const unassignedOwner =
+          unassignedOwnerResponse.data.data.unassignUserFromCourse
+
+        console.log('unassign owner', unassignedOwner)
+      }
+
+      this.initialize()
+    },
+
+    assignCourseTeacherClose() {
+      this.assignTeacherDialog = false
+
+      this.$nextTick(() => {
+        this.selectedTeacher = ''
+        this.selectedTeacherType = ''
+      })
+    },
+
+    async doesUserContainRole(userId, roleName) {
+      const query = `query user($id: ID!) {
+                        user(id: $id) {
+                          roles {
+                            name
+                          }
+                        }
+                      }`
+
+      const variables = {
+        id: userId,
+      }
+
+      const userResponse = await this.$axios.post('/graphql', {
+        query,
+        variables,
+      })
+
+      const selectedTeacherRoles = userResponse.data.data.user.roles.map(
+        (role) => role.name
+      )
+
+      console.log(selectedTeacherRoles)
+
+      if (selectedTeacherRoles.includes(roleName)) return true
+
+      return false
+    },
+
+    async assignCourseTeacherConfirm() {
+      const assignedRole = this.getRoleName(this.selectedTeacherType)
+
+      if (assignedRole === 'COURSE_TEACHER') {
+        const doesContain = await this.doesUserContainRole(
+          this.selectedTeacher.id,
+          'COURSE_TEACHER'
+        )
+
+        if (!doesContain) {
+          // Change role to selectedTeacherType using Update user
+          const changeUserRoleQuery = `mutation updateUser ($id: ID! $roleName: RoleName) {
+                                        updateUser (updateUserInput: {id: $id roleName: $roleName}) {
+                                          id
+                                          roles {
+                                            id
+                                            name
+                                          }
+                                        }
+                                      }`
+          const changeUserRoleVariables = {
+            id: this.selectedTeacher.id,
+            roleName: assignedRole,
+          }
+
+          await this.$axios.post('/graphql', {
+            query: changeUserRoleQuery,
+            variables: changeUserRoleVariables,
+          })
+        }
+
+        const query = `mutation assignTeacherToCourse ($courseId: ID! $teacherId: ID!) {
+                        assignTeacherToCourse (courseId: $courseId teacherId: $teacherId)
+                      }`
+
+        const variables = {
+          teacherId: this.selectedTeacher.id,
+          courseId: this.courseId,
+        }
+
+        const assignTeacherResponse = await this.$axios.post('/graphql', {
+          query,
+          variables,
+        })
+
+        const isTeacherAssigned =
+          assignTeacherResponse.data.data.assignTeacherToCourse
+
+        console.log('assign teacher ', isTeacherAssigned)
+      } else if (assignedRole === 'COURSE_OWNER') {
+        const query = `mutation assignOwnerToCourse($courseId: ID!, $ownerId: ID!) {
+                        assignOwnerToCourse(courseId: $courseId, ownerId: $ownerId)
+                      }`
+
+        const variables = {
+          ownerId: this.selectedTeacher.id,
+          courseId: this.courseId,
+        }
+
+        const assignOwnerResponse = await this.$axios.post('/graphql', {
+          query,
+          variables,
+        })
+
+        const isOwnerAssigned =
+          assignOwnerResponse.data.data.assignOwnerToCourse
+
+        console.log('assign owner ', isOwnerAssigned)
       }
 
       this.initialize()
