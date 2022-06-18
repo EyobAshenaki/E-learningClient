@@ -38,28 +38,28 @@
         this.$refs.login_form.submit()
         this.loading = true
       },
-      onLoginSucess(user) {
-        this.$store.dispatch('auth/login', user)
-        this.$router.push('/home')
-      },
+      // onLoginSucess(user) {
+      //   this.$store.dispatch('auth/login', user)
+      //   this.$router.push('/home')
+      // },
       onLoginError(error) {
         this.$toast.error(error.message)
         this.loading = false
       },
-      // onLoginSucess(data) {
-      //   const roles = data.roles.map((role) => {
-      //     const tempRole = role.split('_')
-      //     return tempRole.length > 1
-      //       ? `${tempRole[0].toLowerCase()}${tempRole[1].slice(
-      //           0,
-      //           1
-      //         )}${tempRole[1].slice(1).toLowerCase()}`
-      //       : role.toLowerCase()
-      //   })
-      //   const id = data.id
+      onLoginSucess(data) {
+        const roles = data.roles.map((role) => {
+          const tempRole = role.split('_')
+          return tempRole.length > 1
+            ? `${tempRole[0].toLowerCase()}${tempRole[1].slice(
+                0,
+                1
+              )}${tempRole[1].slice(1).toLowerCase()}`
+            : role.toLowerCase()
+        })
+        const id = data.id
 
-      //   this.$router.push({ path: `${roles[0]}/${id}`, params: { id } })
-      // },
+        this.$router.push({ path: `${roles[0]}/${id}`, params: { id } })
+      },
     },
   }
 </script>
