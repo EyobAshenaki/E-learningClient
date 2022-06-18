@@ -1,83 +1,22 @@
 <template>
   <v-row>
-    <v-col cols="12" class="pb-0">
-      <v-banner single-line>
-        <h2>Current Courses</h2>
-
-        <template #actions>
-          <v-btn text> View all </v-btn>
-        </template>
-      </v-banner>
+    <v-col cols="12" class="pb-0 mt-5">
+      <span class="text-h5">Current Courses</span>
     </v-col>
-    <v-col cols="12" class="pt-0">
-      <v-sheet class="pt-0" height="42vh" elevation="0">
-        <v-slide-group
-          v-model="courseSlideGroup"
-          class="py-2"
-          center-active
-          show-arrows
-        >
-          <v-slide-item v-for="n in 15" :key="n" v-slot="{ active, toggle }">
-            <v-card
-              :class="active ? 'elevation-15 mx-5 mb-5' : 'ma-2'"
-              class="pa-1 rounded-lg"
-              height="270"
-              width="300"
-              @click="toggle"
-            >
-              <v-row class="fill-height" align="center" justify="center">
-                <v-col cols="12">
-                  <v-row
-                    align="center"
-                    style="max-width: 280px"
-                    class="ma-0 ml-3 mt-3"
-                  >
-                    <v-col cols="3" class="pa-0">
-                      <v-avatar
-                        color="warning lighten-2"
-                        class="rounded-lg"
-                        rounded
-                        size="60"
-                      ></v-avatar>
-                    </v-col>
-                    <v-col cols="9" class="pa-0 pr-2">
-                      <p class="mb-2">Database Design</p>
-                      <v-icon>mdi-account</v-icon>Eyob Aschenaki
-                    </v-col>
-                  </v-row>
-                </v-col>
-
-                <v-divider class="mx-3 mt-n5"></v-divider>
-
-                <v-col cols="12" class="pa-0 ml-12 mb-3">
-                  <v-row
-                    align="center"
-                    justify="center"
-                    style="max-width: 280px"
-                    class="ma-0"
-                  >
-                    <v-col cols="6" class="pa-0 mb-5">
-                      <v-icon>mdi-bookshelf</v-icon>sw132
-                    </v-col>
-                    <v-col cols="6" class="pa-0 mb-5">
-                      <v-icon>mdi-book</v-icon> 3 credit
-                    </v-col>
-                    <v-col cols="6" class="pa-0">
-                      <v-icon>mdi-book-open-variant</v-icon> 8 chapters
-                    </v-col>
-                    <v-col cols="6" class="pa-0">
-                      <v-icon>mdi-timer-outline</v-icon> 3 Hours/Week
-                    </v-col>
-                  </v-row>
-                </v-col>
-                <v-btn text class="mb-n2">View Course</v-btn>
-              </v-row>
-            </v-card>
-          </v-slide-item>
-        </v-slide-group>
-      </v-sheet>
+    <v-col cols="12" class="pt-0 mt-5">
+      <v-row>
+        <v-col v-for="course in courses" :key="course.id" cols="4">
+          <student-course-card
+            :active="active"
+            :toggle="toggle"
+            :course-id="course.id"
+          />
+        </v-col>
+      </v-row>
     </v-col>
-    <v-col cols="7">
+
+    <!-- Activities Section -->
+    <!-- <v-col cols="7">
       <v-row>
         <v-col cols="12">
           <v-banner single-line>
@@ -175,90 +114,80 @@
           </div>
         </v-col>
       </v-row>
-    </v-col>
-    <v-col cols="5">
-      <h2 class="mt-3">Overview</h2>
-      <v-row justify="center" align="center" style="height: 17em">
-        <v-col cols="6">
-          <v-card elevation="10" class="border-radius-1">
-            <v-card-title class="pb-0">Courses in progress</v-card-title>
-
-            <v-row class="pa-4">
-              <v-col cols="5" class="ml-auto">
-                <h1>02</h1>
-              </v-col>
-              <v-col cols="5" class="ml-auto">
-                <v-icon size="50">mdi-progress-clock</v-icon>
-              </v-col>
-            </v-row>
-          </v-card>
-        </v-col>
-
-        <v-col cols="6">
-          <v-card elevation="10" class="border-radius-1">
-            <v-card-title class="pb-0">Completed courses</v-card-title>
-
-            <v-row class="pa-4" justify="center" align="center">
-              <v-col cols="5" class="ml-auto">
-                <h1>07</h1>
-              </v-col>
-              <v-col cols="5" class="ml-auto">
-                <v-icon size="50">mdi-progress-check</v-icon>
-              </v-col>
-            </v-row>
-          </v-card>
-        </v-col>
-      </v-row>
-    </v-col>
+    </v-col> -->
   </v-row>
 </template>
 
 <script>
-export default {
-  layout: 'student',
+  export default {
+    layout: 'student',
 
-  data() {
-    return {
-      courseSlideGroup: null,
-      activitySlideGroup: null,
-    }
-  },
-}
+    data() {
+      return {
+        courses: [],
+      }
+    },
+
+    created() {
+      this.initialize()
+    },
+
+    methods: {
+      async initialize() {
+        const query = `query user($id: ID!) {
+                          user(id: $id) {
+                            attendingCourses {
+                              id
+                              code
+                              name
+                              description
+                              overview
+                              creditHour
+                            }
+                          }
+                        }`
+
+        const variables = {
+          id: this.$nuxt.context.params.id,
+        }
+
+        const userResponse = await this.$axios.post('/graphql', {
+          query,
+          variables,
+        })
+
+        this.courses = userResponse.data.data.user.attendingCourses
+
+        console.log(this.courses)
+      },
+    },
+  }
 </script>
 
 <style scoped>
-/* .dashed {
-  border: dashed black 1px;
-}
+  .half-fullheight {
+    position: relative;
+    max-height: 41vh;
+    overflow: hidden;
+  }
 
-.solid {
-  border: solid black 1px;
-} */
+  .blur {
+    margin-top: -3em;
+    margin-left: -0.2em;
+    position: relative;
+    height: 55px;
+    width: 102%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-image: linear-gradient(
+      rgb(255 255 255 / 0%),
+      rgb(255 255 255 / 95%),
+      rgb(255 255 255 / 100%)
+    );
+  }
 
-.half-fullheight {
-  position: relative;
-  max-height: 41vh;
-  overflow: hidden;
-}
-
-.blur {
-  /* border: dashed black 1px; */
-  margin-top: -3em;
-  margin-left: -0.2em;
-  position: relative;
-  height: 55px;
-  width: 102%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-image: linear-gradient(
-    rgb(255 255 255 / 0%),
-    rgb(255 255 255 / 95%),
-    rgb(255 255 255 / 100%)
-  );
-}
-
-.border-radius-1 {
-  border-radius: 0.7em;
-}
+  .border-radius-1 {
+    border-radius: 0.7em;
+  }
 </style>
