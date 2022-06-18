@@ -1,87 +1,49 @@
 <template>
-  <v-row class="dashed">
-    <v-col cols="8" class="solid">
-      <v-row class="dashed">
-        <v-col cols="12" class="solid">
-          <h2>Recent Courses</h2>
-
-          <v-sheet class="" style="height: 44vh" elevation="0">
-            <v-slide-group
-              v-model="model"
-              class="py-5"
-              center-active
-              show-arrows
-            >
-              <v-slide-item
-                v-for="n in 15"
-                :key="n"
-                v-slot="{ active, toggle }"
+  <v-row style="margin-top: 2em">
+    <v-col cols="8">
+      <v-row>
+        <!-- Welcome section -->
+        <v-col cols="12">
+          <v-card height="250" elevation="0" color="grey lighten-4">
+            <v-row style="height: 100%">
+              <v-col
+                cols="6"
+                class="d-flex align-center justify-center"
+                style="height: 100%"
               >
-                <v-card
-                  :class="active ? 'mx-2 mb-5' : 'ma-2'"
-                  class="pa-1 rounded-lg"
-                  height="270"
-                  width="300"
-                  @click="toggle"
-                >
-                  <v-row class="fill-height" align="center" justify="center">
-                    <v-col cols="12">
-                      <v-row
-                        align="center"
-                        style="max-width: 280px"
-                        class="ma-0 ml-3 mt-3"
-                      >
-                        <v-col cols="3" class="pa-0">
-                          <v-avatar
-                            color="warning lighten-2"
-                            class="rounded-lg"
-                            rounded
-                            size="60"
-                          ></v-avatar>
-                        </v-col>
-                        <v-col cols="9" class="pa-0 pr-2">
-                          <p class="mb-2">Database Design</p>
-                          <v-icon>mdi-account</v-icon>Eyob Aschenaki
-                        </v-col>
-                      </v-row>
-                    </v-col>
-
-                    <v-divider class="mx-3 mt-n5"></v-divider>
-
-                    <v-col cols="12" class="pa-0 ml-12 mb-3">
-                      <v-row
-                        align="center"
-                        justify="center"
-                        style="max-width: 280px"
-                        class="ma-0"
-                      >
-                        <v-col cols="6" class="pa-0 mb-5">
-                          <v-icon>mdi-bookshelf</v-icon>sw132
-                        </v-col>
-                        <v-col cols="6" class="pa-0 mb-5">
-                          <v-icon>mdi-book</v-icon> 3 credit
-                        </v-col>
-                        <v-col cols="6" class="pa-0">
-                          <v-icon>mdi-book-open-variant</v-icon> 8 chapters
-                        </v-col>
-                        <v-col cols="6" class="pa-0">
-                          <v-icon>mdi-timer-outline</v-icon> 3 Hours/Week
-                        </v-col>
-                      </v-row>
-                    </v-col>
-                    <v-btn text class="mb-n2">View Course</v-btn>
-                  </v-row>
-                </v-card>
-              </v-slide-item>
-            </v-slide-group>
-          </v-sheet>
+                <v-row class="d-flex justify-end">
+                  <v-col cols="11" class="py-0">
+                    <p class="mb-0 text-h3 text-left font-weight-light">
+                      Welcome Back,
+                    </p>
+                  </v-col>
+                  <v-col v-if="user" cols="11" class="py-0">
+                    <p
+                      class="orange--text text--darken-2 text-h4 text-left font-weight-medium"
+                    >
+                      {{ user.firstName }}
+                    </p>
+                  </v-col>
+                </v-row>
+              </v-col>
+              <v-col cols="6">
+                <img
+                  style="height: 120%; margin-top: -3.3em"
+                  src="@/assets/img/tourist-welcome.svg"
+                  alt=""
+                />
+              </v-col>
+            </v-row>
+          </v-card>
         </v-col>
 
-        <v-col cols="12" class="solid">
-          Todays Activities
+        <v-col cols="12" class="mt-15">
+          <span class="text-h5 d-flex align-center mb-5">
+            Today's Activities
+          </span>
 
           <v-list>
-            <v-list-item v-for="n in 3" :key="n" class="dashed mb-2">
+            <v-list-item v-for="n in 3" :key="n" class="mb-2">
               <v-list-item-icon>
                 <v-icon>mdi-book-open-page-variant-outline</v-icon>
               </v-list-item-icon>
@@ -102,9 +64,11 @@
         </v-col>
       </v-row>
     </v-col>
-    <v-col cols="4" class="solid">
-      <v-row class="dashed">
-        <v-col cols="12" class="solid">
+
+    <v-col cols="4">
+      <v-row>
+        <!-- Quizzes Section -->
+        <v-col cols="12">
           <v-card class="half-fullheight pt-0" elevation="0">
             <v-card-title primary-title class="justify-center pb-0">
               Quizzes
@@ -127,7 +91,8 @@
           </div>
         </v-col>
 
-        <v-col cols="12" class="solid">
+        <!-- Assignments Section -->
+        <v-col cols="12">
           <v-card class="half-fullheight pt-0" elevation="0">
             <v-card-title primary-title class="justify-center pb-0">
               Assignments
@@ -155,45 +120,66 @@
 </template>
 
 <script>
-export default {
-  layout: 'student',
-  data() {
-    return {
-      model: null,
-    }
-  },
-}
+  export default {
+    layout: 'student',
+
+    data() {
+      return {
+        model: null,
+        user: null,
+      }
+    },
+
+    created() {
+      this.initialize()
+    },
+
+    methods: {
+      async initialize() {
+        const query = `query user($id: ID!) {
+                        user(id: $id) {
+                          id
+                          firstName
+                          middleName
+                          lastName
+                        }
+                      }`
+
+        const variables = {
+          id: this.$nuxt.context.params.id,
+        }
+
+        const userResponse = await this.$axios.post('/graphql', {
+          query,
+          variables,
+        })
+
+        this.user = userResponse.data.data.user
+      },
+    },
+  }
 </script>
 
 <style scoped>
-/* .dashed {
-  border: dashed black 1px;
-}
+  .half-fullheight {
+    position: relative;
+    max-height: 41vh;
+    overflow: hidden;
+  }
 
-.solid {
-  border: solid black 1px;
-} */
-
-.half-fullheight {
-  position: relative;
-  max-height: 41vh;
-  overflow: hidden;
-}
-
-.blur {
-  /* border: dashed black 1px; */
-  margin-top: -3em;
-  margin-left: -0.2em;
-  position: relative;
-  height: 55px;
-  width: 102%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-image: linear-gradient(
-    rgb(255 255 255 / 0%),
-    rgb(255 255 255 / 95%),
-    rgb(255 255 255 / 100%)
-  );
-}
+  .blur {
+    margin-top: -3em;
+    margin-left: -0.2em;
+    position: relative;
+    height: 55px;
+    width: 102%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-image: linear-gradient(
+      rgb(255 255 255 / 0%),
+      rgb(255 255 255 / 95%),
+      rgb(255 255 255 / 100%)
+    );
+  }
 </style>
