@@ -1,6 +1,5 @@
 <template>
   <v-app>
-    <app-header />
     <course-manager-side-bar />
     <v-main class="grey lighten-4">
       <v-container>
@@ -11,13 +10,12 @@
 </template>
 
 <script>
-import AppHeader from '@/components/AppHeader.vue'
-import CourseManagerSideBar from '~/components/CourseManagerSideBar.vue'
-export default {
-  name: 'NavLayout',
-  components: { AppHeader, CourseManagerSideBar },
-  data() {
-    return {}
-  },
-}
+  import CourseManagerSideBar from '~/components/CourseManagerSideBar.vue'
+  export default {
+    name: 'NavLayout',
+    components: { CourseManagerSideBar },
+    data() {
+      return {}
+    },
+  }
 </script>

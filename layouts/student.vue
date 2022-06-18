@@ -1,6 +1,5 @@
 <template>
   <v-app>
-    <app-header />
     <student-side-bar />
     <v-main>
       <v-container>
@@ -11,17 +10,12 @@
 </template>
 
 <script>
-import AppHeader from '@/components/AppHeader.vue'
-import StudentSideBar from '~/components/StudentSideBar.vue'
-export default {
-  name: 'NavLayout',
-  components: { AppHeader, StudentSideBar },
-  // comments: {
-  //   AppHeader,
-  //   StudentSideBar
-  // },
-  data() {
-    return {}
-  },
-}
+  import StudentSideBar from '~/components/StudentSideBar.vue'
+  export default {
+    name: 'NavLayout',
+    components: { StudentSideBar },
+    data() {
+      return {}
+    },
+  }
 </script>
