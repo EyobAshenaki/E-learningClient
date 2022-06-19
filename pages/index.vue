@@ -9,8 +9,8 @@
     "
   >
     <v-col cols="12" class="mx-auto">
-      <v-row class="mt-4">
-        <v-col cols="6">
+      <v-row class="mt-4 ml-15">
+        <v-col cols="5" class="">
           <p
             class="text-h2 orange--text text--lighten-4"
             style="
@@ -35,12 +35,11 @@
             elevation="24"
             x-large
             color="orange lighten-4"
-            style="margin-left: 350px"
             :to="{ name: 'login' }"
             >LOG IN</v-btn
           >
         </v-col>
-        <v-col cols="6">
+        <v-col cols="7">
           <img src="~@/assets/img/guy-girl-in-library.png" width="100%" />
         </v-col>
       </v-row>
