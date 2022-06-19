@@ -7,17 +7,27 @@
       <v-col cols="12" md="6" sm="4">
         <v-text-field
           v-model="middleName"
-          :rules="[rules.singleCharacter]"
+          :rules="[rules.singleWord]"
           label="Middle Name"
           type="text"
           counter
         />
       </v-col>
       <v-col cols="12" md="6" sm="4">
-        <v-text-field v-model="lastName" label="Last Name" type="text" />
+        <v-text-field
+          v-model="lastName"
+          label="Last Name"
+          type="text"
+          :rules="[rules.singleWord]"
+        />
       </v-col>
       <v-col cols="12" md="6" sm="4">
-        <v-text-field v-model="email" label="E-mail" type="email" />
+        <v-text-field
+          v-model="email"
+          label="E-mail"
+          type="email"
+          :rules="[rules.singleWord]"
+        />
       </v-col>
       <v-col cols="12" md="8" sm="12">
         <v-text-field
@@ -36,7 +46,7 @@
 
 <script>
   import randomString from 'randomstring'
-  import { singleCharacter } from '~/utils/validators'
+  import { singleWord } from '~/utils/validators'
   export default {
     props: {
       edit: {
@@ -56,7 +66,7 @@
     },
     data() {
       return {
-        rules: { singleCharacter },
+        rules: { singleWord },
         dialog: false,
         valid: false,
         firstName: this.account.firstName,
