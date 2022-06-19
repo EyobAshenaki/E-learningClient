@@ -1,7 +1,7 @@
 <template>
   <DefaultLayout>
     <template #nav>
-      <GuestNav />
+      <div></div>
     </template>
   </DefaultLayout>
 </template>
