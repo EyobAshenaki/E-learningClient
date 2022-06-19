@@ -6,6 +6,7 @@
     style="
       background-image: linear-gradient(135deg, #0156d2, #d201bf);
       opacity: 0.8;
+      position: absolute;
     "
   >
     <v-col cols="12" class="mx-auto">
@@ -15,7 +16,7 @@
             class="text-h2 orange--text text--lighten-4"
             style="
               margin-top: 100px;
-              font-family: 'Lucida Handwriting', cursive;
+              font-family: 'Lucida Handwriting', cursive !important;
             "
           >
             Welcome To The AASTU <br />
@@ -26,15 +27,16 @@
             style="
               margin-top: 30px;
               margin-bottom: 100px;
-              font-family: 'Lucida Handwriting', cursive;
+              font-family: 'Lucida Handwriting', cursive !important;
             "
           >
-            Take the steps necessary to digitalize your learning experience
+            Take the steps necessary to digitalize your learning experience!
           </p>
           <v-btn
             elevation="24"
             x-large
             color="orange lighten-4"
+            style="font-family: 'Lucida Handwriting', cursive !important"
             :to="{ name: 'login' }"
             >LOG IN</v-btn
           >
