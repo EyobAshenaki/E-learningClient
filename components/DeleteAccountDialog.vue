@@ -16,7 +16,7 @@
       <v-card-actions>
         <v-btn color="error" :disabled="loading" :loading="loading" outlined @click="deleteAccount">Delete</v-btn>
         <v-spacer />
-        <v-btn text :loading="loading" @click.stop="dialog = false">Cancel</v-btn>
+        <v-btn text :disabled="loading" @click.stop="dialog = false">Cancel</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
