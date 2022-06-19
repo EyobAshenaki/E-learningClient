@@ -1,40 +1,29 @@
-export const ALL_STUDENTS = `#graphql
-query {
-  users {
-    id
-    firstName
-    middleName
-    lastName
-    email
-    roles {
-      name
-    }
-    attendingClass{
-      id
-      year
-      section
-    }
-  }
-}`
-
-export const ALL_TEACHERS = `#graphql
-query {
-  users {
-    id
-    firstName
-    middleName
-    lastName
-    email
-    roles {
-      name
-    }
-    attendingClass{
-      id
-      year
-      section
-    }
-  }
-}`
+function usersQuery(rolenameFilter) {
+  return `#graphql
+    query {
+      users (filter: {
+        roleName: ${rolenameFilter ?? null}
+      }){
+        id
+        firstName
+        middleName
+        lastName
+        email
+        roles {
+          name
+        }
+        attendingClass{
+          id
+          year
+          section
+        }
+      }
+  }`
+}
+export const ALL_STUDENTS = usersQuery('STUDENT')
+export const ALL_TEACHERS = usersQuery('TEACHER')
+export const ALL_COURSE_MANAGERS = usersQuery('COURSE_MANAGER')
+export const ALL_USERS = usersQuery(null)
 
 export const CREATE_USER = `#graphql
 mutation ($firstName: String!, 
