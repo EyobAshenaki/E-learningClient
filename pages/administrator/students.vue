@@ -9,8 +9,8 @@
       <v-data-table v-else :headers="headers" :items="students" sort-by="id">
         <template #top><AddStudentDialog @complete="$fetch" /></template>
         <template #item.actions="{ item }">
-          <EditAccountDialog :account="item" />
-          <DeleteAccountDialog :account="item" />
+          <EditAccountDialog :account="item" @update:account="$fetch"/>
+          <DeleteAccountDialog :account="item" @update:account="$fetch" />
         </template>
       </v-data-table>
     </v-card-text>

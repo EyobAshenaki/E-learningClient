@@ -11,9 +11,9 @@
         <account-form ref="accountForm" :account="account" />
       </v-card-text>
       <v-card-actions>
-        <v-btn color="primary" outlined @click="updateAccount">Save</v-btn>
+        <v-btn color="primary" outlined :loading="loading" :disabled="loading" @click="updateAccount">Save</v-btn>
         <v-spacer />
-        <v-btn text @click.stop="dialog = false">Cancel</v-btn>
+        <v-btn text :disabled="loading" @click.stop="dialog = false">Cancel</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -21,6 +21,7 @@
 
 <script>
   import AccountForm from './AccountForm.vue'
+  import { UPDATE_USER } from '~/utils/queries'
 
   export default {
     components: { AccountForm },
@@ -28,7 +29,7 @@
       account: {
         type: Object,
         default: () => ({
-          dbId: '',
+          id: '',
           email: '',
           firstName: '',
           lastName: '',
@@ -39,17 +40,43 @@
     },
     data() {
       return {
+        loading: false,
         dialog: false,
       }
     },
     methods: {
-      updateAccount() {
+      async updateAccount() {
         const account = this.$refs.accountForm.submit()
         if (account !== undefined) {
           try {
-            // call api to update
+            const { email, firstName, middleName, lastName } = account
+            this.loading = true
+            await this.$axios
+              .post('/graphql', {
+                query: UPDATE_USER,
+                variables: {
+                  id: this.account.id,
+                  email,
+                  firstName,
+                  middleName,
+                  lastName,
+                },
+              })
+              .then(({ data }) => {
+                if (data.errors) {
+                  throw data.errors
+                }
+              })
+            this.$emit('update:account')
+            this.$toast.success('Account updated successfully')
           } catch (error) {
+            if (error.isAxiosError && error.response) {
+              this.$toast.error(error.response.data.errors[0].message)
+            } else {
+              this.$toast.error(error)
+            }
           } finally {
+            this.loading = false
             this.dialog = false
           }
         }
