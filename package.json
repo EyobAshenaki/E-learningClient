@@ -22,6 +22,7 @@
     "core-js": "^3.19.3",
     "dotenv": "^16.0.1",
     "minify-css-string": "^1.0.0",
+    "moment": "^2.29.3",
     "nuxt": "^2.15.8",
     "randomstring": "^1.2.2",
     "vue": "^2.6.14",

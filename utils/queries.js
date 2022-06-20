@@ -99,3 +99,15 @@ export function multipleUserCreate(roleName, password) {
     map: `{"0": ["variables.file"]}`,
   }
 }
+
+export const OWNED_COURSES = `#graphql
+  query ($userId: ID!){
+    user(id: $userId) {
+      ownedCourses {
+        id 
+        code
+        name
+      }
+    }
+  }
+`
