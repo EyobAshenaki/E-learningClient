@@ -88,7 +88,9 @@ export default function () {
       },
       minifyTheme,
     },
-
+    publicRuntimeConfig: {
+      baseUrl: process.env.BASE_URL
+    },
     // Build Configuration: https://go.nuxtjs.dev/config-build
     build: {
       optimizeCss: true,
