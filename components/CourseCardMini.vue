@@ -26,7 +26,7 @@
                 <v-btn-toggle>
                   <v-btn
                     nuxt
-                    :to="`${$route.path}/course-documents/${course.id}/`"
+                    :to="`${$route.path}/${course.id}/course-documents`"
                   >
                     <!-- todo tooltip -->
                     <!-- @click="assignCourseTeacher(course.id)"
