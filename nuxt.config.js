@@ -23,7 +23,7 @@ export default function () {
     css: ['~/assets/styles/main.scss'],
 
     // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-    plugins: ['~/plugins/vuex-persist.client', '~/plugins/toast'],
+    plugins: ['~/plugins/vuex-persist', '~/plugins/toast'],
 
     // Auto import components: https://go.nuxtjs.dev/config-components
     components: true,
