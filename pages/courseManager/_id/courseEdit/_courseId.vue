@@ -376,52 +376,52 @@
 </template>
 
 <script>
-export default {
-  layout: 'courseManager',
+  export default {
+    layout: 'courseManager',
 
-  data() {
-    return {
-      course: null,
-      teachers: [],
-      owner: null,
-      courseId: this.$nuxt.context.params.courseId,
-      overviewPanel: [0, 1],
-      editedIndex: -1,
-      editedChapter: {
-        title: '',
-        sequenceNumber: 0,
-      },
-      defaultChapter: {
-        title: '',
-        sequenceNumber: 0,
-      },
-      chapterDialog: false,
-      deleteChapterDialog: false,
-      assignTeacherDialog: false,
-      courseDeleteDialog: false,
-      editLoading: false,
-      createChapterLoading: false,
-      deleteChapterLoading: false,
-      unassignedTeachers: [],
-      teacherTypes: [],
-      selectedTeacher: '',
-      selectedTeacherType: '',
-    }
-  },
-
-  computed: {
-    chapterFormTitle() {
-      return this.editedIndex === -1 ? 'New Chapter' : 'Edit Chapter'
+    data() {
+      return {
+        course: null,
+        teachers: [],
+        owner: null,
+        courseId: this.$nuxt.context.params.courseId,
+        overviewPanel: [0, 1],
+        editedIndex: -1,
+        editedChapter: {
+          title: '',
+          sequenceNumber: 0,
+        },
+        defaultChapter: {
+          title: '',
+          sequenceNumber: 0,
+        },
+        chapterDialog: false,
+        deleteChapterDialog: false,
+        assignTeacherDialog: false,
+        courseDeleteDialog: false,
+        editLoading: false,
+        createChapterLoading: false,
+        deleteChapterLoading: false,
+        unassignedTeachers: [],
+        teacherTypes: [],
+        selectedTeacher: '',
+        selectedTeacherType: '',
+      }
     },
-  },
 
-  created() {
-    this.initialize()
-  },
+    computed: {
+      chapterFormTitle() {
+        return this.editedIndex === -1 ? 'New Chapter' : 'Edit Chapter'
+      },
+    },
 
-  methods: {
-    async initialize() {
-      const query = `query course($id: ID!) {
+    created() {
+      this.initialize()
+    },
+
+    methods: {
+      async initialize() {
+        const query = `query course($id: ID!) {
                       course(id: $id) {
                         id
                         code
@@ -457,21 +457,22 @@ export default {
                       }
                     }`
 
-      const variables = { id: this.courseId }
+        const variables = { id: this.courseId }
 
-      const courseResponse = await this.$axios.post('/graphql', {
-        query,
-        variables,
-      })
+        const courseResponse = await this.$axios.post('/graphql', {
+          query,
+          variables,
+        })
 
-      this.course = courseResponse.data.data.course
-      this.teachers = courseResponse.data.data.course.teachers
-      this.owner = courseResponse.data.data.course.owner
-    },
+        this.course = courseResponse.data.data.course
+        this.teachers = courseResponse.data.data.course.teachers
+        this.owner = courseResponse.data.data.course.owner
+        console.log(courseResponse)
+      },
 
-    async editCourse() {
-      this.editLoading = true
-      const query = `mutation updateCourse(
+      async editCourse() {
+        this.editLoading = true
+        const query = `mutation updateCourse(
                       $id: ID!
                       $code: String
                       $name: String
@@ -498,92 +499,92 @@ export default {
                       }
                     }`
 
-      const variables = {
-        id: this.courseId,
-        code: this.course.code,
-        name: this.course.name,
-        description: this.course.description,
-        overview: this.course.overview,
-        creditHour: parseInt(this.course.creditHour),
-      }
+        const variables = {
+          id: this.courseId,
+          code: this.course.code,
+          name: this.course.name,
+          description: this.course.description,
+          overview: this.course.overview,
+          creditHour: parseInt(this.course.creditHour),
+        }
 
-      await this.$axios.post('/graphql', {
-        query,
-        variables,
-      })
-
-      this.editLoading = false
-    },
-
-    deleteCourse() {
-      this.courseDeleteDialog = true
-    },
-
-    deleteCourseClose(isCourseRemoved) {
-      if (!isCourseRemoved) {
-        this.courseDeleteDialog = false
-        return null
-      }
-
-      this.$nextTick(() => {
-        this.courseDeleteDialog = false
-        this.$router.push({
-          name: 'courseManager-id',
-          params: { id: this.$nuxt.context.params.userId },
+        await this.$axios.post('/graphql', {
+          query,
+          variables,
         })
-      })
-    },
 
-    async deleteCourseConfirm() {
-      const query = `mutation removeCourse($id: ID!) {
+        this.editLoading = false
+      },
+
+      deleteCourse() {
+        this.courseDeleteDialog = true
+      },
+
+      deleteCourseClose(isCourseRemoved) {
+        if (!isCourseRemoved) {
+          this.courseDeleteDialog = false
+          return null
+        }
+
+        this.$nextTick(() => {
+          this.courseDeleteDialog = false
+          this.$router.push({
+            name: 'courseManager-id',
+            params: { id: this.$nuxt.context.params.userId },
+          })
+        })
+      },
+
+      async deleteCourseConfirm() {
+        const query = `mutation removeCourse($id: ID!) {
                       removeCourse(id: $id)
                     }`
-      const variables = {
-        id: this.courseId,
-      }
+        const variables = {
+          id: this.courseId,
+        }
 
-      const removeCourseResponse = await this.$axios.post('/graphql', {
-        query,
-        variables,
-      })
+        const removeCourseResponse = await this.$axios.post('/graphql', {
+          query,
+          variables,
+        })
 
-      const isCourseRemoved = removeCourseResponse.data.data.removeCourse
+        const isCourseRemoved = removeCourseResponse.data.data.removeCourse
 
-      if (isCourseRemoved) this.deleteCourseClose(true)
+        if (isCourseRemoved) this.deleteCourseClose(true)
 
-      this.deleteCourseClose(false)
-    },
+        this.deleteCourseClose(false)
+      },
 
-    addChapter() {
-      this.chapterDialog = true
-      this.createChapterLoading = true
-    },
+      addChapter() {
+        this.chapterDialog = true
+        this.createChapterLoading = true
+      },
 
-    editChapter(chapter) {
-      this.editedIndex = chapter.id
-      this.editedChapter = Object.assign({}, chapter)
-      this.chapterDialog = true
-    },
+      editChapter(chapter) {
+        this.editedIndex = chapter.id
+        this.editedChapter = Object.assign({}, chapter)
+        this.chapterDialog = true
+      },
 
-    deleteChapter(chapter) {
-      this.editedIndex = chapter.id
-      this.deleteChapterDialog = true
-      this.deleteChapterLoading = true
-    },
+      deleteChapter(chapter) {
+        this.editedIndex = chapter.id
+        this.deleteChapterDialog = true
+        this.deleteChapterLoading = true
+      },
 
-    closeAddChapter() {
-      this.chapterDialog = false
-      this.$nextTick(() => {
-        this.editedChapter = Object.assign({}, this.defaultChapter)
-        this.editedIndex = -1
-        this.createChapterLoading = false
-      })
-    },
+      closeAddChapter() {
+        this.chapterDialog = false
+        this.$nextTick(() => {
+          this.editedChapter = Object.assign({}, this.defaultChapter)
+          this.editedIndex = -1
+          this.createChapterLoading = false
+        })
+      },
 
-    async confirmAddChapter() {
-      if (this.editedIndex !== -1) {
-        // Edit Chapter with an id of this.editedIndex
-        const updateChapterQuery = `mutation updateChapter($id: ID!, $title: String, $sequenceNumber: Int) {
+      async confirmAddChapter() {
+        if (this.editedIndex !== -1) {
+          // Edit Chapter with an id of this.editedIndex
+          const updateChapterQuery = `mutation updateChapter($id: ID!, $title: String, $sequenceNumber: Int) {
                                       updateChapter(
                                         updateChapterInput: {
                                           id: $id
@@ -596,19 +597,19 @@ export default {
                                         sequenceNumber
                                       }
                                     }`
-        const updateChapterVariables = {
-          id: this.editedIndex,
-          title: this.editedChapter.title,
-          sequenceNumber: parseInt(this.editedChapter.sequenceNumber),
-        }
+          const updateChapterVariables = {
+            id: this.editedIndex,
+            title: this.editedChapter.title,
+            sequenceNumber: parseInt(this.editedChapter.sequenceNumber),
+          }
 
-        await this.$axios.post('/graphql', {
-          query: updateChapterQuery,
-          variables: updateChapterVariables,
-        })
-      } else {
-        // Create a new Chapter
-        const createChapterQuery = `mutation createChapter($title: String!, $sequenceNumber: Int!, $courseId: ID!) {
+          await this.$axios.post('/graphql', {
+            query: updateChapterQuery,
+            variables: updateChapterVariables,
+          })
+        } else {
+          // Create a new Chapter
+          const createChapterQuery = `mutation createChapter($title: String!, $sequenceNumber: Int!, $courseId: ID!) {
                                       createChapter(
                                         createChapterInput: {
                                           title: $title
@@ -622,54 +623,54 @@ export default {
                                       }
                                     }`
 
-        const createChapterVariables = {
-          title: this.editedChapter.title,
-          sequenceNumber: parseInt(this.editedChapter.sequenceNumber),
-          courseId: this.courseId,
+          const createChapterVariables = {
+            title: this.editedChapter.title,
+            sequenceNumber: parseInt(this.editedChapter.sequenceNumber),
+            courseId: this.courseId,
+          }
+
+          await this.$axios.post('/graphql', {
+            query: createChapterQuery,
+            variables: createChapterVariables,
+          })
         }
 
-        await this.$axios.post('/graphql', {
-          query: createChapterQuery,
-          variables: createChapterVariables,
+        this.initialize()
+        this.closeAddChapter()
+      },
+
+      closeDeleteChapter(isChapterRemoved) {
+        this.deleteChapterDialog = false
+
+        this.$nextTick(() => {
+          this.editedIndex = -1
+          this.deleteChapterLoading = false
+          if (isChapterRemoved) this.initialize()
         })
-      }
+      },
 
-      this.initialize()
-      this.closeAddChapter()
-    },
-
-    closeDeleteChapter(isChapterRemoved) {
-      this.deleteChapterDialog = false
-
-      this.$nextTick(() => {
-        this.editedIndex = -1
-        this.deleteChapterLoading = false
-        if (isChapterRemoved) this.initialize()
-      })
-    },
-
-    async confirmDeleteChapter() {
-      const query = `mutation removeChapter($id: ID!) {
+      async confirmDeleteChapter() {
+        const query = `mutation removeChapter($id: ID!) {
                       removeChapter(id: $id)
                     }`
 
-      const variables = {
-        id: this.editedIndex,
-      }
+        const variables = {
+          id: this.editedIndex,
+        }
 
-      const removeChaperResponse = await this.$axios.post('/graphql', {
-        query,
-        variables,
-      })
+        const removeChaperResponse = await this.$axios.post('/graphql', {
+          query,
+          variables,
+        })
 
-      const isChapterRemoved = removeChaperResponse.data.data.removeChapter
+        const isChapterRemoved = removeChaperResponse.data.data.removeChapter
 
-      if (isChapterRemoved) this.closeDeleteChapter(true)
-      else this.closeDeleteChapter(false)
-    },
+        if (isChapterRemoved) this.closeDeleteChapter(true)
+        else this.closeDeleteChapter(false)
+      },
 
-    async getUsersWithRole(role) {
-      const query = `query users($filter: UserFilter) {
+      async getUsersWithRole(role) {
+        const query = `query users($filter: UserFilter) {
                       users(filter: $filter) {
                         id
                         firstName
@@ -688,97 +689,97 @@ export default {
                       }
                     }`
 
-      const variables = {
-        filter: {
-          roleName: this.getRoleName(role),
-        },
-      }
-
-      const userResponse = await this.$axios.post('/graphql', {
-        query,
-        variables,
-      })
-
-      return userResponse.data.data.users
-    },
-
-    getRoleName(role) {
-      const tempRole = role.split(' ')
-      return tempRole.length > 1
-        ? `${tempRole[0].toUpperCase()}_${tempRole[1].toUpperCase()}`
-        : `${tempRole[0].toUpperCase()}`
-    },
-
-    async getTeachers() {
-      const roles = ['Teacher', 'Course Owner', 'Course Teacher']
-      const teachers = []
-
-      for (const role of roles) {
-        const users = await this.getUsersWithRole(role)
-
-        if (users === null) break
-
-        let duplicateFlag = false
-        for (const user of users) {
-          for (const teacher of teachers) {
-            if (user.id === teacher.id) {
-              duplicateFlag = true
-              break
-            }
-          }
-          if (!duplicateFlag) teachers.push(user)
-        }
-      }
-
-      return teachers
-    },
-
-    async assignCourseTeacher() {
-      this.assignTeacherDialog = true
-
-      this.teacherTypes = ['Course Owner', 'Course Teacher']
-
-      const allTeachers = await this.getTeachers()
-
-      this.unassignedTeachers = allTeachers
-        .filter((teacher) => {
-          return !this.teachers.map((teach) => teach.id).includes(teacher.id)
-        })
-        .filter((teacher) => {
-          return this.owner.id !== teacher.id
-        })
-        .map((unassignedTeacher) => {
-          return {
-            unassignedTeacherFullName: `${unassignedTeacher.firstName} ${unassignedTeacher.middleName} ${unassignedTeacher.lastName}`,
-            unassignedTeacher,
-          }
-        })
-    },
-
-    async removeCourseTeacher(teacherId, teacherType) {
-      if (teacherType === 'teacher') {
-        const query = `mutation unassignTeacherFromCourse($courseId: ID!, $teacherId: ID!) {
-                        unassignTeacherFromCourse(courseId: $courseId, teacherId: $teacherId)
-                      }`
-
         const variables = {
-          teacherId,
-          courseId: this.courseId,
+          filter: {
+            roleName: this.getRoleName(role),
+          },
         }
 
-        const unassignedTeacherResponse = await this.$axios.post('/graphql', {
+        const userResponse = await this.$axios.post('/graphql', {
           query,
           variables,
         })
 
-        const unassignedTeacher =
-          unassignedTeacherResponse.data.data.unassignTeacherFromCourse
+        return userResponse.data.data.users
+      },
 
-        console.log('unassign teacher', unassignedTeacher)
+      getRoleName(role) {
+        const tempRole = role.split(' ')
+        return tempRole.length > 1
+          ? `${tempRole[0].toUpperCase()}_${tempRole[1].toUpperCase()}`
+          : `${tempRole[0].toUpperCase()}`
+      },
 
-        if (unassignedTeacher) {
-          // Then revoke 'teacher' Role from assigned user
-          const revokeUserRoleQuery = `mutation revokeUserRole ($userId: ID! $roleName: RoleName!) {
+      async getTeachers() {
+        const roles = ['Teacher', 'Course Owner', 'Course Teacher']
+        const teachers = []
+
+        for (const role of roles) {
+          const users = await this.getUsersWithRole(role)
+
+          if (users === null) break
+
+          let duplicateFlag = false
+          for (const user of users) {
+            for (const teacher of teachers) {
+              if (user.id === teacher.id) {
+                duplicateFlag = true
+                break
+              }
+            }
+            if (!duplicateFlag) teachers.push(user)
+          }
+        }
+
+        return teachers
+      },
+
+      async assignCourseTeacher() {
+        this.assignTeacherDialog = true
+
+        this.teacherTypes = ['Course Owner', 'Course Teacher']
+
+        const allTeachers = await this.getTeachers()
+
+        this.unassignedTeachers = allTeachers
+          .filter((teacher) => {
+            return !this.teachers.map((teach) => teach.id).includes(teacher.id)
+          })
+          .filter((teacher) => {
+            return this.owner?.id !== teacher.id
+          })
+          .map((unassignedTeacher) => {
+            return {
+              unassignedTeacherFullName: `${unassignedTeacher.firstName} ${unassignedTeacher.middleName} ${unassignedTeacher.lastName}`,
+              unassignedTeacher,
+            }
+          })
+      },
+
+      async removeCourseTeacher(teacherId, teacherType) {
+        if (teacherType === 'teacher') {
+          const query = `mutation unassignTeacherFromCourse($courseId: ID!, $teacherId: ID!) {
+                        unassignTeacherFromCourse(courseId: $courseId, teacherId: $teacherId)
+                      }`
+
+          const variables = {
+            teacherId,
+            courseId: this.courseId,
+          }
+
+          const unassignedTeacherResponse = await this.$axios.post('/graphql', {
+            query,
+            variables,
+          })
+
+          const unassignedTeacher =
+            unassignedTeacherResponse.data.data.unassignTeacherFromCourse
+
+          console.log('unassign teacher', unassignedTeacher)
+
+          if (unassignedTeacher) {
+            // Then revoke 'teacher' Role from assigned user
+            const revokeUserRoleQuery = `mutation revokeUserRole ($userId: ID! $roleName: RoleName!) {
                                       revokeUserRole (userId: $userId roleName: $roleName) {
                                         id
                                         roles {
@@ -788,58 +789,58 @@ export default {
                                       }
                                     }`
 
-          const revokeUserRoleVariables = {
-            userId: this.selectedTeacher.id,
-            roleName: 'COURSE_TEACHER',
+            const revokeUserRoleVariables = {
+              userId: this.selectedTeacher.id,
+              roleName: 'COURSE_TEACHER',
+            }
+
+            const revokeUserRoleResponse = await this.$axios.post('/graphql', {
+              query: revokeUserRoleQuery,
+              variables: revokeUserRoleVariables,
+            })
+
+            const revokeUserRoles =
+              revokeUserRoleResponse.data.data.revokeUserRole.roles.map(
+                (role) => role.name
+              )
+
+            console.log('revokeUserRoleResponse', revokeUserRoles)
           }
-
-          const revokeUserRoleResponse = await this.$axios.post('/graphql', {
-            query: revokeUserRoleQuery,
-            variables: revokeUserRoleVariables,
-          })
-
-          const revokeUserRoles =
-            revokeUserRoleResponse.data.data.revokeUserRole.roles.map(
-              (role) => role.name
-            )
-
-          console.log('revokeUserRoleResponse', revokeUserRoles)
-        }
-      } else if (teacherType === 'owner') {
-        const query = `mutation unassignOwnerFromCourse($courseId: ID!, $ownerId: ID!) {
+        } else if (teacherType === 'owner') {
+          const query = `mutation unassignOwnerFromCourse($courseId: ID!, $ownerId: ID!) {
                         unassignOwnerFromCourse(courseId: $courseId, ownerId: $ownerId)
                       }`
 
-        const variables = {
-          ownerId: teacherId,
-          courseId: this.courseId,
+          const variables = {
+            ownerId: teacherId,
+            courseId: this.courseId,
+          }
+
+          const unassignedOwnerResponse = await this.$axios.post('/graphql', {
+            query,
+            variables,
+          })
+
+          const unassignedOwner =
+            unassignedOwnerResponse.data.data.unassignUserFromCourse
+
+          console.log('unassign owner', unassignedOwner)
         }
 
-        const unassignedOwnerResponse = await this.$axios.post('/graphql', {
-          query,
-          variables,
+        this.initialize()
+      },
+
+      assignCourseTeacherClose() {
+        this.assignTeacherDialog = false
+
+        this.$nextTick(() => {
+          this.selectedTeacher = ''
+          this.selectedTeacherType = ''
         })
+      },
 
-        const unassignedOwner =
-          unassignedOwnerResponse.data.data.unassignUserFromCourse
-
-        console.log('unassign owner', unassignedOwner)
-      }
-
-      this.initialize()
-    },
-
-    assignCourseTeacherClose() {
-      this.assignTeacherDialog = false
-
-      this.$nextTick(() => {
-        this.selectedTeacher = ''
-        this.selectedTeacherType = ''
-      })
-    },
-
-    async doesUserContainRole(userId, roleName) {
-      const query = `query user($id: ID!) {
+      async doesUserContainRole(userId, roleName) {
+        const query = `query user($id: ID!) {
                         user(id: $id) {
                           roles {
                             name
@@ -847,38 +848,38 @@ export default {
                         }
                       }`
 
-      const variables = {
-        id: userId,
-      }
+        const variables = {
+          id: userId,
+        }
 
-      const userResponse = await this.$axios.post('/graphql', {
-        query,
-        variables,
-      })
+        const userResponse = await this.$axios.post('/graphql', {
+          query,
+          variables,
+        })
 
-      const selectedTeacherRoles = userResponse.data.data.user.roles.map(
-        (role) => role.name
-      )
-
-      console.log(selectedTeacherRoles)
-
-      if (selectedTeacherRoles.includes(roleName)) return true
-
-      return false
-    },
-
-    async assignCourseTeacherConfirm() {
-      const assignedRole = this.getRoleName(this.selectedTeacherType)
-
-      if (assignedRole === 'COURSE_TEACHER') {
-        const doesContain = await this.doesUserContainRole(
-          this.selectedTeacher.id,
-          'COURSE_TEACHER'
+        const selectedTeacherRoles = userResponse.data.data.user.roles.map(
+          (role) => role.name
         )
 
-        if (!doesContain) {
-          // Change role to selectedTeacherType using Update user
-          const changeUserRoleQuery = `mutation updateUser ($id: ID! $roleName: RoleName) {
+        console.log(selectedTeacherRoles)
+
+        if (selectedTeacherRoles.includes(roleName)) return true
+
+        return false
+      },
+
+      async assignCourseTeacherConfirm() {
+        const assignedRole = this.getRoleName(this.selectedTeacherType)
+
+        if (assignedRole === 'COURSE_TEACHER') {
+          const doesContain = await this.doesUserContainRole(
+            this.selectedTeacher.id,
+            'COURSE_TEACHER'
+          )
+
+          if (!doesContain) {
+            // Change role to selectedTeacherType using Update user
+            const changeUserRoleQuery = `mutation updateUser ($id: ID! $roleName: RoleName) {
                                         updateUser (updateUserInput: {id: $id roleName: $roleName}) {
                                           id
                                           roles {
@@ -887,59 +888,59 @@ export default {
                                           }
                                         }
                                       }`
-          const changeUserRoleVariables = {
-            id: this.selectedTeacher.id,
-            roleName: assignedRole,
+            const changeUserRoleVariables = {
+              id: this.selectedTeacher.id,
+              roleName: assignedRole,
+            }
+
+            await this.$axios.post('/graphql', {
+              query: changeUserRoleQuery,
+              variables: changeUserRoleVariables,
+            })
           }
 
-          await this.$axios.post('/graphql', {
-            query: changeUserRoleQuery,
-            variables: changeUserRoleVariables,
-          })
-        }
-
-        const query = `mutation assignTeacherToCourse ($courseId: ID! $teacherId: ID!) {
+          const query = `mutation assignTeacherToCourse ($courseId: ID! $teacherId: ID!) {
                         assignTeacherToCourse (courseId: $courseId teacherId: $teacherId)
                       }`
 
-        const variables = {
-          teacherId: this.selectedTeacher.id,
-          courseId: this.courseId,
-        }
+          const variables = {
+            teacherId: this.selectedTeacher.id,
+            courseId: this.courseId,
+          }
 
-        const assignTeacherResponse = await this.$axios.post('/graphql', {
-          query,
-          variables,
-        })
+          const assignTeacherResponse = await this.$axios.post('/graphql', {
+            query,
+            variables,
+          })
 
-        const isTeacherAssigned =
-          assignTeacherResponse.data.data.assignTeacherToCourse
+          const isTeacherAssigned =
+            assignTeacherResponse.data.data.assignTeacherToCourse
 
-        console.log('assign teacher ', isTeacherAssigned)
-      } else if (assignedRole === 'COURSE_OWNER') {
-        const query = `mutation assignOwnerToCourse($courseId: ID!, $ownerId: ID!) {
+          console.log('assign teacher ', isTeacherAssigned)
+        } else if (assignedRole === 'COURSE_OWNER') {
+          const query = `mutation assignOwnerToCourse($courseId: ID!, $ownerId: ID!) {
                         assignOwnerToCourse(courseId: $courseId, ownerId: $ownerId)
                       }`
 
-        const variables = {
-          ownerId: this.selectedTeacher.id,
-          courseId: this.courseId,
+          const variables = {
+            ownerId: this.selectedTeacher.id,
+            courseId: this.courseId,
+          }
+
+          const assignOwnerResponse = await this.$axios.post('/graphql', {
+            query,
+            variables,
+          })
+
+          const isOwnerAssigned =
+            assignOwnerResponse.data.data.assignOwnerToCourse
+
+          console.log('assign owner ', isOwnerAssigned)
         }
 
-        const assignOwnerResponse = await this.$axios.post('/graphql', {
-          query,
-          variables,
-        })
-
-        const isOwnerAssigned =
-          assignOwnerResponse.data.data.assignOwnerToCourse
-
-        console.log('assign owner ', isOwnerAssigned)
-      }
-
-      this.initialize()
-      this.assignCourseTeacherClose()
+        this.initialize()
+        this.assignCourseTeacherClose()
+      },
     },
-  },
-}
+  }
 </script>
