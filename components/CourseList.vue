@@ -18,12 +18,11 @@
     data() {
       return { courses: [] }
     },
-    created() {
-      // todo! replace 'f8263dd9-060f-4449-a568-9d7c90b16172' with current
-      //! logged-in course onwer user
-      this.$store.dispatch(
+    fetchOnServer:false,
+    async fetch() {
+     await this.$store.dispatch(
         'course-management/fetchCourseOwner',
-        'f8263dd9-060f-4449-a568-9d7c90b16172'
+        this.$store.getters['auth/id']
       )
       const owner = this.$store.getters['course-management/getCourseOwner']
       this.courses = owner?.ownedCourses
