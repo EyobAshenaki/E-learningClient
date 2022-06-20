@@ -84,6 +84,26 @@ mutation ($firstName: String,
     }
 }
 `
+export const CREATE_QUIZ = `#graphql
+  mutation ($title: String! $start: Date!, $end: Date!, $duration: Int!, $maxScore: Int! $sections: [CreateQuizSectionInput]! $courseId: ID!) {
+    createQuiz(input: {
+        title: $title
+        start: $start
+        end: $end
+        duration: $duration
+        sections: $sections
+        maxScore: $maxScore,
+        courseId: $courseId
+    }) {
+        id
+        title
+        description
+        start
+        end
+        duration
+    }
+}
+`
 
 export function multipleUserCreate(roleName, password) {
   return {
