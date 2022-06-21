@@ -23,6 +23,8 @@ function usersQuery(rolenameFilter) {
 export const ALL_STUDENTS = usersQuery('STUDENT')
 export const ALL_TEACHERS = usersQuery('TEACHER')
 export const ALL_COURSE_MANAGERS = usersQuery('COURSE_MANAGER')
+export const ALL_COURSE_TEACHERS = usersQuery('COURSE_TEACHER')
+export const ALL_COURSE_OWNERS = usersQuery('COURSE_OWNER')
 export const ALL_USERS = usersQuery(null)
 
 export const REMOVE_USER = `#graphql
@@ -128,6 +130,32 @@ export const OWNED_COURSES = `#graphql
         code
         name
       }
+    }
+  }
+`
+export const ALL_COURSES = `#graphql
+  query courses {
+    courses {
+      id
+      name
+      code
+      description
+      overview
+      creditHour
+      chapters {
+        id
+        title
+        sequenceNumber
+      }
+    }
+  }
+`
+
+export const ALL_DEPARTMENTS = `#graphql
+  query departments {
+    departments {
+      id
+      name
     }
   }
 `

@@ -18,6 +18,12 @@ export const getters = {
   isAdmin(state) {
     return !!state?.user?.roles.includes('ADMINISTRATOR')
   },
+  isCourseManager(state) {
+    return !!state?.user?.roles.includes('COURSE_MANAGER')
+  },
+  user(state) {
+    return state?.user
+  },
   roles(state) {
     return state.user ? state.user.roles : []
   },

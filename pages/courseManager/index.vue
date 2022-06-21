@@ -19,7 +19,11 @@
                   </v-col>
                   <v-col v-if="user" cols="11" class="py-0">
                     <p
-                      class="orange--text text--darken-4 text-h4 text-left font-weight-medium"
+                      class="
+                        orange--text
+                        text--darken-4 text-h4 text-left
+                        font-weight-medium
+                      "
                     >
                       {{ user.firstName }}
                     </p>
@@ -29,7 +33,7 @@
               <v-col cols="6">
                 <img
                   style="height: 120%; margin-top: -3.3em"
-                  src="../../../assets/img/tourist-welcome.svg"
+                  src="@/assets/img/tourist-welcome.svg"
                   alt=""
                 />
               </v-col>
@@ -47,7 +51,13 @@
                 >
                 <v-spacer></v-spacer>
                 <v-col cols="4" class="d-flex justify-end">
-                  <v-btn outlined color="orange darken-4" @click="createCourse">
+                  <v-btn
+                    dark
+                    text
+                    outlined
+                    class="orange darken-4"
+                    @click="createCourse"
+                  >
                     Create Course
                   </v-btn>
                 </v-col>
@@ -97,7 +107,7 @@
                               </v-btn>
 
                               <v-btn
-                                @click="goToCourseEdit(course.id)"
+                                :to="`${$route.path}/courseEdit/${course.id}`"
                                 @mouseenter="editEnter($event)"
                                 @mouseleave="leaveBtn()"
                               >
@@ -272,7 +282,7 @@
                               <v-card-actions
                                 class="pb-4 px-6 d-flex justify-space-between"
                               >
-                                <v-btn @click="assignCourseTeacherClose"
+                                <v-btn @click="assignTeacherDialog = false"
                                   >Cancel</v-btn
                                 >
                                 <v-btn @click="assignCourseTeacherConfirm"
@@ -301,7 +311,9 @@
                           </v-list-item-avatar>
                           <v-list-item-content>
                             <v-list-item-title>
-                              {{ course.chapters.length }}
+                              {{
+                                course.chapters ? course.chapters.length : ''
+                              }}
                             </v-list-item-title>
                             <v-list-item-subtitle>
                               Chapters
@@ -342,7 +354,10 @@
               Teachers
             </v-col>
             <v-col cols="6" class="d-flex justify-end">
-              <v-btn text color="orange darken-4" @click="goToTeachersPage"
+              <v-btn
+                text
+                color="orange darken-4"
+                :to="`${$route.path}/teachers`"
                 >View all</v-btn
               >
             </v-col>
@@ -378,12 +393,24 @@
 </template>
 
 <script>
+  import { mapGetters } from 'vuex'
+  import { uniqBy } from 'lodash'
+  import {
+    ALL_COURSES,
+    ALL_COURSE_OWNERS,
+    ALL_COURSE_TEACHERS,
+    ALL_TEACHERS,
+    ALL_DEPARTMENTS,
+  } from '~/utils/queries'
   export default {
     layout: 'courseManager',
-
+    async fetch() {
+      this.courses = await this.initializeCourses()
+      this.teachers = await this.initializeTeachers()
+      this.departments = await this.initializeDepartments()
+    },
     data() {
       return {
-        user: null,
         courses: [],
         teachers: [],
         departments: [],
@@ -419,6 +446,9 @@
     },
 
     computed: {
+      ...mapGetters({
+        user: 'auth/user',
+      }),
       tooltipText() {
         if (this.tooltipValue === 'assign') return 'Assign Teacher'
         else if (this.tooltipValue === 'edit') return 'Edit Course'
@@ -426,148 +456,38 @@
         else return null
       },
     },
-
-    created() {
-      this.initializeUser()
-      this.initializeCourses()
-      this.initializeTeachers()
-      this.initializeDepartments()
-    },
-
     methods: {
-      async initializeUser() {
-        const query = `query user ($id: ID!) {
-                      user (id: $id) {
-                        id
-                        firstName
-                        middleName
-                        lastName
-                      }
-                    }`
-
-        const variables = {
-          id: this.$nuxt.context.params.id,
-        }
-
-        const userResponse = await this.$axios.post('/graphql', {
-          query,
-          variables,
-        })
-
-        this.user = userResponse.data.data.user
+      initializeCourses() {
+        return this.$axios
+          .post('/graphql', {
+            query: ALL_COURSES,
+          })
+          .then(({ data }) => data.data.courses)
       },
-
-      async initializeCourses() {
-        const query = `query courses {
-                      courses {
-                        id
-                        name
-                        code
-                        description
-                        overview
-                        creditHour
-                        chapters {
-                          id
-                          title
-                          sequenceNumber
-                        }
-                      }
-                    }`
-
-        const response = await this.$axios.post('/graphql', {
-          query,
-        })
-
-        this.courses = [...response.data.data.courses]
-      },
-
       async initializeTeachers() {
-        this.teachers = JSON.parse(JSON.stringify(await this.getTeachers()))
+        const teachers = await this.$axios
+          .post('/graphql', {
+            query: ALL_TEACHERS,
+          })
+          .then(({ data }) => data.data.users ?? [])
+        const courseTeachers = await this.$axios
+          .post('/graphql', {
+            query: ALL_COURSE_TEACHERS,
+          })
+          .then(({ data }) => data.data.users ?? [])
+        const courseOwners = await this.$axios
+          .post('/graphql', {
+            query: ALL_COURSE_OWNERS,
+          })
+          .then(({ data }) => data.data.users ?? [])
+        return uniqBy([...teachers, ...courseTeachers, ...courseOwners], 'id')
       },
-
-      async getTeachers() {
-        const roles = ['Teacher', 'Course Owner', 'Course Teacher']
-        const teachers = []
-
-        for (const role of roles) {
-          const users = await this.getUsersWithRole(role)
-
-          if (users === null) break
-
-          let duplicateFlag = false
-          for (const user of users) {
-            for (const teacher of teachers) {
-              if (user.id === teacher.id) {
-                duplicateFlag = true
-                break
-              }
-            }
-            if (!duplicateFlag) teachers.push(user)
-          }
-        }
-
-        return teachers
-      },
-
-      async getUsersWithRole(role) {
-        const query = `query users($filter: UserFilter) {
-                      users(filter: $filter) {
-                        id
-                        firstName
-                        middleName
-                        lastName
-                        email
-                        department{
-                          name
-                        }
-                        attendingClass {
-                          id
-                          year
-                          section
-                        }
-                      }
-                    }`
-
-        const variables = {
-          filter: {
-            roleName: this.getRoleName(role),
-          },
-        }
-
-        const userResponse = await this.$axios.post('/graphql', {
-          query,
-          variables,
-        })
-
-        return userResponse.data.data.users
-      },
-
-      async initializeDepartments() {
-        const query = `query departments {
-                      departments {
-                        id
-                        name
-                      }
-                    }`
-
-        const departmentsResponse = await this.$axios.post('/graphql', {
-          query,
-        })
-
-        this.departments = departmentsResponse.data.data.departments
-      },
-
-      getRoleName(role) {
-        const tempRole = role.split(' ')
-        return tempRole.length > 1
-          ? `${tempRole[0].toUpperCase()}_${tempRole[1].toUpperCase()}`
-          : `${tempRole[0].toUpperCase()}`
-      },
-
-      goToTeachersPage() {
-        this.$router.push({
-          name: 'courseManager-id-teachers',
-        })
+      initializeDepartments() {
+        return this.$axios
+          .post('/graphql', {
+            query: ALL_DEPARTMENTS,
+          })
+          .then(({ data }) => data.data.departments ?? [])
       },
 
       // Tooltip functions
@@ -618,13 +538,6 @@
         )
       },
 
-      goToCourseEdit(courseId) {
-        this.$router.push({
-          name: 'courseManager-id-courseEdit-courseId',
-          params: { courseId, userId: this.$nuxt.context.params.id },
-        })
-      },
-
       deleteCourse(course) {
         this.newCourse = Object.assign({}, course)
         this.courseDialogDelete = true
@@ -632,8 +545,8 @@
 
       async deleteCourseConfirm() {
         const query = `mutation removeCourse($id: ID!) {
-                      removeCourse(id: $id)
-                    }`
+                                  removeCourse(id: $id)
+                                }`
         const variables = {
           id: this.newCourse.id,
         }
@@ -662,33 +575,28 @@
           this.newCourse = Object.assign({}, this.defaultCourse)
         })
       },
-
-      assignCourseTeacherClose() {
-        this.assignTeacherDialog = false
-      },
-
       async saveCourse() {
         const query = `mutation createCourse(
-                      $code: String!
-                      $name: String!
-                      $description: String!
-                      $overview: String!
-                      $creditHour: Int!
-                      $departmentId: ID!
-                    ) {
-                      createCourse(
-                        createCourseInput: {
-                          code: $code
-                          name: $name
-                          description: $description
-                          overview: $overview
-                          creditHour: $creditHour
-                          departmentId: $departmentId
-                        }
-                      ) {
-                        id
-                      }
-                    }`
+                                                  $code: String!
+                                                  $name: String!
+                                                  $description: String!
+                                                  $overview: String!
+                                                  $creditHour: Int!
+                                                  $departmentId: ID!
+                                                ) {
+                                                  createCourse(
+                                                    createCourseInput: {
+                                                      code: $code
+                                                      name: $name
+                                                      description: $description
+                                                      overview: $overview
+                                                      creditHour: $creditHour
+                                                      departmentId: $departmentId
+                                                    }
+                                                  ) {
+                                                    id
+                                                  }
+                                                }`
 
         const variables = {
           code: this.newCourse.code,
@@ -704,17 +612,14 @@
           variables,
         })
 
-        this.$nextTick(() => {
-          this.initializeCourses()
-        })
-
         this.saveCourseClose()
+        this.$fetch()
       },
 
       async assignCourseTeacherConfirm() {
         const query = `mutation assignUserToCourse ($courseId: ID! $userId: ID!) {
-                        assignUserToCourse (courseId: $courseId userId: $userId)
-                      }`
+                                                                                                                        assignUserToCourse (courseId: $courseId userId: $userId)
+                                                                                                                      }`
         const variables = {
           userId: this.selectedTeacher.id,
           courseId: this.selectedCourseId,
@@ -730,14 +635,14 @@
         if (assignUserResponse.data.data.assignUserToCourse === true) {
           // Change role to selectedTeacherType using Update user
           const changeUserRoleQuery = `mutation updateUser ($id: ID! $roleName: RoleName) {
-                                      updateUser (updateUserInput: {id: $id roleName: $roleName}) {
-                                        id
-                                        roles {
-                                          id
-                                          name
-                                        }
-                                      }
-                                    }`
+                                                                                                                                      updateUser (updateUserInput: {id: $id roleName: $roleName}) {
+                                                                                                                                        id
+                                                                                                                                        roles {
+                                                                                                                                          id
+                                                                                                                                          name
+                                                                                                                                        }
+                                                                                                                                      }
+                                                                                                                                    }`
           const changeUserRoleVariables = {
             id: this.selectedTeacher.id,
             roleName: assignedRole,
@@ -748,10 +653,8 @@
             variables: changeUserRoleVariables,
           })
         }
-
-        this.initializeCourses()
-        this.initializeTeachers()
-        this.assignCourseTeacherClose()
+        this.assignTeacherDialog = false
+        this.$fetch()
       },
     },
   }
