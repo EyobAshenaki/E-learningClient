@@ -159,3 +159,12 @@ export const ALL_DEPARTMENTS = `#graphql
     }
   }
 `
+export const ACCOUNT_COUNTERS = `#graphql
+  query {
+    accountCounters {
+      allUsers
+      students
+      teachers
+    }
+  }
+`
