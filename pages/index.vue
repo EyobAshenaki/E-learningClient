@@ -2,57 +2,50 @@
   <v-row
     justify="center"
     align="center"
-    class="d-flex"
-    style="
-      background-image: linear-gradient(135deg, #0156d2, #d201bf);
-      opacity: 0.8;
-      position: absolute;
-    "
+    class="landing d-flex justify-center align-center"
   >
-    <v-col cols="12" class="mx-auto">
-      <v-row class="mt-4 ml-15">
-        <v-col cols="5" class="">
-          <p
-            class="text-h2 orange--text text--lighten-4"
-            style="
-              margin-top: 100px;
-              font-family: 'Lucida Handwriting', cursive !important;
+    <v-col cols="11" lg="10">
+      <v-row align="center" justify="space-around">
+        <v-col cols="12" md="5">
+          <h2
+            class="
+              text-md-h2 text-sm-h3
+              orange--text
+              text--lighten-4
+              font-weight-medium
+              mb-4
             "
           >
-            Welcome To The AASTU <br />
-            E-learning Portal
-          </p>
-          <p
-            class="text-h4 orange--text text--lighten-4"
-            style="
-              margin-top: 30px;
-              margin-bottom: 100px;
-              font-family: 'Lucida Handwriting', cursive !important;
-            "
-          >
+            Welcome To The AASTU
+            <span class="text-no-wrap">E-learning</span> Portal
+          </h2>
+          <p class="text-md-h4 text-sm-h5 orange--text text--lighten-4 mb-2">
             Take the steps necessary to digitalize your learning experience!
           </p>
           <v-btn
-            elevation="24"
             x-large
             color="orange lighten-4"
-            style="font-family: 'Lucida Handwriting', cursive !important"
             :to="{ name: 'login' }"
-            >LOG IN</v-btn
+            class="mt-8"
+            elevation="24"
+            ><span
+              class="
+                text-md-h4 text-sm-h5
+                mx-sm-2 mx-md-4 mx-lg-4 mx-
+                text-capitalize
+              "
+              >Login</span
+            ></v-btn
           >
         </v-col>
-        <v-col cols="7">
-          <img src="~@/assets/img/guy-girl-in-library.png" width="100%" />
+        <v-col cols="12" md="6" order="first" order-md="last">
+          <img
+            src="~@/assets/img/guy-girl-in-library.png"
+            width="100%"
+            height="100%"
+          />
         </v-col>
       </v-row>
-      <!-- <v-row>
-          <v-col cols="6">
-            <img src="~@/assets/guy-girl-in-library.png" width="100%" />
-          </v-col>
-          <v-col cols="6">
-            <h1>banana</h1>
-          </v-col>
-        </v-row> -->
     </v-col>
   </v-row>
 </template>
@@ -62,3 +55,11 @@
     layout: 'guest',
   }
 </script>
+<style lang="scss" scoped>
+  .landing {
+    background-image: linear-gradient(135deg, #0156d2, #d201bf);
+    opacity: 0.8;
+    width: 100vw;
+    height: 100vh;
+  }
+</style>
