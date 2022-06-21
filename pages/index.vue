@@ -51,7 +51,6 @@
 </template>
 <script>
   export default {
-    name: 'IndexPage',
     layout: 'guest',
   }
 </script>
