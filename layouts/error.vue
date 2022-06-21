@@ -8,7 +8,7 @@
               <p class="text-h6">{{error.message}}</p>
             </v-card-text>
             <v-card-actions>
-              <NuxtLink  class="link" :to="{name: targetPath.name}"> <h3 class="text-h5 text-ligthen-2">{{targetPath.text}}<v-icon class="right-icon">mdi-chevron-right</v-icon></h3></NuxtLink>
+              <NuxtLink  class="link" :to="targetPath.route"> <h3 class="text-h5 text-ligthen-2">{{targetPath.text}}<v-icon class="right-icon">mdi-chevron-right</v-icon></h3></NuxtLink>
             </v-card-actions>
           </v-card>
         </v-col>
@@ -19,7 +19,7 @@
 <script>
   export default {
     name: 'EmptyLayout',
-    layout: 'guest',
+    layout: 'default',
     props: {
       error: {
         type: Object,
@@ -52,8 +52,8 @@
       },
       targetPath() {
         return this.$store.getters['auth/isLoggedIn']
-          ? { name: 'home', text: 'Return Home' }
-          : { name: 'index', text: 'Back to Main Page' }
+          ? { route: '/home', text: 'Return Home' }
+          : { route: '/', text: 'Back to Main Page' }
       },
     },
   }
