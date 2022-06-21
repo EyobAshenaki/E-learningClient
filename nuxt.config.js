@@ -20,7 +20,7 @@ export default function () {
     },
 
     // Global CSS: https://go.nuxtjs.dev/config-css
-    css: ['~/assets/styles/main.scss'],
+    css: ['~/assets/styles/main.scss', '@mdi/font/css/materialdesignicons.css'],
 
     // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
     plugins: ['~/plugins/vuex-persist', '~/plugins/toast'],
@@ -60,6 +60,12 @@ export default function () {
 
     // Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify
     vuetify: {
+      icons: {
+        iconfont: 'mdi'
+      },
+      defaultAssets: {
+        icons: false
+      },
       customVariables: ['~/assets/styles/variables.scss'],
       treeshake: true,
       theme: {
