@@ -69,7 +69,7 @@
           </v-col>
         </v-row>
       </v-col>
-      <v-btn outlined color="orange darken-4" class="mt-2 px-10"
+      <v-btn outlined color="orange darken-4" class="mb-3 mt-4 px-10"
         >View Course</v-btn
       >
     </v-row>
