@@ -373,9 +373,25 @@
 
     mounted() {
       this.timer()
+      this.isWindowActive()
     },
 
     methods: {
+      isWindowActive() {
+        window.addEventListener('blur', () => {
+          console.log('Window Left!')
+
+          const completed = this.completeQuizAttempt(this.quizAttempt.id)
+          if (completed) {
+            console.log('Quiz Done!')
+            this.$router.push({
+              name: 'student-id-quizzes',
+              params: { id: this.$nuxt.context.params.id },
+            })
+          }
+        })
+      },
+
       async initialize() {
         const query = `query quiz($id: ID!) {
                           quiz(id: $id) {
