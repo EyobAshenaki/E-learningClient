@@ -187,6 +187,7 @@
           type: this.type,
           choices: this.choices,
           subQuestions: this.subQuestions,
+          answer: this.answer
         })
       },
       addSubQuestion() {
