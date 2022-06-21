@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <v-form ref="documentUploadForm" lazy-validation>
+  <div >
+    <v-form v-if="!$fetchState.pending" ref="documentUploadForm" lazy-validation>
       <v-card class="pa-6" min-width="850px">
         <h1 class="mb-3">
           {{ isEditMode ? 'Edit' : 'Create' }} document
@@ -60,6 +60,7 @@
         </v-row>
       </v-card>
     </v-form>
+    <v-skeleton-loader v-else type="card" height="300px" />
   </div>
 </template>
 
@@ -82,6 +83,13 @@
         rules: { required: (v) => !!v || 'This field is required.' },
       }
     },
+    fetchOnServer: false,
+    fetch() {
+      Object.assign(
+        this,
+        this.$store.getters['course-management/getCourseDocument']
+      )
+    },
     computed: {
       isEditMode() {
         return this.modifyMode === 'UPDATE/EDIT'
@@ -89,12 +97,6 @@
       isFileUploadInvisible(){
         return this.isEditMode && !this.replaceFile
       }
-    },
-    mounted() {
-      Object.assign(
-        this,
-        this.$store.getters['course-management/getCourseDocument']
-      )
     },
     methods: {
       resetFileForReplace() {

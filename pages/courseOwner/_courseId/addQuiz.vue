@@ -162,7 +162,7 @@
           color="blue darken-1"
           text
           :disabled="loading"
-          @click="$emit('close')"
+          @click="$router.back()"
           >Cancel
         </v-btn>
       </v-card-actions>
@@ -172,7 +172,7 @@
 
 <script>
   import moment from 'moment'
-  import { OWNED_COURSES } from '~/utils/queries'
+  import { CREATE_QUIZ, OWNED_COURSES } from '~/utils/queries'
   import { required, numbers } from '~/utils/validators'
   import SectionForm from '~/components/SectionForm.vue'
 
@@ -236,8 +236,37 @@
       },
     },
     methods: {
-      addQuiz() {
-        // add quiz logic
+      async addQuiz() {
+        try {
+          this.loading = true;
+          await this.$axios.post('/graphql', {
+            query: CREATE_QUIZ,
+            variables: {
+              title: this.title,
+              start: moment(`${this.start_date} ${this.start_time}`).toISOString(),
+              end: moment(`${this.end_date} ${this.end_time}`).toISOString(),
+              duration: this.duration * 60000,
+              sections: this.sections,
+              maxScore: parseInt(this.maxScore),
+              courseId: this.$route.params.courseId
+            }
+          }).then(({data})=> {
+            if(data.errors){
+              throw data.errors[0]
+            }
+            this.$toast.success('Quiz Created Successfully')
+            this.$router.back()
+          })
+          // add quiz logic
+        } catch (error) {
+          if(error.isAxiosError && error.response) {
+            this.$toast.error(error.response.data.errors[0].message)
+          }else {
+            this.$toast.error(error.message)
+          }
+        }finally {
+          this.loading =false
+        }
       },
       addSection() {
         this.sections.push({
