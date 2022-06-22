@@ -17,9 +17,23 @@
         <v-card-title>
           {{ quiz.title }}
         </v-card-title>
-        <v-card-subtitle>
+        <v-card-subtitle class="pb-2">
           {{ quiz.description }}
         </v-card-subtitle>
+
+        <v-chip
+          v-if="!quiz.isQuizOngoing"
+          class="ml-4 mb-3"
+          color="success darken-2"
+          label
+        >
+          <v-icon left> mdi-checkbox-marked-circle-outline </v-icon>
+          Complete
+        </v-chip>
+        <v-chip v-else class="ml-4 mb-3" color="secondary" label>
+          <v-icon left> mdi-timelapse </v-icon>
+          Inomplete
+        </v-chip>
 
         <v-divider class="mx-4"></v-divider>
 
@@ -94,7 +108,55 @@
           query,
         })
 
-        this.quizzes = quizzesResponse.data.data.quizzes
+        // this.quizzes = await this.organizeQuizzes(
+        //   quizzesResponse.data.data.quizzes
+        // )
+
+        this.quizzes = await this.assignQuizStatuses(
+          quizzesResponse.data.data.quizzes
+        )
+      },
+
+      async organizeQuizzes(quizzes) {
+        const tempArr = []
+        for (const quiz of quizzes) {
+          const temp = await this.quizStatus(quiz.id)
+          if (temp) tempArr.push(quiz)
+        }
+
+        return tempArr
+      },
+
+      async assignQuizStatuses(quizzes) {
+        for (const quiz of quizzes) {
+          const temp = await this.quizStatus(quiz.id)
+          quiz.isQuizOngoing = temp
+        }
+
+        return quizzes
+      },
+
+      async quizStatus(quizId) {
+        const query = `query myAttemptForQuiz($quizId: ID!, $userId: ID!) {
+                        myAttemptForQuiz(quizId: $quizId, userId: $userId) {
+                          id
+                        }
+                      }`
+
+        const variables = {
+          quizId,
+          userId: this.$nuxt.context.params.id,
+        }
+
+        const myAttemptForQuizResponse = await this.$axios.post('/graphql', {
+          query,
+          variables,
+        })
+
+        const isQuizOngoing =
+          !myAttemptForQuizResponse.data.data.myAttemptForQuiz
+
+        return isQuizOngoing
       },
 
       formatDate(dateObj) {
