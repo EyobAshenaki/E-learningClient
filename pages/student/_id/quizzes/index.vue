@@ -23,8 +23,9 @@
 
         <v-chip
           v-if="!quiz.isQuizOngoing"
-          class="ml-4 mb-3"
+          class="ml-4 mb-3 font-weight-medium"
           color="success darken-2"
+          outlined
           label
         >
           <v-icon left> mdi-checkbox-marked-circle-outline </v-icon>
@@ -32,32 +33,36 @@
         </v-chip>
         <v-chip
           v-else
-          class="ml-4 mb-3 black--text"
-          color="secondary lighten-1"
+          class="ml-4 mb-3 font-weight-medium"
+          color="primary"
+          outlined
           label
         >
           <v-icon left> mdi-timelapse </v-icon>
-          Inomplete
+          Incomplete
         </v-chip>
 
         <v-divider class="mx-4"></v-divider>
 
         <v-row class="pa-6 pb-0">
           <v-col cols="5" class="px-0">
-            <v-icon>mdi-calendar-range</v-icon> {{ formatDate(quiz.start) }}
+            <v-icon color="primary darken-1"> mdi-calendar-range </v-icon>
+            {{ formatDate(quiz.start) }}
           </v-col>
           <v-col cols="2" class="px-0 d-flex justify-center">
-            <v-icon>mdi-arrow-right</v-icon>
+            <v-icon color="primary darken-1"> mdi-arrow-right </v-icon>
           </v-col>
           <v-col cols="5" class="px-0">
-            <v-icon>mdi-calendar-range</v-icon> {{ formatDate(quiz.end) }}
+            <v-icon color="primary darken-1">mdi-calendar-range</v-icon>
+            {{ formatDate(quiz.end) }}
           </v-col>
           <v-col cols="6">
-            <v-icon>mdi-timer-outline</v-icon>
+            <v-icon color="primary darken-1">mdi-timer-outline</v-icon>
             {{ quiz.duration / 60000 }} min
           </v-col>
           <v-col cols="6">
-            <v-icon>mdi-chart-sankey-variant</v-icon> Grade {{ quiz.maxScore }}%
+            <v-icon color="primary darken-1"> mdi-chart-sankey-variant </v-icon>
+            Grade {{ quiz.maxScore }}%
           </v-col>
         </v-row>
 
