@@ -30,7 +30,12 @@
           <v-icon left> mdi-checkbox-marked-circle-outline </v-icon>
           Complete
         </v-chip>
-        <v-chip v-else class="ml-4 mb-3" color="secondary" label>
+        <v-chip
+          v-else
+          class="ml-4 mb-3 black--text"
+          color="secondary lighten-1"
+          label
+        >
           <v-icon left> mdi-timelapse </v-icon>
           Inomplete
         </v-chip>
@@ -57,7 +62,14 @@
         </v-row>
 
         <v-card-actions class="pl-6 py-5">
-          <v-btn depressed @click="gotoQuizPage(quiz.id)">Start now</v-btn>
+          <v-btn
+            class="black--text text--lighten-4"
+            color="secondary lighten-1"
+            depressed
+            :disabled="!quiz.isQuizOngoing"
+            @click="gotoQuizPage(quiz.id)"
+            >Start now</v-btn
+          >
         </v-card-actions>
       </v-card>
     </v-col>
