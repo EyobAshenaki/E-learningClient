@@ -388,6 +388,10 @@
               name: 'student-id-quizzes',
               params: { id: this.$nuxt.context.params.id },
             })
+
+            window.removeEventListener('blur', () => {
+              console.log('Window Watcher Removed!')
+            })
           }
         })
       },
@@ -551,7 +555,7 @@
             clearInterval(setTimer)
             console.log('Times Up!')
 
-            const completed = this.completeQuizAttempt(this.quizAttempt.id)
+            const completed = this.completeQuizAttempt(this.quizAttempt?.id)
             if (completed) {
               console.log('Quiz Done!')
               this.$router.push({
