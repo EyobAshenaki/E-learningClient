@@ -43,7 +43,9 @@
                   > -->
                     <v-icon color="#25327F">mdi-text-box-plus</v-icon>
                   </v-btn>
-                  <v-btn>
+                  <v-btn
+                    nuxt
+                    :to="`${$route.path}/${course.id}/assignments`">
                     <!-- todo tooltip -->
                     <!-- @click="assignCourseTeacher(course.id)"
                     @mouseenter="assignEnter($event)"
