@@ -527,7 +527,7 @@
         this.teacherTypes = ['Course Owner', 'Course Teacher']
         this.selectedCourseId = courseId
 
-        this.unassignedTeachers = await this.getTeachers()
+        this.unassignedTeachers = await this.initializeTeachers()
         this.unassignedTeachers = this.unassignedTeachers.map(
           (unassignedTeacher) => {
             return {
@@ -545,8 +545,8 @@
 
       async deleteCourseConfirm() {
         const query = `mutation removeCourse($id: ID!) {
-                                  removeCourse(id: $id)
-                                }`
+                                    removeCourse(id: $id)
+                                  }`
         const variables = {
           id: this.newCourse.id,
         }
@@ -577,26 +577,26 @@
       },
       async saveCourse() {
         const query = `mutation createCourse(
-                                                  $code: String!
-                                                  $name: String!
-                                                  $description: String!
-                                                  $overview: String!
-                                                  $creditHour: Int!
-                                                  $departmentId: ID!
-                                                ) {
-                                                  createCourse(
-                                                    createCourseInput: {
-                                                      code: $code
-                                                      name: $name
-                                                      description: $description
-                                                      overview: $overview
-                                                      creditHour: $creditHour
-                                                      departmentId: $departmentId
-                                                    }
+                                                    $code: String!
+                                                    $name: String!
+                                                    $description: String!
+                                                    $overview: String!
+                                                    $creditHour: Int!
+                                                    $departmentId: ID!
                                                   ) {
-                                                    id
-                                                  }
-                                                }`
+                                                    createCourse(
+                                                      createCourseInput: {
+                                                        code: $code
+                                                        name: $name
+                                                        description: $description
+                                                        overview: $overview
+                                                        creditHour: $creditHour
+                                                        departmentId: $departmentId
+                                                      }
+                                                    ) {
+                                                      id
+                                                    }
+                                                  }`
 
         const variables = {
           code: this.newCourse.code,
@@ -618,8 +618,8 @@
 
       async assignCourseTeacherConfirm() {
         const query = `mutation assignUserToCourse ($courseId: ID! $userId: ID!) {
-                                                                                                                        assignUserToCourse (courseId: $courseId userId: $userId)
-                                                                                                                      }`
+                                                                                                                          assignUserToCourse (courseId: $courseId userId: $userId)
+                                                                                                                        }`
         const variables = {
           userId: this.selectedTeacher.id,
           courseId: this.selectedCourseId,
@@ -635,14 +635,14 @@
         if (assignUserResponse.data.data.assignUserToCourse === true) {
           // Change role to selectedTeacherType using Update user
           const changeUserRoleQuery = `mutation updateUser ($id: ID! $roleName: RoleName) {
-                                                                                                                                      updateUser (updateUserInput: {id: $id roleName: $roleName}) {
-                                                                                                                                        id
-                                                                                                                                        roles {
+                                                                                                                                        updateUser (updateUserInput: {id: $id roleName: $roleName}) {
                                                                                                                                           id
-                                                                                                                                          name
+                                                                                                                                          roles {
+                                                                                                                                            id
+                                                                                                                                            name
+                                                                                                                                          }
                                                                                                                                         }
-                                                                                                                                      }
-                                                                                                                                    }`
+                                                                                                                                      }`
           const changeUserRoleVariables = {
             id: this.selectedTeacher.id,
             roleName: assignedRole,
