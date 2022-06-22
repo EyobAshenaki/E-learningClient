@@ -135,15 +135,15 @@
             <v-divider class="my-2" />
             <div class="d-flex justify-space-between my-2">
               <span class="text-h6">Quiz Sections</span>
-              <v-btn text outlined @click="addSection"
-                >Add Section <v-icon>mdi-plus</v-icon></v-btn
-              >
             </div>
             <SectionForm
               v-for="(section, index) in sections"
               :key="section.number"
               v-model="sections[index]"
             />
+            <v-btn text outlined @click="addSection"
+              >Add Section <v-icon>mdi-plus</v-icon></v-btn
+            >
           </v-form>
         </v-container>
       </v-card-text>
@@ -238,34 +238,38 @@
     methods: {
       async addQuiz() {
         try {
-          this.loading = true;
-          await this.$axios.post('/graphql', {
-            query: CREATE_QUIZ,
-            variables: {
-              title: this.title,
-              start: moment(`${this.start_date} ${this.start_time}`).toISOString(),
-              end: moment(`${this.end_date} ${this.end_time}`).toISOString(),
-              duration: this.duration * 60000,
-              sections: this.sections,
-              maxScore: parseInt(this.maxScore),
-              courseId: this.$route.params.courseId
-            }
-          }).then(({data})=> {
-            if(data.errors){
-              throw data.errors[0]
-            }
-            this.$toast.success('Quiz Created Successfully')
-            this.$router.back()
-          })
+          this.loading = true
+          await this.$axios
+            .post('/graphql', {
+              query: CREATE_QUIZ,
+              variables: {
+                title: this.title,
+                start: moment(
+                  `${this.start_date} ${this.start_time}`
+                ).toISOString(),
+                end: moment(`${this.end_date} ${this.end_time}`).toISOString(),
+                duration: this.duration * 60000,
+                sections: this.sections,
+                maxScore: parseInt(this.maxScore),
+                courseId: this.$route.params.courseId,
+              },
+            })
+            .then(({ data }) => {
+              if (data.errors) {
+                throw data.errors[0]
+              }
+              this.$toast.success('Quiz Created Successfully')
+              this.$router.back()
+            })
           // add quiz logic
         } catch (error) {
-          if(error.isAxiosError && error.response) {
+          if (error.isAxiosError && error.response) {
             this.$toast.error(error.response.data.errors[0].message)
-          }else {
+          } else {
             this.$toast.error(error.message)
           }
-        }finally {
-          this.loading =false
+        } finally {
+          this.loading = false
         }
       },
       addSection() {
