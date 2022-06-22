@@ -170,3 +170,34 @@ export const ACCOUNT_COUNTERS = `#graphql
     }
   }
 `
+
+export const DEPARTMENT_FOR_DEPARTMENT_ADMINISTRATOR = `#graphql
+  query user ($id: ID!) {
+    user (id: $id) {
+      department {
+        name
+        ownedCourses {
+          id
+          code
+          name
+          creditHour
+        }
+        classes {
+          id
+          year
+          section
+          students {
+            id
+          }
+          attendingCourses {
+            id
+            name
+            code
+            creditHour
+          }
+        }
+      }
+    }
+  }
+
+`

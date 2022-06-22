@@ -1,10 +1,10 @@
 <template>
   <DefaultLayout>
     <template #nav>
-      <AuthNav/>
+      <AuthNav />
     </template>
     <template #sideNav>
-      <CourseManagerSideBar/>
+      <CourseManagerSideBar />
     </template>
   </DefaultLayout>
 </template>
@@ -14,7 +14,7 @@
   import CourseManagerSideBar from '~/components/CourseManagerSideBar.vue'
   export default {
     name: 'NavLayout',
-    components: { CourseManagerSideBar , DefaultLayout},
+    components: { CourseManagerSideBar, DefaultLayout },
     middleware: ['authenticated', 'courseManager'],
     data() {
       return {}

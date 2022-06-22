@@ -21,6 +21,9 @@ export const getters = {
   isCourseManager(state) {
     return !!state?.user?.roles.includes('COURSE_MANAGER')
   },
+  isDepartmentAdmin(state) {
+    return !!state?.user?.roles.includes('DEPARTMENT_ADMINISTRATOR')
+  },
   user(state) {
     return state?.user
   },

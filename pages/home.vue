@@ -11,6 +11,8 @@
         return redirect('/administrator')
       } else if (store.getters['auth/isCourseManager']) {
         return redirect('/courseManager')
+      } else if (store.getters['auth/isDepartmentAdmin']) {
+        return redirect('/departmentAdministrator')
       }
     },
   }
