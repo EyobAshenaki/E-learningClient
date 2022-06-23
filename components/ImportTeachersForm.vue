@@ -68,7 +68,7 @@
           if (data.errors) {
             this.$toast.error(data.errors[0].message)
           } else {
-            this.$toast.success(`${data.data} accounts imported`)
+            this.$toast.success(`${data.data.createMultipleUsers} accounts imported`)
             this.$emit('save')
           }
         } catch (error) {
