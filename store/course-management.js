@@ -16,6 +16,8 @@ export const state = () => ({
     submittedBy: null,
     values: [],
   },
+  criteria: [],
+  criteriaValues: [],
 })
 
 export const getters = {
@@ -51,6 +53,12 @@ export const getters = {
   getSubmissionToEvaluate(state) {
     return state.submissionToEvaluate
   },
+  getCriteria(state) {
+    return state.criteria
+  },
+  getCriteriaValues(state) {
+    return state.criteriaValues
+  },
 }
 
 export const mutations = {
@@ -71,6 +79,18 @@ export const mutations = {
   },
   setSubmissionToEvaluate(state, submissionToEvaluate) {
     state.submissionToEvaluate = submissionToEvaluate
+  },
+  setCriteria(state, criteria) {
+    state.criteria = criteria
+  },
+  setCriteriaValues(state, criteriaValues) {
+    state.criteriaValues = criteriaValues
+  },
+  pushCriterion(state, criterion) {
+    state.criteria.push(criterion)
+  },
+  pushCriterionValue(state, criterionValue) {
+    state.criteriaValues.push(criterionValue)
   },
 }
 
@@ -229,16 +249,26 @@ export const actions = {
       courseId
     ) => ({
       operations: `{"query": "mutation create_assignment($submissionDeadline:Date! $maximumScore:Float! $isCriteriaBased:Boolean $file:Upload! $courseId:ID! $name:String!){newDefinition:createAssignmentDefinition(createAssignmentDefinitionInput:{submissionDeadline:$submissionDeadline maximumScore:$maximumScore isCriteriaBased:$isCriteriaBased instructionsFile:$file courseId:$courseId name:$name}){id name submissionDeadline maximumScore isCriteriaBased instructionsFile}}","variables": {"name":"${name}","submissionDeadline":"${submissionDeadline}","isCriteriaBased":${isCriteriaBased},"maximumScore":${maximumScore},"courseId":"${courseId}","file":null},"operationName":"create_assignment"}`,
-      map: instructionsFile ? `{"0": ["variables.file"]}`: `{}`,
+      map: instructionsFile ? `{"0": ["variables.file"]}` : `{}`,
     })
-    const query = preQuery(name, submissionDeadline, isCriteriaBased, maximumScore, courseId)
+    const query = preQuery(
+      name,
+      submissionDeadline,
+      isCriteriaBased,
+      maximumScore,
+      courseId
+    )
     const formData = new FormData()
     formData.append('operations', query.operations)
     formData.append('map', query.map)
     formData.append('0', instructionsFile ?? null)
-    const assignmentDefinitionRes = await this.$axios.post('/graphql', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    })
+    const assignmentDefinitionRes = await this.$axios.post(
+      '/graphql',
+      formData,
+      {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      }
+    )
     const { data } = assignmentDefinitionRes
     if (data.data && isCriteriaBased) {
       const definitionId = data.data.newDefinition.id
@@ -266,5 +296,71 @@ export const actions = {
       })
     }
   },
-  async fetchSubmissionToEvaluate({ commit }, submissionId) {},
+  async fetchSubmissionToEvaluate({ commit }, submissionId) {
+    const query = `query submission($id: ID!) {
+      submission:assignmentSubmission(id: $id) {
+        id
+        submissionDate
+        totalScore
+        submittedBy {
+          firstName
+          middleName
+          lastName
+        }
+        definition {
+          id
+          name
+          maximumScore
+          criteria {
+            id
+            title
+            weight
+          }
+        }
+        values {
+          id
+          score
+        }
+      }
+    }`
+    const variables = { id: submissionId }
+    const submissionRes = await this.$axios.post('/graphql', {
+      query,
+      variables,
+    })
+    if (submissionRes?.data?.data)
+      commit('setSubmissionToEvaluate', submissionRes?.data?.data?.submission)
+  },
+  async evaluateCriteriaBasedAssignment({ commit }, { values }) {
+    values.forEach(async (value) => {
+      const query = `mutation criterionValue($score: Float! $criterionId: ID! $submissionId: ID!){
+          createCriterionValue(createCriterionValueInput:{
+            score: $score
+            criterionId: $criterionId
+            submissionId: $submissionId
+          }){
+            id
+            score
+          }
+        }`
+      const variables = { ...value }
+      await this.$axios.post('/graphql', {
+        query,
+        variables,
+      })
+    })
+    const query = `
+    mutation gradeAssignment($id: ID!, $totalScore: Float) {
+      evaluation: gradeSubmission(id: $id, totalScore: $totalScore) {
+        submissionDate
+        totalScore
+        submissionFile
+      }
+    }`
+    const variables = { id: values[0].submissionId, totalScore: 0 }
+    await this.$axios.post('/graphql', {
+      query,
+      variables,
+    })
+  },
 }

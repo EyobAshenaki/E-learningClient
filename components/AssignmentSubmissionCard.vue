@@ -1,5 +1,4 @@
 <template>
-  <div>
     <v-card flat outlined class="mt-3">
       <v-card-title> Submitted By: {{ fullName }} </v-card-title>
       <v-divider />
@@ -17,7 +16,7 @@
         ><v-col
           ><div class="ma-0 mt-1">
             <strong> Score:&nbsp;</strong
-            >{{ submission.totalScore ? submission.totalScore : '-' }}/{{
+            >{{ submission.totalScore ? (submission.totalScore).toFixed(1) : '-' }}/{{
               definition.maximumScore
             }}
           </div></v-col
@@ -34,7 +33,7 @@
         >
           <v-icon class="mr-2">mdi-download</v-icon>Download</v-btn
         ><v-spacer></v-spacer>
-        <v-btn small text outlined @click="evaluate()">
+        <v-btn v-if="!evaluationStatus" small text outlined @click="evaluate()">
           <v-icon class="mr-2">mdi-file-check</v-icon>Evaluate</v-btn
         >
         <v-dialog v-model="evaluateDialog" max-width="450px"
@@ -71,7 +70,6 @@
         >
       </v-card-actions>
     </v-card>
-  </div>
 </template>
 
 <script>
