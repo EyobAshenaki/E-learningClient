@@ -35,7 +35,7 @@
                   > -->
                     <v-icon color="orange darken-4">mdi-file-upload</v-icon>
                   </v-btn>
-                  <v-btn nuxt :to="`${$route.path}/${course.id}/addQuiz`">
+                  <v-btn nuxt :to="`${$route.path}/${course.id}/quizzes`">
                     <!-- todo tooltip -->
                     <!-- @click="assignCourseTeacher(course.id)"
                     @mouseenter="assignEnter($event)"

@@ -201,3 +201,118 @@ export const DEPARTMENT_FOR_DEPARTMENT_ADMINISTRATOR = `#graphql
   }
 
 `
+
+export const QUIZZES_FOR_COURSE = `#graphql
+  query ($id: ID!){
+    quizzesForCourse(courseId: $id) {
+      id
+      title
+      start
+      description
+      end
+      duration
+      attempts {
+        id
+      }
+    }
+  }
+`
+
+export const COURSE = `#graphql
+  query ($id: ID!) {
+    course (id: $id) {
+      id
+      name
+      code
+    }
+  }
+`
+
+export const DELETE_QUIZ = `#graphql 
+  mutation ($id: ID!) {
+    deleteQuiz (quizId: $id) {
+      title
+    }
+  }
+`
+
+export const ATTEMPTS_FOR_QUIZ = `#graphql
+  query ($id: ID!){
+	attemptsForQuiz(quizId: $id) {
+		id
+		completed
+		grade {
+			score
+		}
+    user {
+      firstName
+      middleName
+      lastName
+    }
+	}
+}
+`
+export const ATTEMPT = `#graphql
+  query ($id: ID!){
+    attempt(id: $id) {
+      questions {
+        id
+        answer
+        question {
+          id
+          questionType
+        }
+        subQuestions {
+          number
+          answer
+        }
+      }
+      user {
+        firstName
+        middleName
+        lastName
+      }
+    }
+  }
+`
+
+export const QUESTIONS_FOR_QUIZ = `#graphql
+  query ($id: ID!) {
+    questionsForQuiz(quizId: $id) {
+      id
+      text
+      number
+      answer
+      questionType
+      subQuestions {
+        id
+        number
+        answer
+      }
+      choices {
+        id
+        key
+        text
+      }
+    }
+  }
+`
+
+export const QUIZ = `#graphql
+  query ($id:ID!) {
+    quiz (id: $id) {
+      id
+      maxScore
+    }
+  }
+`
+
+export const GRADE_ATTEMPT = `#graphql
+  mutation ($attemptId: ID!, $markerId: ID!, $score: Float!) {
+    gradeAttempt(
+      input: { attemptId: $attemptId, markerId: $markerId, score: $score }
+    ) {
+      score
+    }
+  }
+`
