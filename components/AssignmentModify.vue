@@ -37,7 +37,7 @@
                   label="Deadline Date"
                   readonly
                   v-bind="attrs"
-                  :rules="[required, isInTheFuture(deadlineDate, moment)]"
+                  :rules="[required, isInTheFuture]"
                   v-on="on"
                 />
               </template>

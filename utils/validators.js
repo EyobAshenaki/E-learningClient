@@ -1,3 +1,4 @@
+import moment from 'moment';
 export const singleCharacter = (val) =>
   val.length === 1 || 'Only a single Character allowed'
 
@@ -12,4 +13,4 @@ export const numbers = (val) =>
 export const isInRange = (val, min, max) =>
   (val <= max && val >= min) || `Has to be from ${min} - ${max}`
 
-  export const isInTheFuture = (val, moment) => moment(val).isAfter(moment()) || 'Has to be in the future'
+  export const isInTheFuture = (val) => moment(val).isAfter(moment()) || 'Has to be in the future'

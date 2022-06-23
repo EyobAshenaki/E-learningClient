@@ -72,6 +72,7 @@
                       label="Start Time"
                       readonly
                       v-bind="attrs"
+                      :rules="[rules.required, rules.isInTheFutue]"
                       v-on="on"
                     />
                   </template>
@@ -95,6 +96,7 @@
                       label="End Date"
                       readonly
                       v-bind="attrs"
+                      :rules="[rules.required, rules.isInTheFutue]"
                       v-on="on"
                     />
                   </template>
@@ -173,7 +175,7 @@
 <script>
   import moment from 'moment'
   import { CREATE_QUIZ, OWNED_COURSES } from '~/utils/queries'
-  import { required, numbers } from '~/utils/validators'
+  import { required, numbers, isInTheFuture } from '~/utils/validators'
   import SectionForm from '~/components/SectionForm.vue'
 
   export default {
@@ -196,6 +198,7 @@
         rules: {
           required,
           numbers,
+          isInTheFuture
         },
         title: '',
         description: '',
