@@ -28,13 +28,6 @@
             icon: 'mdi-note-edit',
             route: '/administrator/teachers',
           },
-          {
-            title: 'Course Managers',
-            icon: 'mdi-text-box-check',
-            route: 'course-managers',
-          },
-          { title: 'Administrators', icon: 'mdi-calendar-month' },
-          { title: 'Department Administrators', icon: 'mdi-calendar-month' },
         ],
       }
     },
