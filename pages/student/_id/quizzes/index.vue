@@ -3,64 +3,132 @@
     <v-col cols="12" class="d-flex align-center">
       <h2 style="display: inline">All Tests</h2>
       <v-divider class="mx-2 my-0" vertical></v-divider>
-      <span>3 in total</span>
+      <span v-if="quizzes"> {{ quizzes.length }} in total</span>
     </v-col>
     <v-col cols="12">
-      <v-card
-        v-for="n in 10"
-        :key="n"
-        max-width="360"
-        elevation="14"
-        class="ma-3"
-        style="display: inline-block"
-      >
-        <v-card-title>Exam-1</v-card-title>
-        <v-card-subtitle>Database Design</v-card-subtitle>
-
-        <v-divider class="mx-4"></v-divider>
-
-        <v-row class="pa-6 pb-0">
-          <v-col cols="5" class="px-0">
-            <v-icon>mdi-calendar-range</v-icon>21 Oct, 1:00pm
-          </v-col>
-          <v-col cols="2" class="px-0 d-flex justify-center">
-            <v-icon>mdi-arrow-right</v-icon>
-          </v-col>
-          <v-col cols="5" class="px-0">
-            <v-icon>mdi-calendar-range</v-icon>24 Oct, 7:00pm
-          </v-col>
-          <v-col cols="6"> <v-icon>mdi-timer-outline</v-icon> 3 min </v-col>
-          <v-col cols="6">
-            <v-icon>mdi-chart-sankey-variant</v-icon> 20 Questions
-          </v-col>
-          <v-col cols="6">
-            <v-icon>mdi-account-multiple-outline</v-icon> 200 students
-          </v-col>
-        </v-row>
-
-        <v-card-actions class="pl-6 py-5">
-          <v-btn depressed @click="gotoQuizPage">Start now</v-btn>
-        </v-card-actions>
-      </v-card>
+      <quiz-info-card v-for="quiz in quizzes" :key="quiz.id" :quiz="quiz" />
     </v-col>
   </v-row>
 </template>
 
 <script>
-export default {
-  layout: 'student',
+  import QuizInfoCard from '~/components/QuizInfoCard.vue'
+  export default {
+    components: { QuizInfoCard },
+    layout: 'student',
 
-  data() {
-    return {}
-  },
-
-  methods: {
-    gotoQuizPage() {
-      this.$router.push({
-        name: 'student-id-quizzes-quizPage',
-        params: { id: 1 },
-      })
+    data() {
+      return {
+        quizzes: [],
+        courses: [],
+      }
     },
-  },
-}
+
+    async created() {
+      if (!this.$nuxt.context.params.courseId) await this.initialize()
+      else await this.initializeQuiz(this.$nuxt.context.params.courseId)
+    },
+
+    methods: {
+      async initialize() {
+        const query = `query user($id: ID!) {
+                        user(id: $id) {
+                          attendingCourses {
+                            id
+                          }
+                        }
+                      }`
+
+        const variables = {
+          id: this.$nuxt.context.params.id,
+        }
+
+        const userResponse = await this.$axios.post('/graphql', {
+          query,
+          variables,
+        })
+
+        this.courses = userResponse?.data?.data?.user.attendingCourses
+
+        for (const course of this.courses) {
+          await this.initializeQuiz(course.id)
+        }
+      },
+
+      async initializeQuiz(courseId) {
+        const query = `query quizzesForCourse($courseId: ID!) {
+                        quizzesForCourse(courseId: $courseId) {
+                          id
+                          title
+                          description
+                          start
+                          end
+                          duration
+                          maxScore
+                          sections {
+                            id
+                            description
+                            sectionType
+                            number
+                            questions {
+                              id
+                              text
+                              number
+                              questionType
+                            }
+                          }
+                        }
+                      }`
+
+        const variables = {
+          courseId,
+        }
+
+        const quizzesForCourseResponse = await this.$axios.post('/graphql', {
+          query,
+          variables,
+        })
+
+        const quizzes = await this.assignQuizStatuses(
+          quizzesForCourseResponse.data.data.quizzesForCourse
+        )
+
+        this.quizzes.push(...quizzes)
+
+        console.log(this.quizzes)
+      },
+
+      async assignQuizStatuses(quizzes) {
+        for (const quiz of quizzes) {
+          const temp = await this.quizStatus(quiz.id)
+          quiz.isQuizOngoing = temp
+        }
+
+        return quizzes
+      },
+
+      async quizStatus(quizId) {
+        const query = `query myAttemptForQuiz($quizId: ID!, $userId: ID!) {
+                        myAttemptForQuiz(quizId: $quizId, userId: $userId) {
+                          id
+                        }
+                      }`
+
+        const variables = {
+          quizId,
+          userId: this.$nuxt.context.params.id,
+        }
+
+        const myAttemptForQuizResponse = await this.$axios.post('/graphql', {
+          query,
+          variables,
+        })
+
+        const isQuizOngoing =
+          !myAttemptForQuizResponse.data.data.myAttemptForQuiz
+
+        return isQuizOngoing
+      },
+    },
+  }
 </script>

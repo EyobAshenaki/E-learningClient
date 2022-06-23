@@ -1,43 +1,66 @@
 <template>
-    <v-card flat outlined class="mt-3">
-      <v-card-title> Submitted By: {{ fullName }} </v-card-title>
-      <v-divider />
-      <v-row class="mb-1 ml-1">
-        <v-col class="ml-auto my-auto mt-2 mb-n3"
-          ><strong> Submitted:</strong> {{ submissionTime }}</v-col
-        >
+  <div>
+    <v-card flat outlined class="mt-3" :width="isStudent ? '23em' : ''">
+      <v-card-title v-if="!isStudent">
+        Submitted By: {{ fullName }}
+      </v-card-title>
+
+      <v-divider v-if="!isStudent" />
+
+      <v-row v-if="!isStudent" class="mb-1 ml-1">
+        <v-col class="ml-auto my-auto mt-2 mb-n3">
+          <strong> Submitted:</strong> {{ submissionTime }}
+        </v-col>
       </v-row>
-      <v-divider class="mb-2"></v-divider>
-      <v-row class="mb-n1 ml-1">
-        <v-col class="ml-auto my-auto"
-          ><v-chip>{{ evaluationStatus }}</v-chip></v-col
-        >
-        <v-divider vertical></v-divider
-        ><v-col
-          ><div class="ma-0 mt-1">
-            <strong> Score:&nbsp;</strong
-            >{{ submission.totalScore ? (submission.totalScore).toFixed(1) : '-' }}/{{
+
+      <v-card-text v-if="isStudent" class="text-h6">
+        Submitted: &nbsp;<span class="text-body-1"> {{ submissionTime }} </span>
+      </v-card-text>
+
+      <v-divider v-if="!isStudent" class="mb-2"></v-divider>
+
+      <v-row class="mb-n1 ml-1" :class="isStudent ? 'ml-2' : ''">
+        <v-col class="ml-auto my-auto">
+          <v-chip outlined color="primary"> {{ evaluationStatus }} </v-chip>
+        </v-col>
+        <v-divider
+          v-if="submission.totalScore"
+          :class="isStudent ? 'my-2 ml-n5 mr-3' : ''"
+          vertical
+        ></v-divider>
+        <v-col v-if="submission.totalScore">
+          <div class="ma-0 mt-1">
+            <strong> Score:&nbsp;</strong>
+            {{ submission.totalScore ? submission.totalScore : '-' }}/{{
               definition.maximumScore
             }}
-          </div></v-col
-        ></v-row
-      >
-      <v-divider></v-divider>
+          </div>
+        </v-col>
+      </v-row>
 
-      <v-card-actions>
+      <v-divider v-if="!isStudent"></v-divider>
+
+      <v-card-actions :class="isStudent ? 'pl-6 pr-10 pt-3 mb-2' : ''">
         <v-btn
-          small
-          text outlined
+          :small="!isStudent"
+          outlined
+          :block="isStudent"
+          color="secondary darken-1"
           target="_blank"
           :href="`${$config.baseUrl}/upload/${submission.submissionFile}`"
         >
-          <v-icon class="mr-2">mdi-download</v-icon>Download</v-btn
-        ><v-spacer></v-spacer>
-        <v-btn v-if="!evaluationStatus" small text outlined @click="evaluate()">
-          <v-icon class="mr-2">mdi-file-check</v-icon>Evaluate</v-btn
-        >
-        <v-dialog v-model="evaluateDialog" max-width="450px"
-          ><v-card>
+          <v-icon class="mr-2" color="secondary darken-1">mdi-download</v-icon>
+          Download
+        </v-btn>
+
+        <v-spacer></v-spacer>
+
+        <v-btn v-if="!isStudent" small text outlined @click="evaluate()">
+          <v-icon class="mr-2">mdi-file-check</v-icon> Evaluate
+        </v-btn>
+
+        <v-dialog v-if="!isStudent" v-model="evaluateDialog" max-width="450px">
+          <v-card>
             <v-card-title
               primary-title
               style="word-break: break-word"
@@ -61,15 +84,17 @@
                         rules.isNumeric,
                         isInRange(totalScore, 0, definition.maximumScore),
                       ]"
-                  /></v-col>
+                    />
+                  </v-col>
                   <v-btn class="primary my-auto" @click="save()">save</v-btn>
                 </v-row>
               </v-form>
             </v-card-text>
-          </v-card></v-dialog
-        >
+          </v-card>
+        </v-dialog>
       </v-card-actions>
     </v-card>
+  </div>
 </template>
 
 <script>
@@ -85,6 +110,10 @@
       definition: {
         type: Object,
         required: true,
+      },
+      isStudent: {
+        type: Boolean,
+        default: false,
       },
     },
     data() {
@@ -149,7 +178,7 @@
         this.$refs.evaluateNormalAssignmentForm.reset()
         this.evaluateDialog = false
       },
-      isInRange
+      isInRange,
     },
   }
 </script>

@@ -6,11 +6,7 @@
     <v-col cols="12" class="pt-0 mt-5">
       <v-row>
         <v-col v-for="course in courses" :key="course.id" cols="4">
-          <student-course-card
-            :active="active"
-            :toggle="toggle"
-            :course-id="course.id"
-          />
+          <student-course-card :course-id="course.id" />
         </v-col>
       </v-row>
     </v-col>
@@ -157,8 +153,6 @@
         })
 
         this.courses = userResponse.data.data.user.attendingCourses
-
-        console.log(this.courses)
       },
     },
   }

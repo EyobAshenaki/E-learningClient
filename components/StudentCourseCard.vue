@@ -69,9 +69,17 @@
           </v-col>
         </v-row>
       </v-col>
-      <v-btn outlined color="orange darken-4" class="mt-2 px-10"
-        >View Course</v-btn
+      <v-btn
+        outlined
+        color="orange darken-4"
+        class="mb-3 mt-4 px-10"
+        :to="{
+          name: 'student-id-courses-coursePage',
+          params: { id: $route.params.id, courseId: courseId },
+        }"
       >
+        View Course
+      </v-btn>
     </v-row>
   </v-card>
 </template>

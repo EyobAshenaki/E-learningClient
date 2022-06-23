@@ -4,16 +4,28 @@
       <v-card-title primary-title>
         <h1>Assignments</h1>
         <v-spacer />
-        <v-btn v-if="courseOwner" class="primary" nuxt :to="`${$route.path}/create`"><v-icon>mdi-plus</v-icon>Create</v-btn>
+        <v-btn
+          v-if="courseOwner"
+          class="primary"
+          nuxt
+          :to="`${$route.path}/create`"
+          ><v-icon>mdi-plus</v-icon>Create</v-btn
+        >
       </v-card-title>
       <v-divider />
       <v-card-text>
-        <v-subheader v-if="!assignments.length">This Course has no assignments created yet. 
+        <v-subheader v-if="!assignments.length"
+          >This Course has no assignments created yet.
           <template v-if="courseOwner">
-            Click on 
-            (<span color="primary" class="white--text primary" @click="gotoCreateAssignment()">
-            Create Assignment</span>) to create a new assignment for this course.
-          </template></v-subheader>
+            Click on (<span
+              color="primary"
+              class="white--text primary"
+              @click="gotoCreateAssignment()"
+            >
+              Create Assignment</span
+            >) to create a new assignment for this course.
+          </template></v-subheader
+        >
         <assignment-definition-card
           v-for="assignment in assignments"
           :key="assignment.id"
@@ -25,7 +37,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+  import { mapGetters } from 'vuex'
   export default {
     props: {
       courseId: {
@@ -54,8 +66,8 @@ import { mapGetters } from 'vuex'
       },
     },
     computed: {
-      ...mapGetters({courseOwner: 'auth/isCourseOwner'}),
-    }
+      ...mapGetters({ courseOwner: 'auth/isCourseOwner' }),
+    },
   }
 </script>
 

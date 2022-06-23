@@ -40,14 +40,14 @@
               params: { id: this.$nuxt.context.params.id },
             },
           },
-          {
-            title: 'Assignments',
-            icon: 'mdi-note-edit',
-            route: {
-              name: 'student-id-assignments',
-              params: { id: this.$nuxt.context.params.id },
-            },
-          },
+          // {
+          //   title: 'Assignments',
+          //   icon: 'mdi-note-edit',
+          //   route: {
+          //     name: 'student-id-assignments',
+          //     params: { id: this.$nuxt.context.params.id },
+          //   },
+          // },
           {
             title: 'Quizzes',
             icon: 'mdi-text-box-check',
