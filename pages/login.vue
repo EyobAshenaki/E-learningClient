@@ -41,7 +41,7 @@
       },
       onLoginSucess(user) {
         this.$store.dispatch('auth/login', user)
-        this.$router.push({ name: 'home' })
+        this.$router.push('/home')
       },
       onLoginError(error) {
         this.$toast.error(error.message)

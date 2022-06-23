@@ -12,7 +12,7 @@
             small
             class="mr-3 yellow darken-4 white--text"
             @click="gotoEditPage()"
-            >
+          >
             <v-icon>mdi-pencil</v-icon>
           </v-btn>
           <v-btn
@@ -55,6 +55,7 @@
 </template>
 
 <script>
+  import { mapActions } from 'vuex'
   export default {
     props: {
       document: {
@@ -72,19 +73,20 @@
       }
     },
     methods: {
+      ...mapActions({
+        deleteCourseDocument: 'course-management/deleteCourseDocument',
+      }),
       gotoEditPage() {
-        this.$store.commit(
-          'course-management/setCourseDocument',
-          this.document
-        )
+        this.$store.commit('course-management/setCourseDocument', this.document)
         this.$router.push({ path: `${this.$route.path}/edit` })
       },
       deleteDocument() {
         this.deleteDialog = false
-        this.$store.dispatch(
-          'course-management/deleteCourseDocument',
-          this.document.id
-        )
+          this.deleteCourseDocument(this.document.id)
+        // this.$store.dispatch(
+        //   'course-management/deleteCourseDocument',
+        //   this.document.id
+        // )
         this.$store.dispatch(
           'course-management/fetchCourseDocuments',
           this.courseId

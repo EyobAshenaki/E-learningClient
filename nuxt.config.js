@@ -18,7 +18,7 @@ export default function () {
       ],
       link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
     },
-
+    server: { port: process.env.PORT || '3000' },
     // Global CSS: https://go.nuxtjs.dev/config-css
     css: ['~/assets/styles/main.scss', '@mdi/font/css/materialdesignicons.css'],
 
@@ -95,7 +95,7 @@ export default function () {
       minifyTheme,
     },
     publicRuntimeConfig: {
-      baseUrl: process.env.BASE_URL
+      baseUrl: process.env.BASE_URL,
     },
     // Build Configuration: https://go.nuxtjs.dev/config-build
     build: {

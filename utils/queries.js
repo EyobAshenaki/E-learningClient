@@ -29,9 +29,7 @@ export const ALL_USERS = usersQuery(null)
 
 export const REMOVE_USER = `#graphql
   mutation ($userId: ID!) {
-    removeUser (id: $userId) {
-      firstName
-    }
+    removeUser (id: $userId) { firstName }
   }
 `
 

@@ -40,7 +40,8 @@
       </v-row>
       <v-row>
         <v-col>
-          <v-btn block>
+          <v-btn block nuxt
+                    :to="`${$route.path}/${course.id}/assignments`">
             Assignments
             <v-icon color="amber darken-3" class="ml-2"
               >mdi-clipboard-text-clock</v-icon

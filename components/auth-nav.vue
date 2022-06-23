@@ -12,9 +12,6 @@
       </template>
 
       <v-list>
-        <v-list-item>
-          <v-list-item-title>My Profile</v-list-item-title>
-        </v-list-item>
         <LogoutButton />
       </v-list>
     </v-menu>
