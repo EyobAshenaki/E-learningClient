@@ -4,7 +4,7 @@
       <span>{{ quiz.title }} </span>
       <v-card-subtitle class="text-h6">{{ quiz.subtitle }}</v-card-subtitle>
       <v-spacer />
-      <v-dialog v-model="deleteDialog" max-width="500px">
+      <v-dialog v-if="courseOwner" v-model="deleteDialog" max-width="500px">
         <template #activator="{ attrs, on }">
           <v-btn outlined color="red" v-bind="attrs" v-on="on"> Delete </v-btn>
         </template>
@@ -94,6 +94,7 @@
 </template>
 
 <script>
+import {mapGetters} from 'vuex'
   import moment from 'moment'
   import { DELETE_QUIZ } from '~/utils/queries'
   export default {
@@ -110,6 +111,7 @@
       }
     },
     computed: {
+      ...mapGetters({courseOwner: 'auth/isCourseOwner'}),
       attempted() {
         return this.attempts.length > 0
       },

@@ -1,3 +1,4 @@
+import { intersection } from "lodash"
 export const state = () => ({
   user: null,
 })
@@ -23,6 +24,12 @@ export const getters = {
   },
   isDepartmentAdmin(state) {
     return !!state?.user?.roles.includes('DEPARTMENT_ADMINISTRATOR')
+  },
+  isCourseOwner(state) {
+    return !!state?.user?.roles.includes('COURSE_OWNER')
+  },
+  isTeacher(state) {
+    return !!intersection(['COURSE_TEACHER' ,'COURSE_OWNER', 'TEACHER'], state?.user?.roles || [])
   },
   user(state) {
     return state?.user

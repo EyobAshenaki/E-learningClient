@@ -18,7 +18,7 @@
               <v-btn
                 replace
                 :to="`grade/${item.id}`"
-                :disabled="item.grade !== null"
+                :disabled="item.grade !== null || !item.completed"
                 color="primary"
                 text
                 outlined
@@ -42,6 +42,7 @@
 <script>
   import { ATTEMPTS_FOR_QUIZ } from '~/utils/queries'
   export default {
+    layout: "teacher",
     async asyncData({ params, $axios }) {
       const attempts = await $axios
         .post('/graphql', {

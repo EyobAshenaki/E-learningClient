@@ -7,7 +7,7 @@
             Quizzes for {{ course.name }}
             <span class="text-h5 text--lighten-4">({{ course.code }})</span>
           </p>
-          <v-btn to="addQuiz" replace
+          <v-btn v-if="courseOwner" to="addQuiz" replace
             >Add Quiz <v-icon color="orange">mdi-plus</v-icon></v-btn
           >
         </v-card-text>
@@ -25,8 +25,10 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
   import { COURSE, QUIZZES_FOR_COURSE } from '~/utils/queries'
   export default {
+    layout: 'teacher',
     async asyncData({ params, $axios }) {
       const quizzes = await $axios
         .post('/graphql', {
@@ -41,6 +43,9 @@
         })
         .then(({ data }) => data.data.course)
       return { quizzes, course }
+    },
+    computed: {
+      ...mapGetters({courseOwner: 'auth/isCourseOwner'})
     },
     methods: {
       updateQuizzes(id) {

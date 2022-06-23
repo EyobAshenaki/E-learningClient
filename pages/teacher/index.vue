@@ -4,3 +4,9 @@
     <course-list class="mt-9" />
   </div>
 </template>
+
+<script>
+export default {
+  layout: 'teacher'
+}
+</script>

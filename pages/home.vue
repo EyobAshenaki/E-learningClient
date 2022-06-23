@@ -13,6 +13,8 @@
         return redirect('/courseManager')
       } else if (store.getters['auth/isDepartmentAdmin']) {
         return redirect('/departmentAdministrator')
+      } else if (store.getters['auth/isTeacher']) {
+        return redirect('/teacher')
       }
     },
   }
