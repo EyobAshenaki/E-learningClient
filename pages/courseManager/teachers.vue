@@ -91,94 +91,94 @@
 </template>
 
 <script>
-export default {
-  layout: 'courseManager',
-  data() {
-    return {
-      teachers: [],
-    }
-  },
-
-  created() {
-    this.initialize()
-  },
-
-  methods: {
-    async initialize() {
-      this.teachers = await this.getTeachers()
-    },
-
-    getRoleName(role) {
-      const tempRole = role.split(' ')
-      return tempRole.length > 1
-        ? `${tempRole[0].toUpperCase()}_${tempRole[1].toUpperCase()}`
-        : `${tempRole[0].toUpperCase()}`
-    },
-
-    async getUsersWithRole(role) {
-      const query = `query users($filter: UserFilter) {
-                      users(filter: $filter) {
-                        id
-                        firstName
-                        middleName
-                        lastName
-                        email
-                        roles {
-                          id
-                          name
-                        }
-                        department{
-                          name
-                        }
-                        attendingClass {
-                          id
-                          year
-                          section
-                        }
-                        teachingCourses {
-                          id
-                          name
-                        }
-                      }
-                    }`
-
-      const variables = {
-        filter: {
-          roleName: this.getRoleName(role),
-        },
+  export default {
+    layout: 'courseManager',
+    data() {
+      return {
+        teachers: [],
       }
-
-      const userResponse = await this.$axios.post('/graphql', {
-        query,
-        variables,
-      })
-
-      return userResponse.data.data.users
     },
 
-    async getTeachers() {
-      const roles = ['Teacher', 'Course Owner', 'Course Teacher']
-      const teachers = []
+    created() {
+      this.initialize()
+    },
 
-      for (const role of roles) {
-        const users = await this.getUsersWithRole(role)
+    methods: {
+      async initialize() {
+        this.teachers = await this.getTeachers()
+      },
 
-        if (users === null) break
+      getRoleName(role) {
+        const tempRole = role.split(' ')
+        return tempRole.length > 1
+          ? `${tempRole[0].toUpperCase()}_${tempRole[1].toUpperCase()}`
+          : `${tempRole[0].toUpperCase()}`
+      },
 
-        let duplicateFlag = false
-        for (const user of users) {
-          for (const teacher of teachers) {
-            if (user.id === teacher.id) {
-              duplicateFlag = true
-              break
-            }
-          }
-          if (!duplicateFlag) teachers.push(user)
+      async getUsersWithRole(role) {
+        const query = `query users($filter: UserFilter) {
+                            users(filter: $filter) {
+                              id
+                              firstName
+                              middleName
+                              lastName
+                              email
+                              roles {
+                                id
+                                name
+                              }
+                              department{
+                                name
+                              }
+                              attendingClass {
+                                id
+                                year
+                                section
+                              }
+                              teachingCourses {
+                                id
+                                name
+                              }
+                            }
+                          }`
+
+        const variables = {
+          filter: {
+            roleName: this.getRoleName(role),
+          },
         }
-      }
 
-      return teachers
+        const userResponse = await this.$axios.post('/graphql', {
+          query,
+          variables,
+        })
+
+        return userResponse.data.data.users
+      },
+
+      async getTeachers() {
+        const roles = ['Teacher', 'Course Owner', 'Course Teacher']
+        const teachers = []
+
+        for (const role of roles) {
+          const users = await this.getUsersWithRole(role)
+
+          if (users === null) break
+
+          let duplicateFlag = false
+          for (const user of users) {
+            for (const teacher of teachers) {
+              if (user.id === teacher.id) {
+                duplicateFlag = true
+                break
+              }
+            }
+            if (!duplicateFlag) teachers.push(user)
+          }
+        }
+
+        return teachers
+      },
     },
-  },
-}
+  }
 </script>

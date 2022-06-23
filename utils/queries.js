@@ -23,11 +23,13 @@ function usersQuery(rolenameFilter) {
 export const ALL_STUDENTS = usersQuery('STUDENT')
 export const ALL_TEACHERS = usersQuery('TEACHER')
 export const ALL_COURSE_MANAGERS = usersQuery('COURSE_MANAGER')
+export const ALL_COURSE_TEACHERS = usersQuery('COURSE_TEACHER')
+export const ALL_COURSE_OWNERS = usersQuery('COURSE_OWNER')
 export const ALL_USERS = usersQuery(null)
 
 export const REMOVE_USER = `#graphql
   mutation ($userId: ID!) {
-    removeUser (id: $userId)
+    removeUser (id: $userId) { firstName }
   }
 `
 
@@ -128,6 +130,187 @@ export const OWNED_COURSES = `#graphql
         code
         name
       }
+    }
+  }
+`
+export const ALL_COURSES = `#graphql
+  query courses {
+    courses {
+      id
+      name
+      code
+      description
+      overview
+      creditHour
+      chapters {
+        id
+        title
+        sequenceNumber
+      }
+    }
+  }
+`
+
+export const ALL_DEPARTMENTS = `#graphql
+  query departments {
+    departments {
+      id
+      name
+    }
+  }
+`
+export const ACCOUNT_COUNTERS = `#graphql
+  query {
+    accountCounters {
+      allUsers
+      students
+      teachers
+    }
+  }
+`
+
+export const DEPARTMENT_FOR_DEPARTMENT_ADMINISTRATOR = `#graphql
+  query user ($id: ID!) {
+    user (id: $id) {
+      department {
+        name
+        ownedCourses {
+          id
+          code
+          name
+          creditHour
+        }
+        classes {
+          id
+          year
+          section
+          students {
+            id
+          }
+          attendingCourses {
+            id
+            name
+            code
+            creditHour
+          }
+        }
+      }
+    }
+  }
+
+`
+
+export const QUIZZES_FOR_COURSE = `#graphql
+  query ($id: ID!){
+    quizzesForCourse(courseId: $id) {
+      id
+      title
+      start
+      description
+      end
+      duration
+      attempts {
+        id
+      }
+    }
+  }
+`
+
+export const COURSE = `#graphql
+  query ($id: ID!) {
+    course (id: $id) {
+      id
+      name
+      code
+    }
+  }
+`
+
+export const DELETE_QUIZ = `#graphql 
+  mutation ($id: ID!) {
+    deleteQuiz (quizId: $id) {
+      title
+    }
+  }
+`
+
+export const ATTEMPTS_FOR_QUIZ = `#graphql
+  query ($id: ID!){
+	attemptsForQuiz(quizId: $id) {
+		id
+		completed
+		grade {
+			score
+		}
+    user {
+      firstName
+      middleName
+      lastName
+    }
+	}
+}
+`
+export const ATTEMPT = `#graphql
+  query ($id: ID!){
+    attempt(id: $id) {
+      questions {
+        id
+        answer
+        question {
+          id
+          questionType
+        }
+        subQuestions {
+          number
+          answer
+        }
+      }
+      user {
+        firstName
+        middleName
+        lastName
+      }
+    }
+  }
+`
+
+export const QUESTIONS_FOR_QUIZ = `#graphql
+  query ($id: ID!) {
+    questionsForQuiz(quizId: $id) {
+      id
+      text
+      number
+      answer
+      questionType
+      subQuestions {
+        id
+        number
+        answer
+      }
+      choices {
+        id
+        key
+        text
+      }
+    }
+  }
+`
+
+export const QUIZ = `#graphql
+  query ($id:ID!) {
+    quiz (id: $id) {
+      id
+      maxScore
+    }
+  }
+`
+
+export const GRADE_ATTEMPT = `#graphql
+  mutation ($attemptId: ID!, $markerId: ID!, $score: Float!) {
+    gradeAttempt(
+      input: { attemptId: $attemptId, markerId: $markerId, score: $score }
+    ) {
+      score
     }
   }
 `

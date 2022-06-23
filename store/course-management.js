@@ -7,6 +7,17 @@ export const state = () => ({
     documentDisplayName: null,
     storedFileName: null,
   },
+  assignmentDefinitions: [],
+  submissionToEvaluate: {
+    id: null,
+    totalScore: null,
+    submissionDate: null,
+    submissionFile: null,
+    submittedBy: null,
+    values: [],
+  },
+  criteria: [],
+  criteriaValues: [],
 })
 
 export const getters = {
@@ -36,6 +47,18 @@ export const getters = {
   getCourseDocument(state) {
     return state.courseDocument
   },
+  getAssignmentDefinitions(state) {
+    return state.assignmentDefinitions
+  },
+  getSubmissionToEvaluate(state) {
+    return state.submissionToEvaluate
+  },
+  getCriteria(state) {
+    return state.criteria
+  },
+  getCriteriaValues(state) {
+    return state.criteriaValues
+  },
 }
 
 export const mutations = {
@@ -50,6 +73,24 @@ export const mutations = {
   },
   pushCourseDocument(state, courseDocument) {
     state.courseDocuments.push(courseDocument)
+  },
+  setAssignmentDefinitions(state, assignmentDefinitions) {
+    state.assignmentDefinitions = assignmentDefinitions
+  },
+  setSubmissionToEvaluate(state, submissionToEvaluate) {
+    state.submissionToEvaluate = submissionToEvaluate
+  },
+  setCriteria(state, criteria) {
+    state.criteria = criteria
+  },
+  setCriteriaValues(state, criteriaValues) {
+    state.criteriaValues = criteriaValues
+  },
+  pushCriterion(state, criterion) {
+    state.criteria.push(criterion)
+  },
+  pushCriterionValue(state, criterionValue) {
+    state.criteriaValues.push(criterionValue)
   },
 }
 
@@ -125,7 +166,6 @@ export const actions = {
     formData.append('operations', query.operations)
     formData.append('map', documentFile ? query.map : '{}')
     formData.append('0', documentFile ?? null)
-    console.log(formData.getAll('map'))
 
     return await this.$axios.post('/graphql', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
@@ -136,7 +176,191 @@ export const actions = {
     const variables = { id: documentId }
     const deletedRes = await this.$axios.post('/graphql', { query, variables })
     const deleted = deletedRes.data?.data?.removeCourseDocument
-    commit('deleteCourseDocument', documentId)
     return deleted
+  },
+  async fetchAssignments({ commit }, courseId) {
+    const query = `query assignmentDefinitions($courseId: ID!) {
+      assignmentDefinitions(courseId: $courseId) {
+        id
+        created_at
+        name
+        submissionDeadline
+        maximumScore
+        isCriteriaBased
+        instructionsFile
+        course {students{id firstName middleName lastName}}
+        criteria { id title weight }
+        submissions {
+          id
+          submissionDate
+          submissionFile
+          totalScore
+          submittedBy {
+            firstName
+            middleName
+            lastName
+          }
+        }
+      }
+    }`
+    const variables = {
+      courseId,
+    }
+    const assignmentsRes = await this.$axios.post('/graphql', {
+      query,
+      variables,
+    })
+    const assignments = assignmentsRes.data.data.assignmentDefinitions
+    commit('setAssignmentDefinitions', assignments)
+  },
+  async evaluateNormalAssignment({ commit }, { submissionId, totalScore }) {
+    const query = `mutation gradeNormalAssignment($id: ID!, $totalScore: Float) {
+                      evaluation: gradeNormalSubmission(id: $id, totalScore: $totalScore) {
+                        submissionDate
+                        totalScore
+                        submissionFile
+                      }
+                    }`
+    const variables = { id: submissionId, totalScore }
+    const evaluationRes = await this.$axios.post('/graphql', {
+      query,
+      variables,
+    })
+    const { evaluation } = evaluationRes?.data?.data
+    return evaluation
+  },
+  async createAssignmentDefinition(
+    { commit },
+    {
+      courseId,
+      name,
+      maximumScore,
+      isCriteriaBased,
+      submissionDeadline,
+      instructionsFile,
+      criteria,
+    }
+  ) {
+    const preQuery = (
+      name,
+      submissionDeadline,
+      isCriteriaBased,
+      maximumScore,
+      courseId
+    ) => ({
+      operations: `{"query": "mutation create_assignment($submissionDeadline:Date! $maximumScore:Float! $isCriteriaBased:Boolean $file:Upload! $courseId:ID! $name:String!){newDefinition:createAssignmentDefinition(createAssignmentDefinitionInput:{submissionDeadline:$submissionDeadline maximumScore:$maximumScore isCriteriaBased:$isCriteriaBased instructionsFile:$file courseId:$courseId name:$name}){id name submissionDeadline maximumScore isCriteriaBased instructionsFile}}","variables": {"name":"${name}","submissionDeadline":"${submissionDeadline}","isCriteriaBased":${isCriteriaBased},"maximumScore":${maximumScore},"courseId":"${courseId}","file":null},"operationName":"create_assignment"}`,
+      map: instructionsFile ? `{"0": ["variables.file"]}` : `{}`,
+    })
+    const query = preQuery(
+      name,
+      submissionDeadline,
+      isCriteriaBased,
+      maximumScore,
+      courseId
+    )
+    const formData = new FormData()
+    formData.append('operations', query.operations)
+    formData.append('map', query.map)
+    formData.append('0', instructionsFile ?? null)
+    const assignmentDefinitionRes = await this.$axios.post(
+      '/graphql',
+      formData,
+      {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      }
+    )
+    const { data } = assignmentDefinitionRes
+    if (data.data && isCriteriaBased) {
+      const definitionId = data.data.newDefinition.id
+      criteria.forEach(async (criterion) => {
+        const { title, weight } = criterion
+        const query = `mutation createAssignmentCriterion($title: String! $weight: Int! $definitionId: ID!){
+          newCriterion: createAssignmentCriterion(createAssignmentCriterionInput: {
+            title: $title
+            weight: $weight
+            definitionId: $definitionId}){
+            id
+            title
+            weight
+          }
+        }`
+        const variables = { title, weight: parseInt(weight), definitionId }
+        const assignmentCriterionRes = await this.$axios.post('/graphql', {
+          query,
+          variables,
+        })
+        const { data } = assignmentCriterionRes
+        if (data.data) {
+          return data.data.newCriterion
+        }
+      })
+    }
+  },
+  async fetchSubmissionToEvaluate({ commit }, submissionId) {
+    const query = `query submission($id: ID!) {
+      submission:assignmentSubmission(id: $id) {
+        id
+        submissionDate
+        totalScore
+        submittedBy {
+          firstName
+          middleName
+          lastName
+        }
+        definition {
+          id
+          name
+          maximumScore
+          criteria {
+            id
+            title
+            weight
+          }
+        }
+        values {
+          id
+          score
+        }
+      }
+    }`
+    const variables = { id: submissionId }
+    const submissionRes = await this.$axios.post('/graphql', {
+      query,
+      variables,
+    })
+    if (submissionRes?.data?.data)
+      commit('setSubmissionToEvaluate', submissionRes?.data?.data?.submission)
+  },
+  async evaluateCriteriaBasedAssignment({ commit }, { values }) {
+    values.forEach(async (value) => {
+      const query = `mutation criterionValue($score: Float! $criterionId: ID! $submissionId: ID!){
+          createCriterionValue(createCriterionValueInput:{
+            score: $score
+            criterionId: $criterionId
+            submissionId: $submissionId
+          }){
+            id
+            score
+          }
+        }`
+      const variables = { ...value }
+      await this.$axios.post('/graphql', {
+        query,
+        variables,
+      })
+    })
+    const query = `
+    mutation gradeAssignment($id: ID!, $totalScore: Float) {
+      evaluation: gradeSubmission(id: $id, totalScore: $totalScore) {
+        submissionDate
+        totalScore
+        submissionFile
+      }
+    }`
+    const variables = { id: values[0].submissionId, totalScore: 0 }
+    await this.$axios.post('/graphql', {
+      query,
+      variables,
+    })
   },
 }

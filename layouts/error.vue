@@ -1,13 +1,19 @@
 <template>
-  <v-app dark>
-    <h1 v-if="error.statusCode === 404">
-      {{ pageNotFound }}
-    </h1>
-    <h1 v-else>
-      {{ otherError }}
-    </h1>
-    <NuxtLink to="/"> Home page </NuxtLink>
-  </v-app>
+      <v-row justify="center" align="center">
+        <v-col cols="10" md="4">
+          <v-card class="text-center pa-4">
+            <h1 class="text-h1 font-weight-black text-lighten-4">{{error.statusCode}}</h1>
+            <h2 class="text-h2 font-weight bold text-ligthen-2">{{text}}</h2>
+            <v-card-text v-if="error.message">
+              <p class="text-h6">{{error.message}}</p>
+            </v-card-text>
+            <v-card-actions>
+              <v-btn nuxt text class="link" replace to="/"> <h3 class="text-h5 text-ligthen-2">{{targetPath.text}}<v-icon class="right-icon">mdi-chevron-right</v-icon></h3></v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-col>
+      </v-row>
+    </v-container>
 </template>
 
 <script>
@@ -27,17 +33,39 @@
       }
     },
     head() {
-      const title =
-        this.error.statusCode === 404 ? this.pageNotFound : this.otherError
       return {
-        title,
+        title: this.text,
       }
+    },
+    computed: {
+      text() {
+        switch (this.error.statusCode) {
+          case 404:
+            return '404 Not Found'
+          case 403:
+            return 'Forbidden'
+          case 500:
+            return 'Internal Server Error'
+          default:
+            return 'Unknown Error'
+        }
+      },
+      targetPath() {
+        return this.$store.getters['auth/isLoggedIn']
+          ? { route: '/', text: 'Return Home' }
+          : { route: '/', text: 'Back to Main Page' }
+      },
     },
   }
 </script>
 
-<style scoped>
-  h1 {
-    font-size: 20px;
+<style  lang="scss" scoped>
+  .link {
+    display: block;
+    text-decoration: none;
+    .right-icon {
+      color: inherit;
+      vertical-align: center;
+    }
   }
 </style>

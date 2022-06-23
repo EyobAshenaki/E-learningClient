@@ -18,9 +18,9 @@ export default function () {
       ],
       link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
     },
-
+    server: { port: process.env.PORT || '3000' },
     // Global CSS: https://go.nuxtjs.dev/config-css
-    css: ['~/assets/styles/main.scss'],
+    css: ['~/assets/styles/main.scss', '@mdi/font/css/materialdesignicons.css'],
 
     // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
     plugins: ['~/plugins/vuex-persist', '~/plugins/toast'],
@@ -60,6 +60,12 @@ export default function () {
 
     // Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify
     vuetify: {
+      icons: {
+        iconfont: 'mdi'
+      },
+      defaultAssets: {
+        icons: false
+      },
       customVariables: ['~/assets/styles/variables.scss'],
       treeshake: true,
       theme: {
@@ -89,7 +95,7 @@ export default function () {
       minifyTheme,
     },
     publicRuntimeConfig: {
-      baseUrl: process.env.BASE_URL
+      baseUrl: process.env.BASE_URL,
     },
     // Build Configuration: https://go.nuxtjs.dev/config-build
     build: {

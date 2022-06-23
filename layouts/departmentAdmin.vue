@@ -1,24 +1,19 @@
 <template>
-  <v-app>
-    <department-admin-side-bar />
-    <v-main class="grey lighten-4">
-      <v-container>
-        <Nuxt />
-      </v-container>
-    </v-main>
-  </v-app>
+  <DefaultLayout>
+    <template #nav>
+      <AuthNav />
+    </template>
+    <template #sideNav>
+      <DepartmentAdminSideBar />
+    </template>
+  </DefaultLayout>
 </template>
 
 <script>
-  import DepartmentAdminSideBar from '@/components/DepartmentAdminSideBar.vue'
+  import DefaultLayout from './default.vue'
   export default {
-    name: 'DepartmentAdminLayout',
-    components: {
-      DepartmentAdminSideBar,
-    },
-
-    data() {
-      return {}
-    },
+    name: 'departmentAdmin',
+    components: { DefaultLayout },
+    middleware: ['authenticated', 'departmentAdmin'],
   }
 </script>

@@ -79,15 +79,20 @@
           </v-col>
           <v-col cols="3">
             <v-btn text="" outlined="" @click="addSubQuestion"
-              >Add Sub-Question</v-btn
+              >Add Sub-Question<v-icon>mdi-plus</v-icon></v-btn
             >
-            <v-icon>mdi-plus</v-icon>
           </v-col>
           <v-col
             v-for="subQuestion in subQuestions"
             :key="subQuestion.number"
             cols="8"
           >
+            <p>
+              {{ subQuestion.number }} :
+              <span style="background-color: #f4f4f4">{{
+                subQuestion.answer
+              }}</span>
+            </p>
           </v-col>
         </v-row>
       </v-form>
@@ -187,7 +192,7 @@
           type: this.type,
           choices: this.choices,
           subQuestions: this.subQuestions,
-          answer: this.answer
+          answer: this.answer,
         })
       },
       addSubQuestion() {

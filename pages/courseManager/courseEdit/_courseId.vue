@@ -422,40 +422,40 @@
     methods: {
       async initialize() {
         const query = `query course($id: ID!) {
-                      course(id: $id) {
-                        id
-                        code
-                        name
-                        description
-                        overview
-                        creditHour
-                        chapters {
-                          id
-                          title
-                          sequenceNumber
-                        }
-                        teachers {
-                          id
-                          firstName
-                          middleName
-                          lastName
-                          department {
-                            id
-                            name
-                          }
-                        }
-                        owner {
-                          id
-                          firstName
-                          middleName
-                          lastName
-                          department {
-                            id
-                            name
-                          }
-                        }
-                      }
-                    }`
+                            course(id: $id) {
+                              id
+                              code
+                              name
+                              description
+                              overview
+                              creditHour
+                              chapters {
+                                id
+                                title
+                                sequenceNumber
+                              }
+                              teachers {
+                                id
+                                firstName
+                                middleName
+                                lastName
+                                department {
+                                  id
+                                  name
+                                }
+                              }
+                              owner {
+                                id
+                                firstName
+                                middleName
+                                lastName
+                                department {
+                                  id
+                                  name
+                                }
+                              }
+                            }
+                          }`
 
         const variables = { id: this.courseId }
 
@@ -473,31 +473,31 @@
       async editCourse() {
         this.editLoading = true
         const query = `mutation updateCourse(
-                      $id: ID!
-                      $code: String
-                      $name: String
-                      $description: String
-                      $overview: String
-                      $creditHour: Int
-                    ) {
-                      updateCourse(
-                        updateCourseInput: {
-                          id: $id
-                          code: $code
-                          name: $name
-                          description: $description
-                          overview: $overview
-                          creditHour: $creditHour
-                        }
-                      ) {
-                        id
-                        name
-                        code
-                        overview
-                        description
-                        creditHour
-                      }
-                    }`
+                            $id: ID!
+                            $code: String
+                            $name: String
+                            $description: String
+                            $overview: String
+                            $creditHour: Int
+                          ) {
+                            updateCourse(
+                              updateCourseInput: {
+                                id: $id
+                                code: $code
+                                name: $name
+                                description: $description
+                                overview: $overview
+                                creditHour: $creditHour
+                              }
+                            ) {
+                              id
+                              name
+                              code
+                              overview
+                              description
+                              creditHour
+                            }
+                          }`
 
         const variables = {
           id: this.courseId,
@@ -525,20 +525,13 @@
           this.courseDeleteDialog = false
           return null
         }
-
-        this.$nextTick(() => {
-          this.courseDeleteDialog = false
-          this.$router.push({
-            name: 'courseManager-id',
-            params: { id: this.$nuxt.context.params.userId },
-          })
-        })
+        this.$router.back()
       },
 
       async deleteCourseConfirm() {
         const query = `mutation removeCourse($id: ID!) {
-                      removeCourse(id: $id)
-                    }`
+                            removeCourse(id: $id)
+                          }`
         const variables = {
           id: this.courseId,
         }
@@ -585,18 +578,18 @@
         if (this.editedIndex !== -1) {
           // Edit Chapter with an id of this.editedIndex
           const updateChapterQuery = `mutation updateChapter($id: ID!, $title: String, $sequenceNumber: Int) {
-                                      updateChapter(
-                                        updateChapterInput: {
-                                          id: $id
-                                          title: $title
-                                          sequenceNumber: $sequenceNumber
-                                        }
-                                      ) {
-                                        id
-                                        title
-                                        sequenceNumber
-                                      }
-                                    }`
+                                            updateChapter(
+                                              updateChapterInput: {
+                                                id: $id
+                                                title: $title
+                                                sequenceNumber: $sequenceNumber
+                                              }
+                                            ) {
+                                              id
+                                              title
+                                              sequenceNumber
+                                            }
+                                          }`
           const updateChapterVariables = {
             id: this.editedIndex,
             title: this.editedChapter.title,
@@ -610,18 +603,18 @@
         } else {
           // Create a new Chapter
           const createChapterQuery = `mutation createChapter($title: String!, $sequenceNumber: Int!, $courseId: ID!) {
-                                      createChapter(
-                                        createChapterInput: {
-                                          title: $title
-                                          sequenceNumber: $sequenceNumber
-                                          courseId: $courseId
-                                        }
-                                      ) {
-                                        id
-                                        title
-                                        sequenceNumber
-                                      }
-                                    }`
+                                            createChapter(
+                                              createChapterInput: {
+                                                title: $title
+                                                sequenceNumber: $sequenceNumber
+                                                courseId: $courseId
+                                              }
+                                            ) {
+                                              id
+                                              title
+                                              sequenceNumber
+                                            }
+                                          }`
 
           const createChapterVariables = {
             title: this.editedChapter.title,
@@ -651,8 +644,8 @@
 
       async confirmDeleteChapter() {
         const query = `mutation removeChapter($id: ID!) {
-                      removeChapter(id: $id)
-                    }`
+                            removeChapter(id: $id)
+                          }`
 
         const variables = {
           id: this.editedIndex,
@@ -671,23 +664,23 @@
 
       async getUsersWithRole(role) {
         const query = `query users($filter: UserFilter) {
-                      users(filter: $filter) {
-                        id
-                        firstName
-                        middleName
-                        lastName
-                        email
-                        email
-                        department{
-                          name
-                        }
-                        attendingClass {
-                          id
-                          year
-                          section
-                        }
-                      }
-                    }`
+                            users(filter: $filter) {
+                              id
+                              firstName
+                              middleName
+                              lastName
+                              email
+                              email
+                              department{
+                                name
+                              }
+                              attendingClass {
+                                id
+                                year
+                                section
+                              }
+                            }
+                          }`
 
         const variables = {
           filter: {
@@ -759,8 +752,8 @@
       async removeCourseTeacher(teacherId, teacherType) {
         if (teacherType === 'teacher') {
           const query = `mutation unassignTeacherFromCourse($courseId: ID!, $teacherId: ID!) {
-                        unassignTeacherFromCourse(courseId: $courseId, teacherId: $teacherId)
-                      }`
+                              unassignTeacherFromCourse(courseId: $courseId, teacherId: $teacherId)
+                            }`
 
           const variables = {
             teacherId,
@@ -780,14 +773,14 @@
           if (unassignedTeacher) {
             // Then revoke 'teacher' Role from assigned user
             const revokeUserRoleQuery = `mutation revokeUserRole ($userId: ID! $roleName: RoleName!) {
-                                      revokeUserRole (userId: $userId roleName: $roleName) {
-                                        id
-                                        roles {
-                                          id
-                                          name
-                                        }
-                                      }
-                                    }`
+                                            revokeUserRole (userId: $userId roleName: $roleName) {
+                                              id
+                                              roles {
+                                                id
+                                                name
+                                              }
+                                            }
+                                          }`
 
             const revokeUserRoleVariables = {
               userId: this.selectedTeacher.id,
@@ -808,8 +801,8 @@
           }
         } else if (teacherType === 'owner') {
           const query = `mutation unassignOwnerFromCourse($courseId: ID!, $ownerId: ID!) {
-                        unassignOwnerFromCourse(courseId: $courseId, ownerId: $ownerId)
-                      }`
+                              unassignOwnerFromCourse(courseId: $courseId, ownerId: $ownerId)
+                            }`
 
           const variables = {
             ownerId: teacherId,
@@ -841,12 +834,12 @@
 
       async doesUserContainRole(userId, roleName) {
         const query = `query user($id: ID!) {
-                        user(id: $id) {
-                          roles {
-                            name
-                          }
-                        }
-                      }`
+                              user(id: $id) {
+                                roles {
+                                  name
+                                }
+                              }
+                            }`
 
         const variables = {
           id: userId,
@@ -880,14 +873,14 @@
           if (!doesContain) {
             // Change role to selectedTeacherType using Update user
             const changeUserRoleQuery = `mutation updateUser ($id: ID! $roleName: RoleName) {
-                                        updateUser (updateUserInput: {id: $id roleName: $roleName}) {
-                                          id
-                                          roles {
-                                            id
-                                            name
-                                          }
-                                        }
-                                      }`
+                                              updateUser (updateUserInput: {id: $id roleName: $roleName}) {
+                                                id
+                                                roles {
+                                                  id
+                                                  name
+                                                }
+                                              }
+                                            }`
             const changeUserRoleVariables = {
               id: this.selectedTeacher.id,
               roleName: assignedRole,
@@ -900,8 +893,8 @@
           }
 
           const query = `mutation assignTeacherToCourse ($courseId: ID! $teacherId: ID!) {
-                        assignTeacherToCourse (courseId: $courseId teacherId: $teacherId)
-                      }`
+                              assignTeacherToCourse (courseId: $courseId teacherId: $teacherId)
+                            }`
 
           const variables = {
             teacherId: this.selectedTeacher.id,
@@ -919,8 +912,8 @@
           console.log('assign teacher ', isTeacherAssigned)
         } else if (assignedRole === 'COURSE_OWNER') {
           const query = `mutation assignOwnerToCourse($courseId: ID!, $ownerId: ID!) {
-                        assignOwnerToCourse(courseId: $courseId, ownerId: $ownerId)
-                      }`
+                              assignOwnerToCourse(courseId: $courseId, ownerId: $ownerId)
+                            }`
 
           const variables = {
             ownerId: this.selectedTeacher.id,

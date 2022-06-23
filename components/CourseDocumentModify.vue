@@ -1,6 +1,10 @@
 <template>
-  <div >
-    <v-form v-if="!$fetchState.pending" ref="documentUploadForm" lazy-validation>
+  <div>
+    <v-form
+      v-if="!$fetchState.pending"
+      ref="documentUploadForm"
+      lazy-validation
+    >
       <v-card class="pa-6" min-width="850px">
         <h1 class="mb-3">
           {{ isEditMode ? 'Edit' : 'Create' }} document
@@ -13,8 +17,11 @@
             name="documentType"
             label="Document Type"
             :items="[
+              { text: 'Course Outline', value: 'OUTLINE' },
               { text: 'Textbook', value: 'TEXTBOOK' },
+              { text: 'Study Module', value: 'STUDY_MODULE' },
               { text: 'Reference Book', value: 'REFERENCE' },
+              { text: 'Practice Worksheet', value: 'PRACTICE_WORKSHEET' },
               { text: 'Powerpoint Slide', value: 'SLIDE' },
               { text: 'Other', value: 'OTHER' },
             ]"
@@ -94,9 +101,9 @@
       isEditMode() {
         return this.modifyMode === 'UPDATE/EDIT'
       },
-      isFileUploadInvisible(){
+      isFileUploadInvisible() {
         return this.isEditMode && !this.replaceFile
-      }
+      },
     },
     methods: {
       resetFileForReplace() {
@@ -105,8 +112,7 @@
       async save() {
         if (!this.$refs.documentUploadForm.validate()) return
         const { courseId } = this.$route.params
-        const { documentType, documentDisplayName, documentFile } =
-          this
+        const { documentType, documentDisplayName, documentFile } = this
         const preQuery = (documentType, documentDisplayName, courseId) => {
           return {
             operations: `{"query":"mutation createCourseDOC($documentType:String!,$documentDisplayName:String!,$file:Upload!,$courseId:ID!){ccd:createCourseDocument(createCourseDocumentInput:{documentType:$documentType,documentDisplayName:$documentDisplayName,fileUpload:$file,courseId:$courseId}){id,documentType,documentDisplayName,storedFileName}}","variables":{"documentType":"${documentType}","documentDisplayName":"${documentDisplayName}","courseId":"${courseId}","file":null},"operationName":"createCourseDOC"}`,
@@ -131,8 +137,8 @@
             data.data.ccd
           )
           this.$refs.documentUploadForm.reset()
-          let {path} = this.$route
-          path = path.substring(0,path.lastIndexOf('/'))
+          let { path } = this.$route
+          path = path.substring(0, path.lastIndexOf('/'))
           this.$router.push(path)
         }
       },
@@ -163,13 +169,13 @@
           this.$toast.success(
             `Update ${this.replaceFile ? 'and Upload' : ''} Successful.`
           )
-            this.$store.commit(
-              'course-management/pushCourseDocument',
-              data.data.ucd
-            )
+          this.$store.commit(
+            'course-management/pushCourseDocument',
+            data.data.ucd
+          )
           this.$refs.documentUploadForm.reset()
-          let {path} = this.$route
-          path = path.substring(0,path.lastIndexOf('/'))
+          let { path } = this.$route
+          path = path.substring(0, path.lastIndexOf('/'))
           this.$router.push(path)
         }
       },

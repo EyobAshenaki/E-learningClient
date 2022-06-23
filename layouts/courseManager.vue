@@ -1,19 +1,21 @@
 <template>
-  <v-app>
-    <course-manager-side-bar />
-    <v-main class="grey lighten-4">
-      <v-container>
-        <Nuxt />
-      </v-container>
-    </v-main>
-  </v-app>
+  <DefaultLayout>
+    <template #nav>
+      <AuthNav />
+    </template>
+    <template #sideNav>
+      <CourseManagerSideBar />
+    </template>
+  </DefaultLayout>
 </template>
 
 <script>
+  import DefaultLayout from './default.vue'
   import CourseManagerSideBar from '~/components/CourseManagerSideBar.vue'
   export default {
     name: 'NavLayout',
-    components: { CourseManagerSideBar },
+    components: { CourseManagerSideBar, DefaultLayout },
+    middleware: ['authenticated', 'courseManager'],
     data() {
       return {}
     },
