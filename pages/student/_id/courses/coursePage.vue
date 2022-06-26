@@ -104,6 +104,9 @@
             </v-expansion-panel>
           </v-expansion-panels>
         </v-col>
+        <v-col v-else cols="12">
+          <span class="text-h6">No Chapters Currently...</span>
+        </v-col>
       </v-row>
     </v-col>
 
@@ -113,7 +116,7 @@
         <v-col cols="12" class="">
           <span style="margin-left: 0.8em; font-size: 1.8em">Assignments</span>
         </v-col>
-        <v-col cols="12" class="pt-0 pb-2">
+        <v-col v-if="assignments.length" cols="12" class="pt-0 pb-2">
           <v-row
             v-for="assignment in assignments"
             :key="assignment.id"
@@ -141,6 +144,9 @@
             <v-divider></v-divider>
           </v-row>
         </v-col>
+        <v-col v-else cols="12">
+          <span class="text-h6">No Assignments Currently...</span>
+        </v-col>
       </v-row>
     </v-col>
 
@@ -150,14 +156,14 @@
 
     <!-- Quizzes Section -->
     <v-col cols="12" class="justify-center mt-6">
-      <v-row style="width: 100%; height: 47em; overflow: hidden">
+      <v-row style="width: 100%; max-height: 47em; overflow: hidden">
         <v-col cols="12" class="ml-10">
           <v-row>
             <v-col cols="10">
               <span style="margin-left: 0.8em; font-size: 1.8em">Quizzes</span>
             </v-col>
 
-            <v-col cols="2">
+            <v-col v-if="quizzes.length" cols="2">
               <v-btn
                 color="secondary"
                 text
@@ -167,16 +173,19 @@
                 }"
               >
                 View all
-              </v-btn></v-col
-            >
+              </v-btn>
+            </v-col>
           </v-row>
         </v-col>
-        <v-col cols="12" class="pt-0 pb-2 ml-5">
+        <v-col v-if="quizzes.length" cols="12" class="pt-0 pb-2 ml-5">
           <v-row>
             <v-col v-for="quiz in quizzes" :key="quiz.id" cols="4">
               <quiz-info-card :quiz="quiz" />
             </v-col>
           </v-row>
+        </v-col>
+        <v-col v-else cols="12" class="ml-15">
+          <span class="text-h6">No Quizzes Currently...</span>
         </v-col>
       </v-row>
     </v-col>
