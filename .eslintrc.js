@@ -14,5 +14,6 @@ module.exports = {
   rules: {
     'vue/multi-word-component-names': 'off',
     'vue/valid-v-slot': 'off',
+    'vue/component-definition-name-casing': [1],
   },
 }
