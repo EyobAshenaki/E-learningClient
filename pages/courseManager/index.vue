@@ -19,11 +19,7 @@
                   </v-col>
                   <v-col v-if="user" cols="11" class="py-0">
                     <p
-                      class="
-                        orange--text
-                        text--darken-4 text-h4 text-left
-                        font-weight-medium
-                      "
+                      class="orange--text text--darken-4 text-h4 text-left font-weight-medium"
                     >
                       {{ user.firstName }}
                     </p>
@@ -404,11 +400,6 @@
   } from '~/utils/queries'
   export default {
     layout: 'courseManager',
-    async fetch() {
-      this.courses = await this.initializeCourses()
-      this.teachers = await this.initializeTeachers()
-      this.departments = await this.initializeDepartments()
-    },
     data() {
       return {
         courses: [],
@@ -443,6 +434,11 @@
         selectedCourseId: null,
         assignTeacherDialog: false,
       }
+    },
+    async fetch() {
+      this.courses = await this.initializeCourses()
+      this.teachers = await this.initializeTeachers()
+      this.departments = await this.initializeDepartments()
     },
 
     computed: {
@@ -563,10 +559,7 @@
 
       deleteCourseClose(isCourseRemoved) {
         this.courseDialogDelete = false
-        this.$nextTick(() => {
-          this.newCourse = Object.assign({}, this.defaultCourse)
-          if (isCourseRemoved) this.initializeCourses()
-        })
+        if (isCourseRemoved) this.$fetch()
       },
 
       saveCourseClose() {
@@ -575,28 +568,65 @@
           this.newCourse = Object.assign({}, this.defaultCourse)
         })
       },
+
+      getRoleName(role) {
+        const tempRole = role.split(' ')
+        return tempRole.length > 1
+          ? `${tempRole[0].toUpperCase()}_${tempRole[1].toUpperCase()}`
+          : `${tempRole[0].toUpperCase()}`
+      },
+
+      async doesUserContainRole(userId, roleName) {
+        const query = `query user($id: ID!) {
+                              user(id: $id) {
+                                roles {
+                                  name
+                                }
+                              }
+                            }`
+
+        const variables = {
+          id: userId,
+        }
+
+        const userResponse = await this.$axios.post('/graphql', {
+          query,
+          variables,
+        })
+
+        const selectedTeacherRoles = userResponse.data.data.user.roles.map(
+          (role) => role.name
+        )
+
+        console.log(selectedTeacherRoles)
+
+        if (selectedTeacherRoles.includes(roleName)) return true
+
+        return false
+      },
+
       async saveCourse() {
         const query = `mutation createCourse(
-                                                    $code: String!
-                                                    $name: String!
-                                                    $description: String!
-                                                    $overview: String!
-                                                    $creditHour: Int!
-                                                    $departmentId: ID!
-                                                  ) {
-                                                    createCourse(
-                                                      createCourseInput: {
-                                                        code: $code
-                                                        name: $name
-                                                        description: $description
-                                                        overview: $overview
-                                                        creditHour: $creditHour
-                                                        departmentId: $departmentId
-                                                      }
-                                                    ) {
-                                                      id
-                                                    }
-                                                  }`
+                          $code: String!
+                          $name: String!
+                          $description: String!
+                          $overview: String!
+                          $creditHour: Int!
+                          $departmentId: ID!
+                        ) {
+                          createCourse(
+                            createCourseInput: {
+                              code: $code
+                              name: $name
+                              description: $description
+                              overview: $overview
+                              creditHour: $creditHour
+                              departmentId: $departmentId
+                            }
+                          ) {
+                            id
+                          }
+                        }`
 
         const variables = {
           code: this.newCourse.code,
@@ -617,42 +647,75 @@
       },
 
       async assignCourseTeacherConfirm() {
-        const query = `mutation assignUserToCourse ($courseId: ID! $userId: ID!) {
-                                                                                                                          assignUserToCourse (courseId: $courseId userId: $userId)
-                                                                                                                        }`
-        const variables = {
-          userId: this.selectedTeacher.id,
-          courseId: this.selectedCourseId,
-        }
-
-        const assignUserResponse = await this.$axios.post('/graphql', {
-          query,
-          variables,
-        })
-
         const assignedRole = this.getRoleName(this.selectedTeacherType)
 
-        if (assignUserResponse.data.data.assignUserToCourse === true) {
-          // Change role to selectedTeacherType using Update user
-          const changeUserRoleQuery = `mutation updateUser ($id: ID! $roleName: RoleName) {
-                                                                                                                                        updateUser (updateUserInput: {id: $id roleName: $roleName}) {
-                                                                                                                                          id
-                                                                                                                                          roles {
-                                                                                                                                            id
-                                                                                                                                            name
-                                                                                                                                          }
-                                                                                                                                        }
-                                                                                                                                      }`
-          const changeUserRoleVariables = {
-            id: this.selectedTeacher.id,
-            roleName: assignedRole,
+        if (assignedRole === 'COURSE_TEACHER') {
+          const doesContain = await this.doesUserContainRole(
+            this.selectedTeacher.id,
+            'COURSE_TEACHER'
+          )
+
+          if (!doesContain) {
+            // Change role to selectedTeacherType using Update user
+            const changeUserRoleQuery = `mutation updateUser ($id: ID! $roleName: RoleName) {
+                                              updateUser (updateUserInput: {id: $id roleName: $roleName}) {
+                                                id
+                                                roles {
+                                                  id
+                                                  name
+                                                }
+                                              }
+                                            }`
+            const changeUserRoleVariables = {
+              id: this.selectedTeacher.id,
+              roleName: assignedRole,
+            }
+
+            await this.$axios.post('/graphql', {
+              query: changeUserRoleQuery,
+              variables: changeUserRoleVariables,
+            })
           }
 
-          await this.$axios.post('/graphql', {
-            query: changeUserRoleQuery,
-            variables: changeUserRoleVariables,
+          const query = `mutation assignTeacherToCourse ($courseId: ID! $teacherId: ID!) {
+                              assignTeacherToCourse (courseId: $courseId teacherId: $teacherId)
+                            }`
+
+          const variables = {
+            teacherId: this.selectedTeacher.id,
+            courseId: this.selectedCourseId,
+          }
+
+          const assignTeacherResponse = await this.$axios.post('/graphql', {
+            query,
+            variables,
           })
+
+          const isTeacherAssigned =
+            assignTeacherResponse.data.data.assignTeacherToCourse
+
+          console.log('assign teacher ', isTeacherAssigned)
+        } else if (assignedRole === 'COURSE_OWNER') {
+          const query = `mutation assignOwnerToCourse($courseId: ID!, $ownerId: ID!) {
+                              assignOwnerToCourse(courseId: $courseId, ownerId: $ownerId)
+                            }`
+
+          const variables = {
+            ownerId: this.selectedTeacher.id,
+            courseId: this.selectedCourseId,
+          }
+
+          const assignOwnerResponse = await this.$axios.post('/graphql', {
+            query,
+            variables,
+          })
+
+          const isOwnerAssigned =
+            assignOwnerResponse.data.data.assignOwnerToCourse
+
+          console.log('assign owner ', isOwnerAssigned)
         }
+
         this.assignTeacherDialog = false
         this.$fetch()
       },
