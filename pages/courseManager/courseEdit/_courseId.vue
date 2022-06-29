@@ -467,7 +467,6 @@
         this.course = courseResponse.data.data.course
         this.teachers = courseResponse.data.data.course.teachers
         this.owner = courseResponse.data.data.course.owner
-        console.log(courseResponse)
       },
 
       async editCourse() {
@@ -749,7 +748,36 @@
           })
       },
 
+      async doesTeacherHasAnotherCourse(teacherId, courseId) {
+        const query = `query user ($id: ID!) {
+                        user (id: $id) {
+                          teachingCourses {
+                            id
+                            name
+                          }
+                        }
+                      }`
+
+        const variables = {
+          id: teacherId,
+        }
+
+        const userResponse = await this.$axios.post('/graphql', {
+          query,
+          variables,
+        })
+
+        const courses = userResponse.data.data.user.teachingCourses
+
+        return !!courses.filter((course) => course.id !== courseId)?.length
+      },
+
       async removeCourseTeacher(teacherId, teacherType) {
+        const hasAnotherCourse = await this.doesTeacherHasAnotherCourse(
+          teacherId,
+          this.courseId
+        )
+
         if (teacherType === 'teacher') {
           const query = `mutation unassignTeacherFromCourse($courseId: ID!, $teacherId: ID!) {
                               unassignTeacherFromCourse(courseId: $courseId, teacherId: $teacherId)
@@ -768,10 +796,8 @@
           const unassignedTeacher =
             unassignedTeacherResponse.data.data.unassignTeacherFromCourse
 
-          console.log('unassign teacher', unassignedTeacher)
-
-          if (unassignedTeacher) {
-            // Then revoke 'teacher' Role from assigned user
+          if (unassignedTeacher && !hasAnotherCourse) {
+            // Then revoke 'course teacher' Role from assigned user
             const revokeUserRoleQuery = `mutation revokeUserRole ($userId: ID! $roleName: RoleName!) {
                                             revokeUserRole (userId: $userId roleName: $roleName) {
                                               id
@@ -783,7 +809,7 @@
                                           }`
 
             const revokeUserRoleVariables = {
-              userId: this.selectedTeacher.id,
+              userId: teacherId,
               roleName: 'COURSE_TEACHER',
             }
 
